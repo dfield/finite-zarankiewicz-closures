@@ -41,7 +41,7 @@ Double-counting pairs $(T,j)$ with $T\subseteq E_j$ gives
 $$
 \sum_{j=1}^{23}\binom{d_j}{3}
 =\sum_{T\in\binom{[9]}3}\lambda_T
-\le2\binom93=168. \tag{1}
+\le2\binom93=168. \qquad\text{(1)}
 $$
 
 ## 3. A sharp one-column inequality
@@ -54,12 +54,9 @@ $$
 
 The ten possible values are
 
-$$
-\begin{array}{c|rrrrrrrrrr}
-d&0&1&2&3&4&5&6&7&8&9\\ \hline
-p(d)&20&14&8&3&0&0&4&13&28&50.
-\end{array}
-$$
+| $d$ | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 |
+|:---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| $p(d)$ | 20 | 14 | 8 | 3 | 0 | 0 | 4 | 13 | 28 | 50 |
 
 In particular, $p(d)\ge0$, equality occurs exactly at $d=4,5$, and the only positive values at most four occur at $d=3,6$.
 
@@ -74,13 +71,13 @@ Consequently,
 $$
 \sum_j\binom{d_j}{3}
 =6\sum_jd_j-20\cdot23+\sum_jp(d_j)
-=164+\sum_jp(d_j). \tag{2}
+=164+\sum_jp(d_j). \qquad\text{(2)}
 $$
 
 Combining (1) and (2) yields
 
 $$
-\sum_jp(d_j)\le4. \tag{3}
+\sum_jp(d_j)\le4. \qquad\text{(3)}
 $$
 
 The table for $p$, together with $\sum_j1=23$ and $\sum_jd_j=104$, leaves exactly three possible multisets of column degrees:
@@ -88,7 +85,7 @@ The table for $p$, together with $\sum_j1=23$ and $\sum_jd_j=104$, leaves exactl
 $$
 4^{11}5^{12},\qquad
 3^1 4^9 5^{13},\qquad
-4^{12}5^{10}6^1. \tag{4}
+4^{12}5^{10}6^1. \qquad\text{(4)}
 $$
 
 For completeness:
@@ -119,13 +116,13 @@ $$
 Each triple has three rows, so another double count gives
 
 $$
-\sum_{r=1}^9D_r=3D. \tag{5}
+\sum_{r=1}^9D_r=3D. \qquad\text{(5)}
 $$
 
 There are $\binom82=28$ row triples containing a fixed row $r$, each with capacity two. A column of degree $d_j$ that contains $r$ contributes $\binom{d_j-1}{2}$ incidences to those triples. Therefore
 
 $$
-D_r=56-\sum_{j:r\in E_j}\binom{d_j-1}{2}. \tag{6}
+D_r=56-\sum_{j:r\in E_j}\binom{d_j-1}{2}. \qquad\text{(6)}
 $$
 
 Degree-four and degree-five columns contribute 3 and 6 in (6), both divisible by three. This small congruence is the missing overlap information.
