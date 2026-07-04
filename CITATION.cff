@@ -1,0 +1,36 @@
+cff-version: 1.2.0
+message: >-
+  If you use this proof or its verification artifacts, please cite this
+  repository and the prior lower-bound work identified in the literature review.
+title: "Closing the finite Zarankiewicz case Z(9,23,3,3)"
+type: software
+authors:
+  - family-names: "GPT 5.6-Sol"
+version: 1.0.0
+date-released: 2026-07-04
+repository-code: "https://github.com/dfield/zarankiewicz-z9-23"
+license: MIT
+keywords:
+  - Zarankiewicz problem
+  - extremal combinatorics
+  - K3,3-free bipartite graph
+  - formal verification
+  - SAT certificates
+abstract: >-
+  A human-readable proof that Z(9,23,3,3)=103, accompanied by an explicit
+  extremal matrix, independent verifiers, exact arithmetic certificates,
+  deterministic SAT/MIP models, a Lean arithmetic audit, and a literature review.
+references:
+  - type: article
+    authors:
+      - family-names: Bhan
+        given-names: Jay
+      - family-names: Nobili
+        given-names: Nicole
+      - family-names: Langer
+        given-names: Patrick
+    title: "New Bounds for Zarankiewicz Numbers via Reinforced LLM Evolutionary Search"
+    year: 2026
+    identifiers:
+      - type: other
+        value: "arXiv:2605.01120v2"

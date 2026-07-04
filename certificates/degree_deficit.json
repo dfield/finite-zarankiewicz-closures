@@ -1,0 +1,97 @@
+{
+  "certificate_type": "exact_integer_double_counting",
+  "problem": {
+    "columns": 23,
+    "rows": 9,
+    "target_ones": 104,
+    "triple_capacity": 2
+  },
+  "global_identity": {
+    "affine_slope": 6,
+    "affine_intercept_per_column": -20,
+    "base_triple_incidence": 164,
+    "maximum_triple_incidence": 168,
+    "maximum_total_penalty": 4,
+    "penalty_by_column_degree_0_through_9": [20, 14, 8, 3, 0, 0, 4, 13, 28, 50]
+  },
+  "allowed_degree_cases": [
+    {
+      "name": "balanced",
+      "counts_by_degree_0_through_9": [0, 0, 0, 0, 11, 12, 0, 0, 0, 0],
+      "triple_incidences": 164,
+      "global_deficit": 4,
+      "row_categories": [
+        {
+          "rows": 9,
+          "exceptional_degree": null,
+          "exceptional_membership": null,
+          "deficit_residue_mod_3": 2,
+          "minimum_nonnegative_deficit": 2
+        }
+      ],
+      "sum_row_deficits": 12,
+      "certified_lower_bound_sum_row_deficits": 18,
+      "row_cut_coefficients_by_degree": {"4": 1, "5": 2},
+      "row_cut_rhs": 18,
+      "aggregate_row_cut_lhs": 164,
+      "aggregate_row_cut_rhs": 162
+    },
+    {
+      "name": "one_degree_3",
+      "counts_by_degree_0_through_9": [0, 0, 0, 1, 9, 13, 0, 0, 0, 0],
+      "triple_incidences": 167,
+      "global_deficit": 1,
+      "row_categories": [
+        {
+          "rows": 3,
+          "exceptional_degree": 3,
+          "exceptional_membership": true,
+          "deficit_residue_mod_3": 1,
+          "minimum_nonnegative_deficit": 1
+        },
+        {
+          "rows": 6,
+          "exceptional_degree": 3,
+          "exceptional_membership": false,
+          "deficit_residue_mod_3": 2,
+          "minimum_nonnegative_deficit": 2
+        }
+      ],
+      "sum_row_deficits": 3,
+      "certified_lower_bound_sum_row_deficits": 15,
+      "row_cut_coefficients_by_degree": {"3": 0, "4": 1, "5": 2},
+      "row_cut_rhs": 18,
+      "aggregate_row_cut_lhs": 166,
+      "aggregate_row_cut_rhs": 162
+    },
+    {
+      "name": "one_degree_6",
+      "counts_by_degree_0_through_9": [0, 0, 0, 0, 12, 10, 1, 0, 0, 0],
+      "triple_incidences": 168,
+      "global_deficit": 0,
+      "row_categories": [
+        {
+          "rows": 6,
+          "exceptional_degree": 6,
+          "exceptional_membership": true,
+          "deficit_residue_mod_3": 1,
+          "minimum_nonnegative_deficit": 1
+        },
+        {
+          "rows": 3,
+          "exceptional_degree": 6,
+          "exceptional_membership": false,
+          "deficit_residue_mod_3": 2,
+          "minimum_nonnegative_deficit": 2
+        }
+      ],
+      "sum_row_deficits": 0,
+      "certified_lower_bound_sum_row_deficits": 12,
+      "row_cut_coefficients_by_degree": {"4": 1, "5": 2, "6": 3},
+      "row_cut_rhs": 18,
+      "aggregate_row_cut_lhs": 166,
+      "aggregate_row_cut_rhs": 162
+    }
+  ],
+  "conclusion": "No 9-by-23 K_3,3-free Boolean matrix has 104 ones."
+}

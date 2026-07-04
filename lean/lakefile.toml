@@ -1,0 +1,6 @@
+name = "ZarankiewiczZ923"
+version = "1.0.0"
+defaultTargets = ["ZarankiewiczZ923"]
+
+[[lean_lib]]
+name = "ZarankiewiczZ923"

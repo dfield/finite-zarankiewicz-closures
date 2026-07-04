@@ -1,0 +1,235 @@
+{
+  "known_cases": [
+    {
+      "expected_satisfiable": true,
+      "observed_satisfiable": true,
+      "problem": "Z(3,4,3,3)",
+      "target": 10
+    },
+    {
+      "expected_satisfiable": false,
+      "observed_satisfiable": false,
+      "problem": "Z(3,4,3,3)",
+      "target": 11
+    }
+  ],
+  "random_fixed_matrices": [
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 0,
+      "ones": 14
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 1,
+      "ones": 14
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": false,
+      "column_constraints_hold": false,
+      "direct_k33_free": false,
+      "index": 2,
+      "ones": 17
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 3,
+      "ones": 7
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 4,
+      "ones": 13
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": false,
+      "column_constraints_hold": false,
+      "direct_k33_free": false,
+      "index": 5,
+      "ones": 18
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 6,
+      "ones": 14
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 7,
+      "ones": 19
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 8,
+      "ones": 17
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 9,
+      "ones": 13
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 10,
+      "ones": 17
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 11,
+      "ones": 15
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 12,
+      "ones": 11
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 13,
+      "ones": 15
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": false,
+      "column_constraints_hold": false,
+      "direct_k33_free": false,
+      "index": 14,
+      "ones": 17
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 15,
+      "ones": 14
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 16,
+      "ones": 14
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 17,
+      "ones": 16
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 18,
+      "ones": 15
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": false,
+      "column_constraints_hold": false,
+      "direct_k33_free": false,
+      "index": 19,
+      "ones": 16
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 20,
+      "ones": 12
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 21,
+      "ones": 17
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 22,
+      "ones": 14
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 23,
+      "ones": 14
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 24,
+      "ones": 15
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 25,
+      "ones": 11
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 26,
+      "ones": 16
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 27,
+      "ones": 10
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 28,
+      "ones": 16
+    },
+    {
+      "cell_cnf_satisfiable_when_fixed": true,
+      "column_constraints_hold": true,
+      "direct_k33_free": true,
+      "index": 29,
+      "ones": 15
+    }
+  ],
+  "scope": "Small-instance semantic validation only; the mathematical proof, not a raw-cell solver run, establishes unsatisfiability at 9 by 23 and weight 104.",
+  "seed": 20260704,
+  "solver": {
+    "name": "CaDiCaL",
+    "version": "3.0.0"
+  },
+  "status": "VERIFIED"
+}

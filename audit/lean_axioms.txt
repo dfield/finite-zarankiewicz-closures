@@ -1,0 +1,7 @@
+'ZarankiewiczZ923.penalty_eq_formula' does not depend on any axioms
+'ZarankiewiczZ923.penalty_table' does not depend on any axioms
+'ZarankiewiczZ923.penalty_budget_structure' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ZarankiewiczZ923.classify_degree_profile' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ZarankiewiczZ923.balanced_deficits_impossible' depends on axioms: [propext, Quot.sound]
+'ZarankiewiczZ923.degree_three_deficits_impossible' depends on axioms: [propext, Quot.sound]
+'ZarankiewiczZ923.degree_six_deficits_impossible' depends on axioms: [propext, Quot.sound]

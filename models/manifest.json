@@ -1,0 +1,25 @@
+{
+  "models": {
+    "cell_cnf": {
+      "base_cell_variables": 207,
+      "clauses_total": 277931,
+      "columns": 23,
+      "forbidden_submatrix_clauses": 148764,
+      "rows": 9,
+      "sha256": "4e43958ced4aac04073dd10ca536b0b980d8d9352bf303baa640a329b1795ec7",
+      "target_ones": 104,
+      "variables_total": 32654
+    },
+    "column_lp": {
+      "columns": 23,
+      "row_triple_constraints": 84,
+      "rows": 9,
+      "sha256": "abc8cbad116455c9b588f6bb8d561f2741c5138f3a149018e4ffbcbb9a3d2266",
+      "structural_constraints": 86,
+      "support_variables": 512,
+      "target_ones": 104
+    }
+  },
+  "monotonicity_note": "Testing exactly 104 ones suffices: deleting ones preserves K_3,3-freeness, so any denser witness would contain a 104-one witness.",
+  "schema_version": 1
+}

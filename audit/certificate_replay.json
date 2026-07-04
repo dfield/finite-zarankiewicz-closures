@@ -1,0 +1,25 @@
+{
+  "cases": [
+    {
+      "case": "balanced",
+      "drat_verified": true,
+      "lrat_verified": true
+    },
+    {
+      "case": "one_degree_3",
+      "drat_verified": true,
+      "lrat_verified": true
+    },
+    {
+      "case": "one_degree_6",
+      "drat_verified": true,
+      "lrat_verified": true
+    }
+  ],
+  "commands": [
+    "drat-trim models/terminal_CASE.cnf certificates/terminal_CASE.drat",
+    "lrat-check models/terminal_CASE.cnf certificates/terminal_CASE.lrat"
+  ],
+  "scope": "These traces replay only the terminal integer aggregations. The independently checked JSON certificate establishes the reduction from matrices to those cases.",
+  "status": "VERIFIED"
+}

@@ -1,0 +1,496 @@
+{
+  "full_dgh_lp": {
+    "constraint_checks_at_optimum": [
+      {
+        "alpha": null,
+        "constraint": "roman_triple_capacity",
+        "lhs": "168",
+        "rhs": "168",
+        "slack": "0",
+        "v": null
+      },
+      {
+        "alpha": 0,
+        "constraint": "dgh_v1_k3",
+        "lhs": "314/3",
+        "rhs": "504",
+        "slack": "1198/3",
+        "v": 1
+      },
+      {
+        "alpha": 2,
+        "constraint": "dgh_v1_k4",
+        "lhs": "314/3",
+        "rhs": "162",
+        "slack": "172/3",
+        "v": 1
+      },
+      {
+        "alpha": 2,
+        "constraint": "dgh_v1_k5",
+        "lhs": "221/3",
+        "rhs": "81",
+        "slack": "22/3",
+        "v": 1
+      },
+      {
+        "alpha": 6,
+        "constraint": "dgh_v1_k6",
+        "lhs": "-31",
+        "rhs": "45",
+        "slack": "76",
+        "v": 1
+      },
+      {
+        "alpha": 11,
+        "constraint": "dgh_v1_k7",
+        "lhs": "-971/6",
+        "rhs": "27",
+        "slack": "1133/6",
+        "v": 1
+      },
+      {
+        "alpha": 14,
+        "constraint": "dgh_v1_k8",
+        "lhs": "-412/3",
+        "rhs": "18",
+        "slack": "466/3",
+        "v": 1
+      },
+      {
+        "alpha": 0,
+        "constraint": "dgh_v1_k9",
+        "lhs": "18",
+        "rhs": "18",
+        "slack": "0",
+        "v": 1
+      },
+      {
+        "alpha": 0,
+        "constraint": "dgh_v2_k3",
+        "lhs": "566/3",
+        "rhs": "504",
+        "slack": "946/3",
+        "v": 2
+      },
+      {
+        "alpha": 0,
+        "constraint": "dgh_v2_k4",
+        "lhs": "566/3",
+        "rhs": "252",
+        "slack": "190/3",
+        "v": 2
+      },
+      {
+        "alpha": 2,
+        "constraint": "dgh_v2_k5",
+        "lhs": "380/3",
+        "rhs": "144",
+        "slack": "52/3",
+        "v": 2
+      },
+      {
+        "alpha": 2,
+        "constraint": "dgh_v2_k6",
+        "lhs": "190/3",
+        "rhs": "108",
+        "slack": "134/3",
+        "v": 2
+      },
+      {
+        "alpha": 4,
+        "constraint": "dgh_v2_k7",
+        "lhs": "-752/3",
+        "rhs": "72",
+        "slack": "968/3",
+        "v": 2
+      },
+      {
+        "alpha": 2,
+        "constraint": "dgh_v2_k8",
+        "lhs": "95/3",
+        "rhs": "72",
+        "slack": "121/3",
+        "v": 2
+      },
+      {
+        "alpha": 0,
+        "constraint": "dgh_v2_k9",
+        "lhs": "72",
+        "rhs": "72",
+        "slack": "0",
+        "v": 2
+      }
+    ],
+    "exact_optimum": "314/3",
+    "floor_upper_bound": 104,
+    "optimal_degree_profile": {
+      "4": "31/3",
+      "5": "38/3"
+    }
+  },
+  "integer_profiles_at_objective_104": [
+    {
+      "all_dgh_constraints_satisfied": true,
+      "case": "balanced",
+      "constraints": [
+        {
+          "constraint": "roman_triple_capacity",
+          "lhs": "164",
+          "rhs": "168",
+          "slack": "4"
+        },
+        {
+          "constraint": "dgh_v1_k3",
+          "lhs": "104",
+          "rhs": "504",
+          "slack": "400"
+        },
+        {
+          "constraint": "dgh_v1_k4",
+          "lhs": "104",
+          "rhs": "162",
+          "slack": "58"
+        },
+        {
+          "constraint": "dgh_v1_k5",
+          "lhs": "71",
+          "rhs": "81",
+          "slack": "10"
+        },
+        {
+          "constraint": "dgh_v1_k6",
+          "lhs": "-33",
+          "rhs": "45",
+          "slack": "78"
+        },
+        {
+          "constraint": "dgh_v1_k7",
+          "lhs": "-163",
+          "rhs": "27",
+          "slack": "190"
+        },
+        {
+          "constraint": "dgh_v1_k8",
+          "lhs": "-964/7",
+          "rhs": "18",
+          "slack": "1090/7"
+        },
+        {
+          "constraint": "dgh_v1_k9",
+          "lhs": "123/7",
+          "rhs": "18",
+          "slack": "3/7"
+        },
+        {
+          "constraint": "dgh_v2_k3",
+          "lhs": "186",
+          "rhs": "504",
+          "slack": "318"
+        },
+        {
+          "constraint": "dgh_v2_k4",
+          "lhs": "186",
+          "rhs": "252",
+          "slack": "66"
+        },
+        {
+          "constraint": "dgh_v2_k5",
+          "lhs": "120",
+          "rhs": "144",
+          "slack": "24"
+        },
+        {
+          "constraint": "dgh_v2_k6",
+          "lhs": "60",
+          "rhs": "108",
+          "slack": "48"
+        },
+        {
+          "constraint": "dgh_v2_k7",
+          "lhs": "-252",
+          "rhs": "72",
+          "slack": "324"
+        },
+        {
+          "constraint": "dgh_v2_k8",
+          "lhs": "30",
+          "rhs": "72",
+          "slack": "42"
+        },
+        {
+          "constraint": "dgh_v2_k9",
+          "lhs": "492/7",
+          "rhs": "72",
+          "slack": "12/7"
+        }
+      ],
+      "degree_counts": {
+        "4": 11,
+        "5": 12
+      },
+      "objective": 104,
+      "triple_incidences": 164
+    },
+    {
+      "all_dgh_constraints_satisfied": true,
+      "case": "one_degree_3",
+      "constraints": [
+        {
+          "constraint": "roman_triple_capacity",
+          "lhs": "167",
+          "rhs": "168",
+          "slack": "1"
+        },
+        {
+          "constraint": "dgh_v1_k3",
+          "lhs": "104",
+          "rhs": "504",
+          "slack": "400"
+        },
+        {
+          "constraint": "dgh_v1_k4",
+          "lhs": "98",
+          "rhs": "162",
+          "slack": "64"
+        },
+        {
+          "constraint": "dgh_v1_k5",
+          "lhs": "293/4",
+          "rhs": "81",
+          "slack": "31/4"
+        },
+        {
+          "constraint": "dgh_v1_k6",
+          "lhs": "-123/4",
+          "rhs": "45",
+          "slack": "303/4"
+        },
+        {
+          "constraint": "dgh_v1_k7",
+          "lhs": "-643/4",
+          "rhs": "27",
+          "slack": "751/4"
+        },
+        {
+          "constraint": "dgh_v1_k8",
+          "lhs": "-955/7",
+          "rhs": "18",
+          "slack": "1081/7"
+        },
+        {
+          "constraint": "dgh_v1_k9",
+          "lhs": "501/28",
+          "rhs": "18",
+          "slack": "3/28"
+        },
+        {
+          "constraint": "dgh_v2_k3",
+          "lhs": "187",
+          "rhs": "504",
+          "slack": "317"
+        },
+        {
+          "constraint": "dgh_v2_k4",
+          "lhs": "371/2",
+          "rhs": "252",
+          "slack": "133/2"
+        },
+        {
+          "constraint": "dgh_v2_k5",
+          "lhs": "127",
+          "rhs": "144",
+          "slack": "17"
+        },
+        {
+          "constraint": "dgh_v2_k6",
+          "lhs": "127/2",
+          "rhs": "108",
+          "slack": "89/2"
+        },
+        {
+          "constraint": "dgh_v2_k7",
+          "lhs": "-247",
+          "rhs": "72",
+          "slack": "319"
+        },
+        {
+          "constraint": "dgh_v2_k8",
+          "lhs": "127/4",
+          "rhs": "72",
+          "slack": "161/4"
+        },
+        {
+          "constraint": "dgh_v2_k9",
+          "lhs": "501/7",
+          "rhs": "72",
+          "slack": "3/7"
+        }
+      ],
+      "degree_counts": {
+        "3": 1,
+        "4": 9,
+        "5": 13
+      },
+      "objective": 104,
+      "triple_incidences": 167
+    },
+    {
+      "all_dgh_constraints_satisfied": true,
+      "case": "one_degree_6",
+      "constraints": [
+        {
+          "constraint": "roman_triple_capacity",
+          "lhs": "168",
+          "rhs": "168",
+          "slack": "0"
+        },
+        {
+          "constraint": "dgh_v1_k3",
+          "lhs": "104",
+          "rhs": "504",
+          "slack": "400"
+        },
+        {
+          "constraint": "dgh_v1_k4",
+          "lhs": "104",
+          "rhs": "162",
+          "slack": "58"
+        },
+        {
+          "constraint": "dgh_v1_k5",
+          "lhs": "68",
+          "rhs": "81",
+          "slack": "13"
+        },
+        {
+          "constraint": "dgh_v1_k6",
+          "lhs": "-30",
+          "rhs": "45",
+          "slack": "75"
+        },
+        {
+          "constraint": "dgh_v1_k7",
+          "lhs": "-160",
+          "rhs": "27",
+          "slack": "187"
+        },
+        {
+          "constraint": "dgh_v1_k8",
+          "lhs": "-136",
+          "rhs": "18",
+          "slack": "154"
+        },
+        {
+          "constraint": "dgh_v1_k9",
+          "lhs": "18",
+          "rhs": "18",
+          "slack": "0"
+        },
+        {
+          "constraint": "dgh_v2_k3",
+          "lhs": "187",
+          "rhs": "504",
+          "slack": "317"
+        },
+        {
+          "constraint": "dgh_v2_k4",
+          "lhs": "187",
+          "rhs": "252",
+          "slack": "65"
+        },
+        {
+          "constraint": "dgh_v2_k5",
+          "lhs": "115",
+          "rhs": "144",
+          "slack": "29"
+        },
+        {
+          "constraint": "dgh_v2_k6",
+          "lhs": "65",
+          "rhs": "108",
+          "slack": "43"
+        },
+        {
+          "constraint": "dgh_v2_k7",
+          "lhs": "-244",
+          "rhs": "72",
+          "slack": "316"
+        },
+        {
+          "constraint": "dgh_v2_k8",
+          "lhs": "65/2",
+          "rhs": "72",
+          "slack": "79/2"
+        },
+        {
+          "constraint": "dgh_v2_k9",
+          "lhs": "72",
+          "rhs": "72",
+          "slack": "0"
+        }
+      ],
+      "degree_counts": {
+        "4": 12,
+        "5": 10,
+        "6": 1
+      },
+      "objective": 104,
+      "triple_incidences": 168
+    }
+  ],
+  "interpretation": "The full degree-count relaxation retains the Roman optimum 314/3, and all three integral profiles at weight 104 satisfy every listed inequality. The final contradiction requires marked-row overlap information absent from this LP.",
+  "problem": "Z(9,23,3,3)",
+  "roman_bounds": [
+    {
+      "floor": 214,
+      "k": 2,
+      "value": "214"
+    },
+    {
+      "floor": 117,
+      "k": 3,
+      "value": "352/3"
+    },
+    {
+      "floor": 104,
+      "k": 4,
+      "value": "314/3"
+    },
+    {
+      "floor": 108,
+      "k": 5,
+      "value": "544/5"
+    },
+    {
+      "floor": 118,
+      "k": 6,
+      "value": "1778/15"
+    },
+    {
+      "floor": 130,
+      "k": 7,
+      "value": "392/3"
+    },
+    {
+      "floor": 144,
+      "k": 8,
+      "value": "144"
+    },
+    {
+      "floor": 158,
+      "k": 9,
+      "value": "158"
+    }
+  ],
+  "source": {
+    "arxiv": "2411.18842v2",
+    "authors": [
+      "Sara Davies",
+      "Peter Gill",
+      "Daniel Horsley"
+    ],
+    "doi": "10.1016/j.disc.2025.114924",
+    "title": "Improved upper bounds on Zarankiewicz numbers"
+  }
+}
