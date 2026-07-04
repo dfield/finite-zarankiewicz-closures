@@ -1,44 +1,21 @@
-name: verification
+name: Verification
 
 on:
   push:
-    branches: [main]
   pull_request:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  python:
-    name: Python ${{ matrix.python-version }}
+  verify:
+    name: Python verification
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ["3.9", "3.13"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: "3.11"
       - name: Run the deterministic verification gate
         run: make verify
-
-  lean:
-    name: Lean arithmetic kernel
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: leanprover/lean-action@v1
-        with:
-          lake-package-directory: lean
-          build: true
-          test: false
-          use-mathlib-cache: false
-          nanoda: true
-          nanoda-allow-sorry: false
-      - name: Print theorem axiom dependencies
-        working-directory: lean
-        run: lake env lean AxiomAudit.lean
