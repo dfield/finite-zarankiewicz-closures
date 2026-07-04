@@ -1,12 +1,12 @@
 > **Attribution:** The proof, formal arithmetic, verification code, and repository were produced by **GPT 5.6-Sol**. This is a research artifact awaiting independent expert review, not a peer-reviewed publication.
 
-# Closing the finite case \(Z(9,23,3,3)\)
+# Closing the finite case $Z(9,23,3,3)$
 
 This repository presents a reproducible proof that
 
-\[
+$$
 \boxed{Z(9,23,3,3)=103}.
-\]
+$$
 
 In plain language: place as many ones as possible in a 9-row, 23-column zero-one matrix, subject to the rule that no choice of three rows and three columns may form an all-one square. The answer is 103. A concrete 103-one matrix exists, while the proof shows that 104 ones are impossible.
 
@@ -14,13 +14,13 @@ The upper bound is an elementary counting argument, not a solver verdict. Comput
 
 ## Why this case mattered
 
-The Zarankiewicz problem is a classical question in extremal combinatorics. Reading a Boolean matrix as the adjacency matrix of a bipartite graph turns an all-one \(3\times3\) submatrix into a copy of the complete bipartite graph \(K_{3,3}\).
+The Zarankiewicz problem is a classical question in extremal combinatorics. Reading a Boolean matrix as the adjacency matrix of a bipartite graph turns an all-one $3\times3$ submatrix into a copy of the complete bipartite graph $K_{3,3}$.
 
 Immediately before this work, the public literature gave
 
-\[
+$$
 103\le Z(9,23,3,3)\le104.
-\]
+$$
 
 The 104 upper bound comes from the degree-counting method of Steven Roman. The 103 lower bound was reported in 2026 by Jay Bhan, Nicole Nobili, and Patrick Langer using LLM-guided evolutionary search. Their paper displayed the one-edge gap rather than claiming this cell was exact. Jeremy Tan's earlier SAT table likewise listed 104 as an upper bound, and the strengthened linear program of Sara Davies, Peter Gill, and Daniel Horsley does not remove the last edge.
 
@@ -28,29 +28,29 @@ Credit for the previously public 103 lower bound belongs to Bhan--Nobili--Langer
 
 ## The proof idea
 
-Treat each column as the set \(E_j\) of rows containing a one, and let \(d_j=|E_j|\). Every triple of rows may occur together in at most two columns; otherwise those rows and three such columns form a forbidden \(3\times3\) block. Therefore
+Treat each column as the set $E_j$ of rows containing a one, and let $d_j=|E_j|$. Every triple of rows may occur together in at most two columns; otherwise those rows and three such columns form a forbidden $3\times3$ block. Therefore
 
-\[
+$$
 \sum_j\binom{d_j}{3}\le2\binom93=168.
-\]
+$$
 
 For a hypothetical 104-one matrix, introduce
 
-\[
+$$
 p(d)=\binom d3-6d+20.
-\]
+$$
 
-Its values for \(d=0,\ldots,9\) are
+Its values for $d=0,\ldots,9$ are
 
-\[
+$$
 (20,14,8,3,0,0,4,13,28,50).
-\]
+$$
 
-The capacity inequality implies \(\sum_j p(d_j)\le4\). This leaves only three possible multisets of column degrees:
+The capacity inequality implies $\sum_j p(d_j)\le4$. This leaves only three possible multisets of column degrees:
 
-\[
+$$
 4^{11}5^{12},\qquad 3^1 4^9 5^{13},\qquad 4^{12}5^{10}6^1.
-\]
+$$
 
 Now mark one row and count unused row-triple capacity through that row. Contributions from degree-four and degree-five columns are multiples of three. In the three cases above, the exact total deficits are respectively 12, 3, and 0, but their forced residue classes give lower bounds 18, 15, and 12. Each case is contradictory.
 
@@ -130,9 +130,9 @@ The versions used for the recorded audit were CaDiCaL 3.0.0 and GLPK 5.0. The DR
 The exact decision problem has two formulations.
 
 1. **Cell SAT.** There are 207 cell variables. Every choice of three rows and three columns contributes a nine-literal clause forbidding that all-one submatrix, and a fully defined threshold circuit imposes exactly 104 ones.
-2. **Column-type MIP.** For each support \(S\subseteq[9]\), an integer \(x_S\) counts columns having exactly that support. The model fixes 23 columns and 104 ones and requires every row triple to occur in at most two columns.
+2. **Column-type MIP.** For each support $S\subseteq[9]$, an integer $x_S$ counts columns having exactly that support. The model fixes 23 columns and 104 ones and requires every row triple to occur in at most two columns.
 
-Testing exactly 104 is enough: if a denser \(K_{3,3}\)-free matrix existed, deleting ones would preserve the forbidden-submatrix condition until exactly 104 remained.
+Testing exactly 104 is enough: if a denser $K_{3,3}$-free matrix existed, deleting ones would preserve the forbidden-submatrix condition until exactly 104 remained.
 
 The stored models are deterministic outputs. They are included for transparency and regression checking, not as the logical basis of the upper bound. The [methods document](docs/METHODS.md) specifies the encodings and maps each program to the corresponding proof step.
 
