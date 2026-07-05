@@ -1,7 +1,7 @@
 PYTHON ?= python3
 export PYTHONPATH := src
 
-.PHONY: all analysis audit certificate checksums extended models test verify witness
+.PHONY: all analysis audit certificate checksums extended models new-bounds test verify witness
 
 all: verify
 
@@ -20,6 +20,9 @@ extended:
 	$(PYTHON) scripts/check_extended_results.py --check
 	$(PYTHON) scripts/verify_extended_witnesses_independent.py
 
+new-bounds:
+	$(PYTHON) scripts/check_new_bounds.py --check
+
 models:
 	$(PYTHON) scripts/generate_models.py --check
 
@@ -32,4 +35,4 @@ checksums:
 audit:
 	$(PYTHON) scripts/audit_repository.py
 
-verify: test witness certificate extended models analysis checksums audit
+verify: test witness certificate extended new-bounds models analysis checksums audit

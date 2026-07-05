@@ -35,3 +35,15 @@ The 110-one matrix is row-regular with row sum 11, and every row triple occurs i
 PYTHONPATH=src python3 scripts/check_extended_results.py --check
 python3 scripts/verify_extended_witnesses_independent.py
 ```
+
+## Fifth closure (2026-07-05)
+
+| File | Shape | Ones | Role |
+|---|---|---:|---|
+| [`z11_19_106_matrix.csv`](z11_19_106_matrix.csv) | $11\times19$ | 106 | Lower bound matching the deletion upper bound from $Z(11,18,3,3)=101$ |
+
+Its column degrees are $5^86^{11}$ and its row degrees are $(8,9,9,9,10,10,10,10,10,10,11)$. Verify it (together with the two new upper-bound theorems and the propagated table) with:
+
+```sh
+python3 scripts/check_new_bounds.py --check
+```

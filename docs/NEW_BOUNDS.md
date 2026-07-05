@@ -1,0 +1,229 @@
+# A fifth closure and new bounds on the 2026 frontier
+
+> **Attribution:** The results in this document were produced by **Claude (Anthropic)** in a verification-and-extension session dated 2026-07-05, building directly on this repository's four closures and on the sources cited in the [literature review](LITERATURE_REVIEW.md). They await independent expert review.
+
+## 1. Summary
+
+This document extends the repository's results on the Bhan--Nobili--Langer frontier ([BNL26], Figure 2) in three ways.
+
+**A fifth exact value.**
+
+$$
+\boxed{Z(11,19,3,3)=106.}
+$$
+
+The upper bound is the deletion bound already derived in [`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) from the established value $Z(11,18,3,3)=101$. The matching lower bound is a new explicit 106-one matrix, [`data/z11_19_106_matrix.csv`](../data/z11_19_106_matrix.csv), found by simulated annealing over fixed column-degree profiles and verified by exhaustive scan. Bhan--Nobili--Langer's best construction had 102 ones.
+
+With this closure, eight of the paper's 44 open cells are settled and **36 remain open**.
+
+**Two new elementary upper bounds.**
+
+$$
+Z(12,23,3,3)\le135,
+\qquad
+Z(13,23,3,3)\le144.
+$$
+
+The previous upper bounds were 136 and 145. Both proofs use only the row-triple capacity count and the deficit mechanisms already present in this repository — the pair-deficit count of the $Z(10,22)$ proof and the marked-row residues of the $Z(9,23)$ proof — applied at new parameters. Full proofs are in Sections 3 and 4; every arithmetic step is checked by [`scripts/check_new_bounds.py`](../scripts/check_new_bounds.py).
+
+**A propagated bound table.** Closing the table of [BNL26] under the deletion lemma and under two-one-line extensions tightens 17 upper bounds and 19 lower bounds beyond the paper's published intervals, without any new search. The machine-readable result, with per-cell provenance, is [`analysis/new_bounds.json`](../analysis/new_bounds.json). Section 5 lists every change.
+
+## 2. The value $Z(11,19,3,3)=106$
+
+### 2.1 Upper bound
+
+[`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) Section 2 already proves
+
+$$
+Z(11,19,3,3)\le\left\lfloor\frac{19\cdot101}{18}\right\rfloor=106
+$$
+
+from the established value $Z(11,18,3,3)=101$: a $K_{3,3}$-free $11\times19$ matrix with $e$ ones has a column with at most $\lfloor e/19\rfloor$ ones, and deleting it leaves an $11\times18$ matrix. At $e=107$ this leaves at least $107-5=102>101$ ones, a contradiction.
+
+### 2.2 Lower bound
+
+[`data/z11_19_106_matrix.csv`](../data/z11_19_106_matrix.csv) is an $11\times19$ Boolean matrix with 106 ones, column degrees $5^86^{11}$, and row degrees $(8,9,9,9,10,10,10,10,10,10,11)$. Exhaustive inspection of all $\binom{11}{3}\binom{19}{3}=160{,}215$ candidate $3\times3$ submatrices confirms that none is all one; equivalently, every row triple occurs in at most two columns (the used triple capacity is $8\binom53+11\binom63=300$ of the available $2\binom{11}3=330$).
+
+The matrix was found by annealing within the fixed degree profile $5^86^{11}$; the discovery method carries no logical weight, because the verification is a direct scan.
+
+## 3. Theorem: $Z(12,23,3,3)\le135$
+
+Suppose, for contradiction, that a $12\times23$ $K_{3,3}$-free matrix has 136 ones. Let $E_j$ and $d_j$ be the row set and degree of column $j$, and for each row triple $T$ let $\lambda_T$ be the number of columns whose row set contains $T$. As in the four existing proofs, $K_{3,3}$-freeness means $\lambda_T\le2$, and double counting gives
+
+$$
+\sum_{j=1}^{23}\binom{d_j}{3}=\sum_T\lambda_T\le2\binom{12}{3}=440. \tag{1}
+$$
+
+### 3.1 The degree profile is forced
+
+The integer inequality
+
+$$
+\binom d3\ge10d-40 \tag{2}
+$$
+
+holds for all $0\le d\le12$ with equality exactly at $d=5$ and $d=6$ (the deficit at $d=4$ is 4, at $d=7$ is 5, and grows monotonically further away). Summing (2) over the 23 columns,
+
+$$
+\sum_j\binom{d_j}{3}\;\ge\;10\cdot136-40\cdot23=440.
+$$
+
+Combined with (1), equality holds everywhere. Consequently:
+
+- every column degree is 5 or 6; and
+- $\sum_T\lambda_T=440$, so $\lambda_T=2$ for **every** row triple $T$.
+
+Solving $a+b=23$, $5a+6b=136$ gives $(a,b)=(2,21)$: exactly two degree-5 columns and twenty-one degree-6 columns.
+
+### 3.2 The pair count
+
+Fix a row pair $P$; there are $\binom{12}2=66$ such pairs, and each lies in $10$ row triples. Since every triple satisfies $\lambda_T=2$,
+
+$$
+\sum_{T\supset P}\lambda_T=20.
+$$
+
+On the other hand, a column $j$ with $P\subseteq E_j$ contains $d_j-2$ triples through $P$, and columns not containing $P$ contribute nothing, so
+
+$$
+\sum_{j:\,P\subseteq E_j}(d_j-2)=20.
+$$
+
+Writing $a_P$ for the number of degree-5 columns containing $P$ and $b_P$ for the number of degree-6 columns containing $P$,
+
+$$
+3a_P+4b_P=20,\qquad 0\le a_P\le2.
+$$
+
+Modulo 4 this forces $3a_P\equiv0\pmod4$, hence $a_P\equiv0\pmod4$, hence $a_P=0$.
+
+### 3.3 The contradiction
+
+Every row pair therefore lies in **no** degree-5 column. But each of the two degree-5 columns contains $\binom52=10$ row pairs, so
+
+$$
+\sum_P a_P=2\binom52=20\ne0.
+$$
+
+This contradiction shows no 136-one matrix exists, and deleting ones handles any denser matrix. $\blacksquare$
+
+Together with the lower bound of Section 5 ($Z(12,23,3,3)\ge134$, by extending a $Z(12,22,3,3)=132$ witness with a two-one column),
+
+$$
+134\le Z(12,23,3,3)\le135 .
+$$
+
+## 4. Theorem: $Z(13,23,3,3)\le144$
+
+Suppose a $13\times23$ $K_{3,3}$-free matrix has 145 ones. Now
+
+$$
+\sum_j\binom{d_j}{3}\le2\binom{13}{3}=572, \tag{3}
+$$
+
+and the line through degrees 6 and 7 gives the integer inequality
+
+$$
+\binom d3\ge15d-70, \tag{4}
+$$
+
+valid for $0\le d\le13$ with equality exactly at $d=6,7$; the deficit is 5 at $d=5$, 6 at $d=8$, and at least 14 elsewhere. Summing (4),
+
+$$
+\sum_j\binom{d_j}{3}\ge15\cdot145-70\cdot23=565,
+$$
+
+so the total deficit budget is $572-565=7$: at most one column may have degree outside $\{6,7\}$, and its degree must be 5 or 8. Exhausting $a+b=23$ (or 22) with the degree sums leaves exactly three profiles:
+
+| Profile | $\sum_j\binom{d_j}3$ | slack $s=572-\sum_j\binom{d_j}3$ | $3s$ |
+|---|---:|---:|---:|
+| $6^{16}7^{7}$ | 565 | 7 | 21 |
+| $5^{1}6^{14}7^{8}$ | 570 | 2 | 6 |
+| $8^{1}6^{17}7^{5}$ | 571 | 1 | 3 |
+
+### 4.1 Marked-row deficits modulo 5
+
+For each triple put $\delta_T=2-\lambda_T\ge0$, and for each row $r$ put $D_r=\sum_{T\ni r}\delta_T$. Exactly as in the $Z(9,23)$ proof,
+
+$$
+\sum_{r=1}^{13}D_r=3\sum_T\delta_T=3s,
+\qquad
+D_r=2\binom{12}{2}-\sum_{j:\,r\in E_j}\binom{d_j-1}{2}
+=132-\sum_{j:\,r\in E_j}\binom{d_j-1}{2}. \tag{5}
+$$
+
+The column contributions in (5) are $\binom52=10$ for degree 6 and $\binom62=15$ for degree 7 — both divisible by 5 — and $132\equiv2\pmod5$.
+
+Call a row **clean** if it lies in no degree-5 and no degree-8 column. For a clean row, (5) gives $D_r\equiv2\pmod5$, and since $D_r\ge0$,
+
+$$
+D_r\ge2 .
+$$
+
+### 4.2 The three contradictions
+
+- **$6^{16}7^{7}$.** All 13 rows are clean, so $\sum_rD_r\ge26>21=3s$.
+- **$5^{1}6^{14}7^{8}$.** The single degree-5 column meets 5 rows, so at least 8 rows are clean and $\sum_rD_r\ge16>6=3s$.
+- **$8^{1}6^{17}7^{5}$.** The single degree-8 column meets 8 rows, so at least 5 rows are clean and $\sum_rD_r\ge10>3=3s$.
+
+All profiles are impossible, so no 145-one matrix exists. $\blacksquare$
+
+## 5. The propagated bound table
+
+Two elementary observations close the published table under implication:
+
+1. **Deletion (upper bounds).** If $Z(m-1,n,3,3)\le B$ then $Z(m,n,3,3)\le\lfloor mB/(m-1)\rfloor$, and symmetrically in $n$. This is the lemma of [`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) Section 2.
+2. **Two-one-line extension (lower bounds).** Appending a row or column with exactly two ones can never create a $K_{3,3}$ (an all-one $3\times3$ block needs three ones from every participating line), so $Z(m,n,3,3)\ge Z(m-1,n,3,3)+2$ and $Z(m,n,3,3)\ge Z(m,n-1,3,3)+2$.
+
+Seeding with the "previously established" cells of [BNL26] Figure 2 (values from Tan's Table 3, [Tan22]), the eight closures, the paper's published intervals, and the two theorems above, and iterating to a fixpoint, produces [`analysis/new_bounds.json`](../analysis/new_bounds.json). The changed cells:
+
+| Cell | [BNL26] interval | New interval | Upper-bound mechanism |
+|---|---:|---:|---|
+| $(10,23)$ | 112--115 | 112--**114** | deletion from $Z(9,23)=103$ |
+| $(11,23)$ | 118--125 | **123**--125 | (lower bound lift from $Z(11,22)=121$) |
+| $(12,17)$ | 102--108 | 102--**104** | deletion from $Z(11,17)=96$ |
+| $(12,18)$ | 108--113 | 108--**110** | deletion from $Z(11,18)=101$ |
+| $(12,19)$ | 110--118 | 110--**115** | deletion from $Z(11,19)=106$ |
+| $(12,20)$ | 113--122 | 113--**121** | deletion from $Z(11,20)=111$ |
+| $(12,21)$ | 116--127 | **118**--**126** | deletion from $Z(11,21)=116$ |
+| $(12,23)$ | 125--136 | **134**--**135** | Section 3 theorem |
+| $(13,17)$ | 106--116 | **109**--**112** | deletion from $(12,17)$ |
+| $(13,18)$ | 115--121 | 115--**118** | deletion from $(13,17)$ |
+| $(13,19)$ | 114--125 | **117**--**124** | deletion from $(13,18)$ |
+| $(13,23)$ | 135--145 | **139**--**144** | Section 4 theorem |
+| $(14,17)$ | 118--124 | 118--**120** | deletion from $(13,17)$ |
+| $(14,18)$ | 124--129 | 124--**127** | deletion from $(13,18)$ |
+| $(14,19)$ | 121--135 | **126**--**133** | deletion from $(13,19)$ |
+| $(14,20)$ | 125--140 | **128**--140 | (lower bound lift only) |
+| $(14,22)$ | 137--150 | **139**--150 | (lower bound lift only) |
+| $(14,23)$ | 138--155 | **141**--155 | (lower bound lift only) |
+| $(15,17)$ | 125--132 | 125--**128** | deletion from $(14,17)$ |
+| $(15,18)$ | 132--138 | 132--**135** | deletion from $(15,17)$ |
+| $(15,19)$ | 132--143 | **134**--**142** | deletion from $(15,18)$ |
+| $(15,21)$ | 139--154 | **140**--154 | (lower bound lift only) |
+| $(16,17)$ | 128--141 | **130**--**136** | deletion from $Z(16,16)=128$ |
+| $(16,18)$ | 130--146 | **134**--**144** | deletion from $(16,17)$ |
+| $(16,19)$ | 132--152 | **136**--**151** | deletion from $(15,19)$ |
+| $(16,21)$ | 147--164 | **148**--164 | (lower bound lift only) |
+| $(16,22)$ | 149--169 | **150**--169 | (lower bound lift only) |
+
+Cells not listed are unchanged. Note that $(12,19)$, $(12,20)$, and $(12,21)$ inherit their improvements from this session's closure of $(11,19)$ and from the repository's $(11,20)$ and the paper's $(11,21)$ values through a single deletion step each; the remaining improvements chain through the $n=16$ and $n=17$ columns.
+
+## 6. Provenance, trust boundary, and what is *not* claimed
+
+- The $Z(11,19)$ **upper** bound and every deletion-propagated bound depend on the correctness of the established values in [BNL26] Figure 2 / Tan's Table 3 — the same dependency already accepted by [`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) for $Z(10,21)$ and $Z(11,20)$. The witness and both deficit theorems are self-contained.
+- The theorems of Sections 3 and 4 are fully elementary; [`scripts/check_new_bounds.py`](../scripts/check_new_bounds.py) re-derives the profile classifications by exhaustive enumeration and re-checks every displayed number, in the standard library only.
+- During the same session, per-profile SAT runs (CaDiCaL via PySAT, with sequential-counter cardinality encodings and double-lex symmetry breaking) returned `UNSAT` for 10 of the 11 capacity-feasible degree profiles of a hypothetical 114-one $10\times23$ matrix, and for several profiles at other near-tight targets. **No claim in this document rests on those verdicts**; they are recorded here only as a research pointer, since no independently checkable proof trace was retained. A DRAT-logged rerun would be the natural follow-up.
+- The figure-2 transcription used here was re-read from the arXiv HTML of [BNL26] v2 during the session and matches [`analysis/extended_results.json`](../analysis/extended_results.json); the upper bounds equal $\min(\text{[Tan22] Table 3},\ \text{[DGH26] Table 2})$ cell-by-cell, and an exact-rational re-computation of the [DGH26] linear program reproduced their published values for every open cell.
+
+## 7. Reproduction
+
+```sh
+# everything claimed above (witness scan, both theorems, the propagated table)
+python3 scripts/check_new_bounds.py --check
+
+# regenerate the machine-readable table after an intentional change
+python3 scripts/check_new_bounds.py --write
+```
+
+The checker requires only Python 3.9+ and finishes in well under a minute.
