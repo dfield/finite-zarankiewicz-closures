@@ -20,7 +20,6 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-WITNESS = ROOT / "data" / "z11_19_106_matrix.csv"
 TABLE = ROOT / "analysis" / "new_bounds.json"
 
 C = math.comb
@@ -28,27 +27,35 @@ C = math.comb
 
 # ---------------------------------------------------------------- witness ----
 
-def check_witness() -> dict:
-    """Exhaustively verify the 11x19 lower-bound witness for Z(11,19,3,3)>=106."""
-    rows = [[int(x) for x in r] for r in csv.reader(WITNESS.open())]
-    assert len(rows) == 11 and all(len(r) == 19 for r in rows), "shape must be 11x19"
+def _check_one_witness(name: str, m: int, n: int, target: int) -> dict:
+    """Exhaustively verify an m x n lower-bound witness with `target` ones."""
+    path = ROOT / "data" / name
+    rows = [[int(x) for x in r] for r in csv.reader(path.open())]
+    assert len(rows) == m and all(len(r) == n for r in rows), f"shape must be {m}x{n}"
     assert all(x in (0, 1) for r in rows for x in r), "entries must be 0/1"
     ones = sum(map(sum, rows))
-    assert ones == 106, f"expected 106 ones, found {ones}"
+    assert ones == target, f"expected {target} ones, found {ones}"
     checked = 0
-    for cols in itertools.combinations(range(19), 3):
+    for cols in itertools.combinations(range(n), 3):
         full = 0
         for r in rows:
             if r[cols[0]] and r[cols[1]] and r[cols[2]]:
                 full += 1
                 assert full <= 2, f"all-one 3x3 submatrix at columns {cols}"
         checked += 1
-    assert checked == C(19, 3)
+    assert checked == C(n, 3)
     return {
-        "file": "data/z11_19_106_matrix.csv",
+        "file": f"data/{name}",
         "ones": ones,
         "column_triples_checked": checked,
-        "sha256": hashlib.sha256(WITNESS.read_bytes()).hexdigest(),
+        "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+    }
+
+
+def check_witness() -> dict:
+    return {
+        "z11_19": _check_one_witness("z11_19_106_matrix.csv", 11, 19, 106),
+        "z12_23": _check_one_witness("z12_23_134_matrix.csv", 12, 23, 134),
     }
 
 
@@ -302,7 +309,7 @@ CLOSED = {
     # Bhan--Nobili--Langer
     (11, 21): 116, (11, 22): 121, (12, 22): 132,
     # this extension (docs/NEW_BOUNDS.md)
-    (11, 19): 106,
+    (11, 19): 106, (12, 23): 134,
 }
 BNL_OPEN = {
     (10, 23): (112, 115), (11, 23): (118, 125),

@@ -1,0 +1,72 @@
+{
+ "description": "Per-profile SAT verdicts from the 2026-07-05 session. Solver: CaDiCaL 1.9.5 via PySAT; encoding: triple-coverage at-most-2 (sequential counter), exact column degrees, double-lex symmetry breaking. NO proof traces were retained: these verdicts are corroborating evidence only and no repository claim rests on them. See docs/NEW_BOUNDS.md section 6.",
+ "frontier_observations": {
+  "10,23 at 113 (21 of 24 UNSAT at 2M conflicts; 3 pending)": {
+   "2x1,4x1,5x19,6x2": "UNSAT",
+   "2x1,4x1,5x20,7x1": "UNSAT",
+   "2x1,4x2,5x17,6x3": "UNSAT",
+   "2x1,5x21,6x1": "UNSAT",
+   "3x1,4x1,5x20,6x1": "UNSAT",
+   "3x1,4x2,5x18,6x2": "UNSAT",
+   "3x1,4x2,5x19,7x1": "UNSAT",
+   "3x1,4x3,5x16,6x3": "UNSAT",
+   "3x1,4x3,5x17,6x1,7x1": "UNSAT",
+   "3x1,4x4,5x14,6x4": "UNSAT",
+   "3x1,5x22": "UNKNOWN",
+   "3x2,4x1,5x17,6x3": "UNSAT",
+   "3x2,4x2,5x15,6x4": "UNSAT",
+   "3x2,5x19,6x2": "UNSAT",
+   "3x2,5x20,7x1": "UNSAT",
+   "4x2,5x21": "UNKNOWN",
+   "4x3,5x19,6x1": "UNKNOWN",
+   "4x4,5x17,6x2": "UNSAT",
+   "4x4,5x18,7x1": "UNSAT",
+   "4x5,5x15,6x3": "UNSAT",
+   "4x5,5x16,6x1,7x1": "UNSAT",
+   "4x6,5x13,6x4": "UNSAT",
+   "4x6,5x14,6x2,7x1": "UNSAT",
+   "4x7,5x11,6x5": "UNSAT"
+  },
+  "10,23 at 114": {
+   "2x1,5x20,6x2": "UNSAT",
+   "3x1,4x1,5x19,6x2": "UNSAT",
+   "3x1,4x1,5x20,7x1": "UNSAT",
+   "3x1,4x2,5x17,6x3": "UNSAT",
+   "3x1,5x21,6x1": "UNSAT",
+   "4x1,5x22": "UNSAT",
+   "4x2,5x20,6x1": "UNSAT",
+   "4x3,5x18,6x2": "UNSAT",
+   "4x3,5x19,7x1": "UNSAT",
+   "4x4,5x16,6x3": "UNSAT",
+   "4x5,5x14,6x4": "UNSAT"
+  }
+ },
+ "repository_targets_cross_check": {
+  "10,21,107": {
+   "4x1,5x17,6x3": "UNSAT",
+   "4x1,5x18,6x1,7x1": "UNSAT",
+   "4x2,5x15,6x4": "UNSAT",
+   "5x19,6x2": "UNSAT",
+   "5x20,7x1": "FILTER-KILLED"
+  },
+  "10,22,111": {
+   "4x1,5x19,6x2": "UNSAT",
+   "4x1,5x20,7x1": "UNSAT",
+   "4x2,5x17,6x3": "UNSAT",
+   "5x21,6x1": "UNSAT"
+  },
+  "11,20,112": {
+   "4x1,5x6,6x13": "UNSAT",
+   "4x1,5x7,6x11,7x1": "UNSAT",
+   "4x2,5x4,6x14": "UNSAT",
+   "5x10,6x8,7x2": "UNSAT",
+   "5x8,6x12": "UNSAT",
+   "5x9,6x10,7x1": "UNSAT"
+  },
+  "9,23,104": {
+   "3x1,4x9,5x13": "FILTER-KILLED",
+   "4x11,5x12": "FILTER-KILLED",
+   "4x12,5x10,6x1": "FILTER-KILLED"
+  }
+ }
+}

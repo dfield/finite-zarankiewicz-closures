@@ -36,13 +36,14 @@ PYTHONPATH=src python3 scripts/check_extended_results.py --check
 python3 scripts/verify_extended_witnesses_independent.py
 ```
 
-## Fifth closure (2026-07-05)
+## Fifth and sixth closures (2026-07-05)
 
 | File | Shape | Ones | Role |
 |---|---|---:|---|
 | [`z11_19_106_matrix.csv`](z11_19_106_matrix.csv) | $11\times19$ | 106 | Lower bound matching the deletion upper bound from $Z(11,18,3,3)=101$ |
+| [`z12_23_134_matrix.csv`](z12_23_134_matrix.csv) | $12\times23$ | 134 | Lower bound matching the two-step deficit theorem $Z(12,23,3,3)\le134$ |
 
-Its column degrees are $5^86^{11}$ and its row degrees are $(8,9,9,9,10,10,10,10,10,10,11)$. Verify it (together with the two new upper-bound theorems and the propagated table) with:
+The $11\times19$ matrix has column degrees $5^86^{11}$ and row degrees $(8,9^3,10^6,11)$; the $12\times23$ matrix has column degrees $4^15^26^{20}$ and row degrees $(11^{10},12^2)$. Verify both (together with the two new upper-bound theorems and the propagated table) with:
 
 ```sh
 python3 scripts/check_new_bounds.py --check
