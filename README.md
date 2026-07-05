@@ -56,6 +56,18 @@ Now mark one row and count unused row-triple capacity through that row. Contribu
 
 That is the entire upper-bound mechanism. The [full proof](docs/PROOF.md) supplies every definition and double count.
 
+## Follow-on finite closures
+
+Propagating vertex-deletion bounds through the 44 open cells in Bhan--Nobili--Langer's 2026 table and applying a new pair-deficit certificate gives three additional exact values:
+
+$$
+Z(10,21,3,3)=106,
+\qquad Z(10,22,3,3)=110,
+\qquad Z(11,20,3,3)=111.
+$$
+
+The first and third follow from the elementary deletion lemma. The middle value has an explicit 110-one matrix and a standard-library enumeration excluding all four possible 111-one degree profiles. Together with the paper's three exact values and this repository's original $(9,23)$ result, seven of the paper's 44 open cells are closed and **37 remain open**. See [the extended-results proof and precise claim boundary](docs/EXTENDED_RESULTS.md).
+
 ## Evidence and trust boundaries
 
 No single program is asked to carry the theorem. The repository separates the evidence into layers:
@@ -70,6 +82,7 @@ No single program is asked to carry the theorem. The repository separates the ev
 | Decision models | Reconstructs the 207-cell SAT and 512-column-type MIP formulations | [`models/`](models/) |
 | Standard proof traces | Replays the three terminal integer contradictions in DRAT and LRAT | [`certificates/`](certificates/) |
 | Adversarial audit | Records mutation tests, independent tools, trust assumptions, and limitations | [`docs/ADVERSARIAL_AUDIT.md`](docs/ADVERSARIAL_AUDIT.md) |
+| Follow-on finite certificate | Closes $(10,21)$, $(10,22)$, and $(11,20)$ and records the 37-cell frontier | [`docs/EXTENDED_RESULTS.md`](docs/EXTENDED_RESULTS.md), [`analysis/extended_results.json`](analysis/extended_results.json) |
 
 Two boundaries are important:
 
@@ -143,14 +156,15 @@ The stored models are deterministic outputs. They are included for transparency 
 ├── README.md                    introduction and result status
 ├── docs/
 │   ├── PROOF.md                 human-readable proof, committed before code
+│   ├── EXTENDED_RESULTS.md      three follow-on closures and open frontier
 │   ├── LITERATURE_REVIEW.md     prior work and dated status search
 │   ├── METHODS.md               models, certificates, and proof/code map
 │   ├── ADVERSARIAL_AUDIT.md     attack surface, tests, findings, limits
 │   └── REPRODUCIBILITY.md       commands and expected outputs
-├── data/                        explicit 103-one matrix
+├── data/                        explicit matrices for all claimed lower bounds
 ├── certificates/                exact JSON reduction and terminal traces
 ├── models/                      deterministic SAT/MIP artifacts
-├── analysis/                    exact DGH boundary and kernel catalog
+├── analysis/                    exact boundaries, kernel catalog, and table frontier
 ├── lean/                        formal arithmetic subproject
 ├── src/zarankiewicz_z9_23/      documented standard-library package
 ├── scripts/                     small command-line entry points
@@ -168,7 +182,7 @@ Reviewers are encouraged to begin with the six-page-equivalent [proof](docs/PROO
 
 ## Status and humility
 
-The repository's internal checks support the exact value 103, and no mathematical gap is presently known. Nevertheless:
+The repository's internal checks support the main exact value 103 and the three follow-on closures, and no mathematical gap is presently known. Nevertheless:
 
 - this work has not yet been independently peer reviewed;
 - the literature search cannot exclude unpublished or poorly indexed prior work;

@@ -20,7 +20,7 @@ From the repository root:
 make verify
 ```
 
-This runs tests, both witness checks, the exact certificate, deterministic model regeneration, and the repository audit. It does not invoke external solvers or Lean.
+This runs tests, the original and follow-on witness checks, both exact certificates, deterministic model regeneration, and the repository audit. It does not invoke external solvers or Lean.
 
 ## Individual commands and expected facts
 
@@ -30,7 +30,7 @@ This runs tests, both witness checks, the exact certificate, deterministic model
 make test
 ```
 
-Expected: 19 tests and `OK`. The test count is secondary; the named cases in [`tests/`](../tests/) define the coverage.
+Expected: 23 tests and `OK`. The test count is secondary; the named cases in [`tests/`](../tests/) define the coverage.
 
 ### Witness
 
@@ -59,6 +59,21 @@ make certificate
 ```
 
 Expected: `status: VERIFIED`, `profiles_enumerated: 3`, and the three named cases `balanced`, `one_degree_3`, and `one_degree_6`.
+
+### Follow-on exact values
+
+```sh
+make extended
+```
+
+Expected from the primary checker:
+
+- `status: IDENTICAL`;
+- `source_open_cases: 44`;
+- `remaining_open_cases: 37`; and
+- three verified follow-on witnesses.
+
+The independent checker must inspect 159,600 candidate submatrices for the $10\times21$ matrix, 184,800 for the $10\times22$ matrix, and 188,100 for the $11\times20$ matrix. The standard-library upper-bound certificate must enumerate four degree profiles, 1,050 profile-B cases, and $77\times22{,}155$ profile-C cases.
 
 ### Decision models
 
@@ -143,6 +158,7 @@ The following outputs are byte-deterministic:
 - model metadata;
 - exact DGH boundary report;
 - local-kernel catalog; and
+- extended finite-table report; and
 - artifact checksum file.
 
 Reports from external tools retain semantic outcomes and tool versions while omitting elapsed time, temporary directories, and machine identifiers.

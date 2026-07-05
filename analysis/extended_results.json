@@ -1,0 +1,454 @@
+{
+  "frontier": {
+    "deletion_checks": {
+      "Z(10,21)<=106": 106,
+      "Z(11,19)<=106": 106,
+      "Z(11,20)<=111": 111
+    },
+    "paper_bounds": {
+      "10,21": {
+        "lower": 106,
+        "upper": 108
+      },
+      "10,22": {
+        "lower": 110,
+        "upper": 111
+      },
+      "10,23": {
+        "lower": 112,
+        "upper": 115
+      },
+      "11,19": {
+        "lower": 102,
+        "upper": 108
+      },
+      "11,20": {
+        "lower": 111,
+        "upper": 112
+      },
+      "11,21": {
+        "lower": 116,
+        "upper": 116
+      },
+      "11,22": {
+        "lower": 121,
+        "upper": 121
+      },
+      "11,23": {
+        "lower": 118,
+        "upper": 125
+      },
+      "12,17": {
+        "lower": 102,
+        "upper": 108
+      },
+      "12,18": {
+        "lower": 108,
+        "upper": 113
+      },
+      "12,19": {
+        "lower": 110,
+        "upper": 118
+      },
+      "12,20": {
+        "lower": 113,
+        "upper": 122
+      },
+      "12,21": {
+        "lower": 116,
+        "upper": 127
+      },
+      "12,22": {
+        "lower": 132,
+        "upper": 132
+      },
+      "12,23": {
+        "lower": 125,
+        "upper": 136
+      },
+      "13,17": {
+        "lower": 106,
+        "upper": 116
+      },
+      "13,18": {
+        "lower": 115,
+        "upper": 121
+      },
+      "13,19": {
+        "lower": 114,
+        "upper": 125
+      },
+      "13,20": {
+        "lower": 119,
+        "upper": 130
+      },
+      "13,21": {
+        "lower": 127,
+        "upper": 135
+      },
+      "13,22": {
+        "lower": 137,
+        "upper": 140
+      },
+      "13,23": {
+        "lower": 135,
+        "upper": 145
+      },
+      "14,17": {
+        "lower": 118,
+        "upper": 124
+      },
+      "14,18": {
+        "lower": 124,
+        "upper": 129
+      },
+      "14,19": {
+        "lower": 121,
+        "upper": 135
+      },
+      "14,20": {
+        "lower": 125,
+        "upper": 140
+      },
+      "14,21": {
+        "lower": 131,
+        "upper": 145
+      },
+      "14,22": {
+        "lower": 137,
+        "upper": 150
+      },
+      "14,23": {
+        "lower": 138,
+        "upper": 155
+      },
+      "15,17": {
+        "lower": 125,
+        "upper": 132
+      },
+      "15,18": {
+        "lower": 132,
+        "upper": 138
+      },
+      "15,19": {
+        "lower": 132,
+        "upper": 143
+      },
+      "15,20": {
+        "lower": 138,
+        "upper": 149
+      },
+      "15,21": {
+        "lower": 139,
+        "upper": 154
+      },
+      "15,22": {
+        "lower": 143,
+        "upper": 160
+      },
+      "15,23": {
+        "lower": 149,
+        "upper": 165
+      },
+      "16,17": {
+        "lower": 128,
+        "upper": 141
+      },
+      "16,18": {
+        "lower": 130,
+        "upper": 146
+      },
+      "16,19": {
+        "lower": 132,
+        "upper": 152
+      },
+      "16,20": {
+        "lower": 146,
+        "upper": 158
+      },
+      "16,21": {
+        "lower": 147,
+        "upper": 164
+      },
+      "16,22": {
+        "lower": 149,
+        "upper": 169
+      },
+      "16,23": {
+        "lower": 158,
+        "upper": 175
+      },
+      "9,23": {
+        "lower": 103,
+        "upper": 104
+      }
+    },
+    "paper_exact_values": {
+      "11,21": 116,
+      "11,22": 121,
+      "12,22": 132
+    },
+    "remaining_open_cases": 37,
+    "remaining_parameters": [
+      "10,23",
+      "11,19",
+      "11,23",
+      "12,17",
+      "12,18",
+      "12,19",
+      "12,20",
+      "12,21",
+      "12,23",
+      "13,17",
+      "13,18",
+      "13,19",
+      "13,20",
+      "13,21",
+      "13,22",
+      "13,23",
+      "14,17",
+      "14,18",
+      "14,19",
+      "14,20",
+      "14,21",
+      "14,22",
+      "14,23",
+      "15,17",
+      "15,18",
+      "15,19",
+      "15,20",
+      "15,21",
+      "15,22",
+      "15,23",
+      "16,17",
+      "16,18",
+      "16,19",
+      "16,20",
+      "16,21",
+      "16,22",
+      "16,23"
+    ],
+    "repository_exact_values": {
+      "10,21": 106,
+      "10,22": 110,
+      "11,20": 111,
+      "9,23": 103
+    },
+    "source": "arXiv:2605.01120v2, Figure 2",
+    "source_open_cases": 44,
+    "status": "VERIFIED"
+  },
+  "status": "VERIFIED",
+  "witnesses": [
+    {
+      "column_sums": [
+        4,
+        6,
+        5,
+        5,
+        5,
+        6,
+        5,
+        4,
+        5,
+        5,
+        5,
+        5,
+        6,
+        5,
+        4,
+        5,
+        5,
+        5,
+        4,
+        6,
+        6
+      ],
+      "columns": 21,
+      "file": "data/z10_21_106_matrix.csv",
+      "first_violation": null,
+      "maximum_common_columns": 2,
+      "ones": 106,
+      "row_sums": [
+        10,
+        11,
+        10,
+        11,
+        11,
+        10,
+        10,
+        11,
+        11,
+        11
+      ],
+      "row_triples_checked": 120,
+      "rows": 10,
+      "sha256": "14369479cd1b71105ef3295bbe938498ded7fc3dddbca5d0262ff9f2960ff2bb",
+      "valid": true
+    },
+    {
+      "column_sums": [
+        4,
+        6,
+        5,
+        5,
+        5,
+        6,
+        5,
+        4,
+        5,
+        5,
+        5,
+        5,
+        6,
+        5,
+        4,
+        5,
+        5,
+        5,
+        4,
+        6,
+        6,
+        4
+      ],
+      "columns": 22,
+      "file": "data/z10_22_110_matrix.csv",
+      "first_violation": null,
+      "maximum_common_columns": 2,
+      "ones": 110,
+      "row_sums": [
+        11,
+        11,
+        11,
+        11,
+        11,
+        11,
+        11,
+        11,
+        11,
+        11
+      ],
+      "row_triples_checked": 120,
+      "rows": 10,
+      "sha256": "97bbe6284b61d6b828cd07b51b81e9a4f30af2b49b9aebd245d7030d2f232f46",
+      "valid": true
+    },
+    {
+      "column_sums": [
+        5,
+        6,
+        6,
+        5,
+        6,
+        5,
+        5,
+        5,
+        6,
+        6,
+        5,
+        6,
+        6,
+        6,
+        5,
+        6,
+        5,
+        6,
+        5,
+        6
+      ],
+      "columns": 20,
+      "file": "data/z11_20_111_matrix.csv",
+      "first_violation": null,
+      "maximum_common_columns": 2,
+      "ones": 111,
+      "row_sums": [
+        10,
+        10,
+        9,
+        10,
+        9,
+        10,
+        11,
+        11,
+        10,
+        11,
+        10
+      ],
+      "row_triples_checked": 165,
+      "rows": 11,
+      "sha256": "900aee82bb430e3e68b3908d1fd104510e81f6177aec60466f8b60f2df4070b7",
+      "valid": true
+    }
+  ],
+  "z10_22_upper_certificate": {
+    "case_a": {
+      "outside_row_pair_degree_sum": 45,
+      "pair_deficit_sum": 30,
+      "profile": {
+        "5": 21,
+        "6": 1
+      },
+      "required_divisor": 4
+    },
+    "case_b": {
+      "minimum_residue_sums_by_six_column_intersection": {
+        "2": 21,
+        "3": 21,
+        "4": 21,
+        "5": 33,
+        "6": 48
+      },
+      "pair_deficit_sum": 18,
+      "profile": {
+        "4": 1,
+        "5": 19,
+        "6": 2
+      }
+    },
+    "case_c": {
+      "degree_four_multiset_cases_per_orbit": 22155,
+      "minimum_pair_residue_sum": 12,
+      "profile": {
+        "4": 2,
+        "5": 17,
+        "6": 3
+      },
+      "row_symmetry_orbits": 77
+    },
+    "case_d": {
+      "minimum_forced_row_deficit_sum": 9,
+      "minimum_symmetric_difference": 3,
+      "profile": {
+        "4": 1,
+        "5": 20,
+        "7": 1
+      },
+      "row_deficit_sum": 3
+    },
+    "degree_profiles": [
+      {
+        "5": 21,
+        "6": 1
+      },
+      {
+        "4": 1,
+        "5": 19,
+        "6": 2
+      },
+      {
+        "4": 2,
+        "5": 17,
+        "6": 3
+      },
+      {
+        "4": 1,
+        "5": 20,
+        "7": 1
+      }
+    ],
+    "excluded_target": 111,
+    "problem": "Z(10,22,3,3)",
+    "status": "VERIFIED",
+    "triple_capacity": 240
+  }
+}

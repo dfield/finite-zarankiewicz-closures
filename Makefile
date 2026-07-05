@@ -1,7 +1,7 @@
 PYTHON ?= python3
 export PYTHONPATH := src
 
-.PHONY: all analysis audit certificate checksums models test verify witness
+.PHONY: all analysis audit certificate checksums extended models test verify witness
 
 all: verify
 
@@ -15,6 +15,10 @@ witness:
 certificate:
 	$(PYTHON) scripts/check_proof_certificate.py
 
+extended:
+	$(PYTHON) scripts/check_extended_results.py --check
+	$(PYTHON) scripts/verify_extended_witnesses_independent.py
+
 models:
 	$(PYTHON) scripts/generate_models.py --check
 
@@ -27,4 +31,4 @@ checksums:
 audit:
 	$(PYTHON) scripts/audit_repository.py
 
-verify: test witness certificate models analysis checksums audit
+verify: test witness certificate extended models analysis checksums audit

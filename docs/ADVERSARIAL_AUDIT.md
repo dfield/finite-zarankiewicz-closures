@@ -2,7 +2,7 @@
 
 ## Audit objective
 
-This audit asks how the claimed value \(Z(9,23,3,3)=103\) could be wrong even if ordinary happy-path tests pass. It treats prose, data, generators, certificates, formal code, and literature claims as separate attack surfaces.
+This audit asks how the claimed value \(Z(9,23,3,3)=103\) and the three follow-on closures could be wrong even if ordinary happy-path tests pass. It treats prose, data, generators, certificates, formal code, and literature claims as separate attack surfaces.
 
 The audit was completed against the repository state dated 2026-07-04. “Full” here means every evidence layer shipped by the repository was placed in scope; it does not mean the work has received external peer review or that every possible implementation has been verified.
 
@@ -18,6 +18,7 @@ The principal failure modes considered were:
 6. a literature table is misread as exact;
 7. generated evidence depends on a local path, timestamp, random seed, or unavailable private source; or
 8. documentation silently upgrades corroborating computation into the theorem's logical basis.
+9. the follow-on table is mistranscribed, a deletion bound is rounded incorrectly, or a symmetry orbit is omitted from the $Z(10,22)$ certificate.
 
 ## 1. Human-proof audit
 
@@ -69,6 +70,13 @@ The checker independently enumerates degree histograms rather than iterating ove
 
 The enumeration uses only nonnegative integer arithmetic and produces exactly three profiles. Category sizes are derived from the exceptional degree, so a certificate cannot choose how many rows are “inside” the exceptional column.
 
+The follow-on certificate independently enumerates the four possible degree profiles at 111 ones for a 10-by-22 matrix. Its two finite residue searches cover:
+
+- every intersection size $2,3,4,5,6$ for the two degree-six columns and all 210 degree-four columns in profile $4^1 5^{19}6^2$; and
+- 77 row-symmetry orbits for three degree-six columns, with all 22,155 unordered degree-four multisets in each orbit, in profile $4^2 5^{17}6^3$.
+
+The minimum residue sums are recomputed rather than trusted from JSON. The other two profiles are rejected by transparent divisibility and symmetric-difference arguments.
+
 ## 4. Encoding audit
 
 The sequential threshold circuit was checked by a separate DPLL implementation on every assignment of one through six base variables, every possible bound, both positive and signed literals, and every exact target. The direct \(K_{3,3}\) clauses were compared with an independently constructed set in a smaller model.
@@ -113,6 +121,8 @@ The three table-level claims most relevant to the previous one-edge gap were che
 
 The search included exact parameter variants, paper titles, DOI and arXiv records, and forward-looking queries through 2026-07-04. No earlier closure was located. The repository describes this as a dated search conclusion and explicitly invites earlier references.
 
+The follow-on audit transcribes all 44 cells that the paper identifies as previously open and checks the set cardinality directly. After the paper's three closures, the original $(9,23)$ result, and three follow-on closures, set subtraction leaves 37 cells. The documentation expressly retains their open status.
+
 ## 8. Portability and provenance audit
 
 The core package uses Python's standard library and supports Python 3.9 onward. The first test run exposed two features that were not available in the actual Python 3.9 interpreter (`type | type` at runtime and `int.bit_count`); both were removed, and the declared compatibility floor was corrected.
@@ -128,6 +138,7 @@ The audit does not remove the need for external review. In particular:
 - no independent mathematician has yet signed off on the proof;
 - the Lean development is an arithmetic formalization, not an end-to-end theorem;
 - no monolithic LRAT trace is provided for the raw 9-by-23 cell model;
+- the follow-on pair-deficit enumeration is checked by standard-library code but is not formalized in Lean;
 - the DGH formula transcription was checked by exact tests and source comparison but is diagnostic, not part of the theorem;
 - the finite literature search cannot establish absolute priority; and
 - external replay tools add their own trusted implementations.

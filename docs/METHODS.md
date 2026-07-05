@@ -157,3 +157,14 @@ The following are not formalized in Lean:
 - the CSV witness.
 
 Those layers are human-readable and independently executable, but they remain outside the proof assistant. [`lean/README.md`](../lean/README.md) and [`lean/AxiomAudit.lean`](../lean/AxiomAudit.lean) make this boundary testable.
+
+## 11. Follow-on finite-table certificate
+
+[`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) closes three additional cells from the 2026 table. Two closures use only the vertex-deletion recurrence. The $Z(10,22,3,3)=110$ upper bound first enumerates all column-degree profiles at 111 ones, then uses deficits through row pairs.
+
+The two nontrivial finite subcases are checked by row-symmetry reduction:
+
+- 1,050 configurations for profile $4^1 5^{19}6^2$; and
+- 77 exceptional-column orbits, each with 22,155 degree-four multisets, for profile $4^2 5^{17}6^3$.
+
+The reusable implementation is [`extended.py`](../src/zarankiewicz_z9_23/extended.py), and [`check_extended_results.py`](../scripts/check_extended_results.py) compares its recomputed output byte-for-byte with [`extended_results.json`](../analysis/extended_results.json). The independent witness checker imports no package code.

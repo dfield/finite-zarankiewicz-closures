@@ -92,7 +92,21 @@ $$
 
 The construction in this repository independently certifies the same lower bound. Credit for publicly reporting the 103 lower bound belongs to Bhan--Nobili--Langer. The contribution claimed here is the elementary upper-bound argument excluding 104, together with a reproducible verification package.
 
-## 6. Relation of the present proof to prior methods
+## 6. Follow-on review of the remaining finite table
+
+Figure 2 of Bhan--Nobili--Langer contains 44 cells that were open at the paper's stated literature boundary. The paper closes three of those cells. The original result in this repository closes $(9,23)$, and the follow-on analysis in [`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) closes three more:
+
+$$
+Z(10,21,3,3)=106,
+\qquad Z(10,22,3,3)=110,
+\qquad Z(11,20,3,3)=111.
+$$
+
+The first and third follow by propagating the classical minimum-degree deletion bound from established neighboring values. The middle result combines a 110-one construction with a degree-profile and pair-deficit argument excluding 111. These additions leave 37 of the paper's original 44 open cells unresolved. No exact value is asserted for those cases.
+
+This follow-on status was checked against the paper's rendered Figure 2 with a cutoff of **2026-07-04**. The search located no later arXiv source closing the remaining cells, but this negative literature finding remains provisional.
+
+## 7. Relation of the present proof to prior methods
 
 The proof uses only ingredients that are individually classical:
 
@@ -106,7 +120,7 @@ What appears to be new is their combination at this boundary. The penalty identi
 
 This novelty assessment is intentionally modest. The authors located no earlier source containing this exact argument or closing this exact parameter, but a literature search is not a proof of priority. The mathematical claim $Z(9,23,3,3)=103$ stands independently of any novelty claim.
 
-## 7. Status summary
+## 8. Status summary
 
 | Date | Source | Contribution relevant here | Status of $Z(9,23,3,3)$ |
 |---|---|---|---|
@@ -120,7 +134,7 @@ This novelty assessment is intentionally modest. The authors located no earlier 
 | 2026 | Bhan--Nobili--Langer [BNL26] | New 103-one construction | Establishes $103\le Z\le104$ |
 | This repository | Elementary proof and checked witness | Excludes 104 and verifies 103 | $Z(9,23,3,3)=103$ |
 
-## 8. Reproducibility of the literature claims
+## 9. Reproducibility of the literature claims
 
 The bibliography is stored in [`references.bib`](../references.bib). Links below point to publisher, DOI, or arXiv records rather than copied papers. The three sources that directly establish the pre-existing numerical status are:
 

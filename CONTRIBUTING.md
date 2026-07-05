@@ -10,6 +10,7 @@ Independent scrutiny is especially welcome because this repository presents a ne
 4. Run `make test`; the tests include deliberate corruptions and exhaustive small cardinality checks.
 5. Inspect the explicit formalization boundary in [`lean/README.md`](lean/README.md), then run `lake build` inside `lean/`.
 6. Treat the SAT/MIP models and DRAT/LRAT traces as corroborating evidence, not substitutes for Step 1.
+7. For the follow-on results, read [`docs/EXTENDED_RESULTS.md`](docs/EXTENDED_RESULTS.md), run `make extended`, and inspect the explicit 37-cell claim boundary.
 
 ## Useful issue reports
 
@@ -17,6 +18,7 @@ Please open an issue for any of the following:
 
 - a mathematical gap or ambiguous quantifier in the proof;
 - an earlier source that closes this exact case or contains the marked-row argument;
+- a missing or previously solved cell in the follow-on 37-case frontier;
 - a witness checker or certificate mutation that is incorrectly accepted;
 - a mismatch between a proof equation and its Python or Lean counterpart;
 - a deterministic artifact that does not regenerate byte-for-byte; or

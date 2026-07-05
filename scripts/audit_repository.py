@@ -23,6 +23,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from zarankiewicz_z9_23.certificate import verify_certificate  # noqa: E402
+from zarankiewicz_z9_23.extended import (  # noqa: E402
+    extended_frontier_report,
+    z10_22_certificate_report,
+)
 from zarankiewicz_z9_23.matrix import read_boolean_csv, verify_by_row_triples  # noqa: E402
 
 
@@ -33,12 +37,17 @@ EXPECTED_FILES = (
     "docs/METHODS.md",
     "docs/ADVERSARIAL_AUDIT.md",
     "docs/REPRODUCIBILITY.md",
+    "docs/EXTENDED_RESULTS.md",
     "data/z9_23_103_matrix.csv",
+    "data/z10_21_106_matrix.csv",
+    "data/z10_22_110_matrix.csv",
+    "data/z11_20_111_matrix.csv",
     "certificates/degree_deficit.json",
     "models/cells_9x23_exact_104.cnf",
     "models/column_types_9x23_exact_104.lp",
     "analysis/dgh_boundary.json",
     "analysis/local_kernel_catalog.csv",
+    "analysis/extended_results.json",
     "lean/ZarankiewiczZ923/ArithmeticKernel.lean",
     "artifacts.sha256",
 )
@@ -267,10 +276,36 @@ def check_mathematical_artifacts() -> dict[str, object]:
     certificate_report = verify_certificate(certificate)
     if certificate_report["status"] != "VERIFIED":
         raise AssertionError("stored exact certificate failed")
+    extended_witnesses = []
+    for filename, rows, columns, ones in (
+        ("z10_21_106_matrix.csv", 10, 21, 106),
+        ("z10_22_110_matrix.csv", 10, 22, 110),
+        ("z11_20_111_matrix.csv", 11, 20, 111),
+    ):
+        path = ROOT / "data" / filename
+        report = verify_by_row_triples(
+            read_boolean_csv(path),
+            expected_rows=rows,
+            expected_columns=columns,
+            expected_ones=ones,
+            raw_bytes=path.read_bytes(),
+        )
+        if not report.valid:
+            raise AssertionError(f"stored extended witness failed: {filename}")
+        extended_witnesses.append(report.ones)
+    extended_certificate = z10_22_certificate_report()
+    if extended_certificate["status"] != "VERIFIED":
+        raise AssertionError("extended exact certificate failed")
+    frontier = extended_frontier_report()
+    if frontier["source_open_cases"] != 44 or frontier["remaining_open_cases"] != 37:
+        raise AssertionError("extended frontier count mismatch")
     return {
         "witness_ones": matrix_report.ones,
+        "extended_witness_ones": extended_witnesses,
         "row_triples_checked": matrix_report.row_triples_checked,
         "profiles_enumerated": certificate_report["profiles_enumerated"],
+        "extended_profiles_enumerated": len(extended_certificate["degree_profiles"]),
+        "remaining_open_cases": frontier["remaining_open_cases"],
     }
 
 
