@@ -140,9 +140,9 @@
   },
   "12,23": {
    "lower": 134,
-   "lower_source": "two-one-line-extension-of-(12, 22)",
+   "lower_source": "closed",
    "upper": 134,
-   "upper_source": "deficit-theorem"
+   "upper_source": "closed"
   },
   "13,16": {
    "lower": 107,

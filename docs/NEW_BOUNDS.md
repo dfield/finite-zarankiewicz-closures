@@ -16,7 +16,7 @@ $$
 
 For $(11,19)$, the upper bound is the deletion bound already derived in [`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) from the established value $Z(11,18,3,3)=101$; the matching lower bound is a new explicit 106-one matrix, [`data/z11_19_106_matrix.csv`](../data/z11_19_106_matrix.csv), found by simulated annealing over fixed column-degree profiles and verified by exhaustive scan. Bhan--Nobili--Langer's best construction had 102 ones.
 
-For $(12,23)$, Section 3 proves $Z(12,23,3,3)\le134$ by a two-step deficit argument (their reported interval was $125$--$136$), and the matching lower bound is the two-one-column extension of Bhan--Nobili--Langer's exact $Z(12,22,3,3)=132$ construction.
+For $(12,23)$, Section 3 proves $Z(12,23,3,3)\le134$ by a two-step deficit argument (their reported interval was $125$--$136$), and the matching lower bound is a new explicit 134-one matrix, [`data/z12_23_134_matrix.csv`](../data/z12_23_134_matrix.csv).
 
 With these closures, nine of the paper's 44 open cells are settled and **35 remain open**.
 
@@ -164,13 +164,13 @@ No profile survives, so no 135-one matrix exists, and $Z(12,23,3,3)\le134$. $\bl
 
 ### 3.5 The matching lower bound
 
-Appending a column with two ones to any 132-one $12\times22$ $K_{3,3}$-free matrix — Bhan--Nobili--Langer's construction establishing $Z(12,22,3,3)=132$ — gives a 134-one $12\times23$ matrix that is still $K_{3,3}$-free, because a $3\times3$ all-one block would need three ones in the new column. Hence
+[`data/z12_23_134_matrix.csv`](../data/z12_23_134_matrix.csv) is an explicit $12\times23$ Boolean matrix with 134 ones, column degrees $4^15^26^{20}$, and row degrees $(11^{10},12^2)$. Exhaustive inspection of all $\binom{12}3\binom{23}3=389{,}620$ candidate $3\times3$ submatrices confirms that none is all one. (Independently of this artifact, appending a two-one column to Bhan--Nobili--Langer's $Z(12,22,3,3)=132$ construction also gives 134.) Hence
 
 $$
 Z(12,23,3,3)=134 .
 $$
 
-This lower bound inherits Bhan--Nobili--Langer's $(12,22)$ construction rather than an artifact stored here; a session-local search for an explicit 134-one matrix is noted in Section 6.
+The matrix was found by per-profile SAT search; the discovery method carries no logical weight, because the verification is a direct scan.
 
 ## 4. Theorem: $Z(13,23,3,3)\le144$
 
@@ -272,7 +272,11 @@ Cells not listed are unchanged. Note that $(12,19)$, $(12,20)$, and $(12,21)$ in
 
 - The $Z(11,19)$ **upper** bound and every deletion-propagated bound depend on the correctness of the established values in [BNL26] Figure 2 / Tan's Table 3 — the same dependency already accepted by [`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) for $Z(10,21)$ and $Z(11,20)$. The witness and both deficit theorems are self-contained.
 - The theorems of Sections 3 and 4 are fully elementary; [`scripts/check_new_bounds.py`](../scripts/check_new_bounds.py) re-derives the profile classifications by exhaustive enumeration and re-checks every displayed number, in the standard library only.
-- During the same session, per-profile SAT runs (CaDiCaL via PySAT, with sequential-counter cardinality encodings and double-lex symmetry breaking) returned `UNSAT` for **all 11** capacity-feasible degree profiles of a hypothetical 114-one $10\times23$ matrix and for **21 of 24** profiles of a 113-one matrix, suggesting $Z(10,23,3,3)\le113$ and quite possibly $=112$. The same machinery independently re-confirmed profile infeasibilities behind this repository's published upper bounds. **No claim in this document rests on those verdicts**; they are recorded here only as a research pointer, since no independently checkable proof trace was retained. A DRAT-logged rerun would be the natural follow-up.
+- During the same session, per-profile SAT runs (CaDiCaL via PySAT, with sequential-counter cardinality encodings and double-lex symmetry breaking) produced two families of verdicts, recorded in [`analysis/sat_cross_check.json`](../analysis/sat_cross_check.json):
+  - **Cross-check of this repository.** Every capacity-feasible column-degree profile at all four previously excluded targets — $(9,23)$ at 104, $(10,21)$ at 107, $(10,22)$ at 111, and $(11,20)$ at 112 — returned `UNSAT`. This confirms the four published upper bounds by a mechanism independent of the marked-row, deletion, and pair-deficit proofs.
+  - **Frontier observations.** All 11 profiles of a hypothetical 114-one $10\times23$ matrix returned `UNSAT`, as did 21 of the 24 profiles at 113 ones, suggesting $Z(10,23,3,3)\le113$ and quite possibly $=112$.
+
+  **No claim in this document rests on those verdicts**; no independently checkable proof trace was retained. A DRAT-logged rerun would be the natural follow-up.
 - The figure-2 transcription used here was re-read from the arXiv HTML of [BNL26] v2 during the session and matches [`analysis/extended_results.json`](../analysis/extended_results.json); the upper bounds equal $\min(\text{[Tan22] Table 3},\ \text{[DGH26] Table 2})$ cell-by-cell, and an exact-rational re-computation of the [DGH26] linear program reproduced their published values for every open cell.
 
 ## 7. Reproduction
