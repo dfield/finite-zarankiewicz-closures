@@ -6,9 +6,9 @@ Independent scrutiny is especially welcome because this repository presents four
 
 1. Read [`docs/PROOF.md`](docs/PROOF.md) without consulting the code. Check the two double counts, the penalty-based degree classification, and each marked-row residue.
 2. Run `make witness` and inspect the explicit matrix in [`data/`](data/).
-3. Run `make certificate` and compare the JSON cases with the marked-row proof.
+3. Run `make certificate` and compare all four case certificates with their proof sections.
 4. Run `make test`; the tests include deliberate corruptions and exhaustive small cardinality checks.
-5. Inspect the explicit formalization boundary in [`lean/README.md`](lean/README.md), then run `lake build` inside `lean/`.
+5. Inspect the four-case formalization boundary in [`lean/README.md`](lean/README.md), then run `lake build` inside `lean/`.
 6. Treat the SAT/MIP models and DRAT/LRAT traces as corroborating evidence, not substitutes for Step 1.
 7. For the three additional results, read [`docs/EXTENDED_RESULTS.md`](docs/EXTENDED_RESULTS.md), run `make extended`, and inspect the explicit 37-cell claim boundary.
 

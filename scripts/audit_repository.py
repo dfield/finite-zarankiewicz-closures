@@ -13,6 +13,7 @@ import ast
 import hashlib
 import itertools
 import json
+import math
 import re
 import subprocess
 import sys
@@ -23,6 +24,10 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from finite_zarankiewicz_closures.certificate import verify_certificate  # noqa: E402
+from finite_zarankiewicz_closures.case_certificates import (  # noqa: E402
+    CASE_SPECS,
+    verify_case_certificate,
+)
 from finite_zarankiewicz_closures.extended import (  # noqa: E402
     extended_frontier_report,
     z10_22_certificate_report,
@@ -36,6 +41,9 @@ from finite_zarankiewicz_closures.matrix import (  # noqa: E402
 EXPECTED_FILES = (
     "README.md",
     "docs/PROOF.md",
+    "docs/PROOF_Z10_21.md",
+    "docs/PROOF_Z10_22.md",
+    "docs/PROOF_Z11_20.md",
     "docs/LITERATURE_REVIEW.md",
     "docs/METHODS.md",
     "docs/ADVERSARIAL_AUDIT.md",
@@ -46,12 +54,23 @@ EXPECTED_FILES = (
     "data/z10_22_110_matrix.csv",
     "data/z11_20_111_matrix.csv",
     "certificates/degree_deficit.json",
+    "certificates/z9_23_103.json",
+    "certificates/z10_21_106.json",
+    "certificates/z10_22_110.json",
+    "certificates/z11_20_111.json",
     "models/cells_9x23_exact_104.cnf",
     "models/column_types_9x23_exact_104.lp",
+    "models/cells_10x21_exact_107.cnf",
+    "models/column_types_10x21_exact_107.lp",
+    "models/cells_10x22_exact_111.cnf",
+    "models/column_types_10x22_exact_111.lp",
+    "models/cells_11x20_exact_112.cnf",
+    "models/column_types_11x20_exact_112.lp",
     "analysis/dgh_boundary.json",
     "analysis/local_kernel_catalog.csv",
     "analysis/extended_results.json",
     "lean/ZarankiewiczZ923/ArithmeticKernel.lean",
+    "lean/ZarankiewiczFiniteClosures/ArithmeticKernels.lean",
     "artifacts.sha256",
 )
 
@@ -146,7 +165,9 @@ def check_python_documentation() -> dict[str, object]:
         if ast.get_docstring(tree) is None:
             missing.append(f"{path.name}: module")
         for node in tree.body:
-            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and not node.name.startswith("_"):
+            if isinstance(
+                node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+            ) and not node.name.startswith("_"):
                 public_objects += 1
                 if ast.get_docstring(node) is None:
                     missing.append(f"{path.name}: {node.name}")
@@ -155,7 +176,9 @@ def check_python_documentation() -> dict[str, object]:
     return {"package_modules": modules, "documented_public_objects": public_objects}
 
 
-def parse_dimacs(path: Path, expected_prefix: Iterator[tuple[int, ...]] | None = None) -> tuple[int, int]:
+def parse_dimacs(
+    path: Path, expected_prefix: Iterator[tuple[int, ...]] | None = None
+) -> tuple[int, int]:
     """Strictly parse one-clause-per-line DIMACS and optionally check a prefix."""
 
     variables = None
@@ -209,44 +232,70 @@ def parse_dimacs(path: Path, expected_prefix: Iterator[tuple[int, ...]] | None =
     return variables, clauses
 
 
-def expected_cell_forbidders() -> Iterator[tuple[int, ...]]:
-    """Yield all direct 9-by-23 forbidden clauses independently of the generator."""
+def expected_cell_forbidders(rows: int, columns: int) -> Iterator[tuple[int, ...]]:
+    """Yield all direct forbidden clauses independently of the generator."""
 
-    for rows in itertools.combinations(range(9), 3):
-        for columns in itertools.combinations(range(23), 3):
-            yield tuple(-(row * 23 + column + 1) for row in rows for column in columns)
+    for row_triple in itertools.combinations(range(rows), 3):
+        for column_triple in itertools.combinations(range(columns), 3):
+            yield tuple(
+                -(row * columns + column + 1)
+                for row in row_triple
+                for column in column_triple
+            )
 
 
 def check_models() -> dict[str, object]:
     """Parse all CNFs and verify stored model metadata and hashes."""
 
-    cell = ROOT / "models" / "cells_9x23_exact_104.cnf"
-    cell_variables, cell_clauses = parse_dimacs(cell, expected_cell_forbidders())
-    if (cell_variables, cell_clauses) != (32654, 277931):
-        raise AssertionError("unexpected target cell-model dimensions")
+    manifest = json.loads((ROOT / "models" / "manifest.json").read_text(encoding="utf-8"))
+    if manifest.get("schema_version") != 2 or set(manifest.get("cases", {})) != {
+        case.slug for case in CASE_SPECS
+    }:
+        raise AssertionError("model manifest does not cover all four cases")
+    case_reports = {}
+    for case in CASE_SPECS:
+        entry = manifest["cases"][case.slug]
+        cell_metadata = entry["cell_cnf"]
+        column_metadata = entry["column_lp"]
+        cell = ROOT / cell_metadata["file"]
+        cell_variables, cell_clauses = parse_dimacs(
+            cell, expected_cell_forbidders(case.rows, case.columns)
+        )
+        if (
+            cell_variables != cell_metadata["variables_total"]
+            or cell_clauses != cell_metadata["clauses_total"]
+        ):
+            raise AssertionError(f"unexpected cell-model dimensions: {case.slug}")
+        if cell_metadata["forbidden_submatrix_clauses"] != math.comb(
+            case.rows, 3
+        ) * math.comb(case.columns, 3):
+            raise AssertionError(f"wrong forbidden-clause count: {case.slug}")
+        if hashlib.sha256(cell.read_bytes()).hexdigest() != cell_metadata["sha256"]:
+            raise AssertionError(f"cell model hash mismatch: {case.slug}")
+        lp_path = ROOT / column_metadata["file"]
+        lp = lp_path.read_text(encoding="ascii")
+        expected_triples = math.comb(case.rows, 3)
+        expected_supports = 1 << case.rows
+        if (
+            lp.count("\n triple_") != expected_triples
+            or lp.count("\n x_") != expected_supports
+            or not lp.endswith("End\n")
+            or hashlib.sha256(lp_path.read_bytes()).hexdigest() != column_metadata["sha256"]
+        ):
+            raise AssertionError(f"column LP has unexpected structure: {case.slug}")
+        case_reports[case.slug] = {
+            "cell_variables": cell_variables,
+            "cell_clauses": cell_clauses,
+            "forbidden_prefix_clauses": cell_metadata["forbidden_submatrix_clauses"],
+            "column_support_variables": expected_supports,
+            "column_triple_constraints": expected_triples,
+        }
     terminal_dimensions = {}
     for case in ("balanced", "one_degree_3", "one_degree_6"):
         terminal_dimensions[case] = parse_dimacs(ROOT / "models" / f"terminal_{case}.cnf")
-    manifest = json.loads((ROOT / "models" / "manifest.json").read_text(encoding="utf-8"))
-    expected_hashes = {
-        "cell_cnf": hashlib.sha256(cell.read_bytes()).hexdigest(),
-        "column_lp": hashlib.sha256(
-            (ROOT / "models" / "column_types_9x23_exact_104.lp").read_bytes()
-        ).hexdigest(),
-    }
-    for name, digest in expected_hashes.items():
-        if manifest["models"][name]["sha256"] != digest:
-            raise AssertionError(f"model manifest hash mismatch: {name}")
-    lp = (ROOT / "models" / "column_types_9x23_exact_104.lp").read_text(encoding="ascii")
-    if lp.count("\n triple_") != 84 or lp.count("\n x_") != 512 or not lp.endswith("End\n"):
-        raise AssertionError("column LP has unexpected structure")
     return {
-        "cell_variables": cell_variables,
-        "cell_clauses": cell_clauses,
-        "forbidden_prefix_clauses": 148764,
+        "cases": case_reports,
         "terminal_dimensions": terminal_dimensions,
-        "column_support_variables": 512,
-        "column_triple_constraints": 84,
     }
 
 
@@ -302,6 +351,14 @@ def check_mathematical_artifacts() -> dict[str, object]:
     frontier = extended_frontier_report()
     if frontier["source_open_cases"] != 44 or frontier["remaining_open_cases"] != 37:
         raise AssertionError("extended frontier count mismatch")
+    case_certificate_reports = []
+    for case in CASE_SPECS:
+        case_path = ROOT / "certificates" / f"{case.slug}.json"
+        case_certificate_reports.append(
+            verify_case_certificate(
+                json.loads(case_path.read_text(encoding="utf-8")), ROOT
+            )
+        )
     return {
         "witness_ones": matrix_report.ones,
         "extended_witness_ones": extended_witnesses,
@@ -309,6 +366,7 @@ def check_mathematical_artifacts() -> dict[str, object]:
         "profiles_enumerated": certificate_report["profiles_enumerated"],
         "extended_profiles_enumerated": len(extended_certificate["degree_profiles"]),
         "remaining_open_cases": frontier["remaining_open_cases"],
+        "case_certificates_verified": len(case_certificate_reports),
     }
 
 

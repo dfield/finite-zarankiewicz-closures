@@ -1,6 +1,9 @@
-name = "ZarankiewiczZ923"
-version = "1.0.0"
-defaultTargets = ["ZarankiewiczZ923"]
+name = "FiniteZarankiewiczClosures"
+version = "1.3.0"
+defaultTargets = ["ZarankiewiczZ923", "ZarankiewiczFiniteClosures"]
 
 [[lean_lib]]
 name = "ZarankiewiczZ923"
+
+[[lean_lib]]
+name = "ZarankiewiczFiniteClosures"

@@ -1,0 +1,138 @@
+{
+  "certificate_type": "exact_finite_zarankiewicz_case",
+  "conclusion": "Z(10,22,3,3)=110",
+  "lower_bound": {
+    "column_sums": [
+      4,
+      6,
+      5,
+      5,
+      5,
+      6,
+      5,
+      4,
+      5,
+      5,
+      5,
+      5,
+      6,
+      5,
+      4,
+      5,
+      5,
+      5,
+      4,
+      6,
+      6,
+      4
+    ],
+    "columns": 22,
+    "file": "data/z10_22_110_matrix.csv",
+    "first_violation": null,
+    "maximum_common_columns": 2,
+    "ones": 110,
+    "row_sums": [
+      11,
+      11,
+      11,
+      11,
+      11,
+      11,
+      11,
+      11,
+      11,
+      11
+    ],
+    "row_triples_checked": 120,
+    "rows": 10,
+    "sha256": "97bbe6284b61d6b828cd07b51b81e9a4f30af2b49b9aebd245d7030d2f232f46",
+    "valid": true
+  },
+  "parameters": {
+    "columns": 22,
+    "exact_value": 110,
+    "forbidden_columns": 3,
+    "forbidden_rows": 3,
+    "rows": 10
+  },
+  "schema_version": 1,
+  "slug": "z10_22_110",
+  "theorem": "Z(10,22,3,3)=110",
+  "upper_bound": {
+    "computer_assisted_component": "case-B and case-C row-symmetry orbit enumeration",
+    "detailed_report": {
+      "case_a": {
+        "outside_row_pair_degree_sum": 45,
+        "pair_deficit_sum": 30,
+        "profile": {
+          "5": 21,
+          "6": 1
+        },
+        "required_divisor": 4
+      },
+      "case_b": {
+        "minimum_residue_sums_by_six_column_intersection": {
+          "2": 21,
+          "3": 21,
+          "4": 21,
+          "5": 33,
+          "6": 48
+        },
+        "pair_deficit_sum": 18,
+        "profile": {
+          "4": 1,
+          "5": 19,
+          "6": 2
+        }
+      },
+      "case_c": {
+        "degree_four_multiset_cases_per_orbit": 22155,
+        "minimum_pair_residue_sum": 12,
+        "profile": {
+          "4": 2,
+          "5": 17,
+          "6": 3
+        },
+        "row_symmetry_orbits": 77
+      },
+      "case_d": {
+        "minimum_forced_row_deficit_sum": 9,
+        "minimum_symmetric_difference": 3,
+        "profile": {
+          "4": 1,
+          "5": 20,
+          "7": 1
+        },
+        "row_deficit_sum": 3
+      },
+      "degree_profiles": [
+        {
+          "5": 21,
+          "6": 1
+        },
+        {
+          "4": 1,
+          "5": 19,
+          "6": 2
+        },
+        {
+          "4": 2,
+          "5": 17,
+          "6": 3
+        },
+        {
+          "4": 1,
+          "5": 20,
+          "7": 1
+        }
+      ],
+      "excluded_target": 111,
+      "problem": "Z(10,22,3,3)",
+      "status": "VERIFIED",
+      "triple_capacity": 240
+    },
+    "excluded_target": 111,
+    "lean_kernel": "ZarankiewiczFiniteClosures.ArithmeticKernels",
+    "method": "pair_deficit_enumeration"
+  }
+}

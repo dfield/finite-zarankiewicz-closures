@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate or byte-check the two exact decision models."""
+"""Generate or byte-check exact decision models for all four cases."""
 
 from __future__ import annotations
 
@@ -19,8 +19,51 @@ from finite_zarankiewicz_closures.encodings import (  # noqa: E402
 )
 
 
+MODEL_CASES = (
+    ("z9_23_103", 9, 23, 104),
+    ("z10_21_106", 10, 21, 107),
+    ("z10_22_110", 10, 22, 111),
+    ("z11_20_111", 11, 20, 112),
+)
+
+
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _names(rows: int, columns: int, target: int) -> tuple[str, str]:
+    return (
+        f"cells_{rows}x{columns}_exact_{target}.cnf",
+        f"column_types_{rows}x{columns}_exact_{target}.lp",
+    )
+
+
+def _generate_case(
+    directory: Path, slug: str, rows: int, columns: int, target: int
+) -> dict[str, object]:
+    cell_name, column_name = _names(rows, columns, target)
+    cell_path = directory / cell_name
+    column_path = directory / column_name
+    cell = write_cell_cnf(cell_path, rows=rows, columns=columns, target_ones=target)
+    column = write_column_type_lp(
+        column_path, rows=rows, columns=columns, target_ones=target
+    )
+    return {
+        "slug": slug,
+        "rows": rows,
+        "columns": columns,
+        "excluded_target": target,
+        "cell_cnf": {"file": f"models/{cell_name}", **cell},
+        "column_lp": {"file": f"models/{column_name}", **column},
+        "monotonicity_note": (
+            f"Testing exactly {target} ones suffices because deleting ones preserves "
+            "K_3,3-freeness."
+        ),
+    }
+
+
+def _manifest(cases: dict[str, object]) -> dict[str, object]:
+    return {"schema_version": 2, "cases": cases}
 
 
 def main() -> int:
@@ -31,49 +74,54 @@ def main() -> int:
         help="regenerate in a temporary directory and require byte-for-byte identity",
     )
     args = parser.parse_args()
-    destinations = {
-        "cell_cnf": ROOT / "models" / "cells_9x23_exact_104.cnf",
-        "column_lp": ROOT / "models" / "column_types_9x23_exact_104.lp",
-    }
+    model_directory = ROOT / "models"
 
     if args.check:
-        with tempfile.TemporaryDirectory(prefix="z9-23-model-check-") as directory:
-            temporary = Path(directory)
-            reports = {
-                "cell_cnf": write_cell_cnf(temporary / destinations["cell_cnf"].name),
-                "column_lp": write_column_type_lp(temporary / destinations["column_lp"].name),
-            }
-            for name, destination in destinations.items():
-                generated = temporary / destination.name
-                if not destination.exists() or generated.read_bytes() != destination.read_bytes():
-                    print(json.dumps({"status": "MISMATCH", "artifact": name}, indent=2))
-                    return 1
-                reports[name]["stored_sha256"] = _sha256(destination)
-        print(json.dumps({"status": "IDENTICAL", "models": reports}, indent=2, sort_keys=True))
+        with tempfile.TemporaryDirectory(prefix="four-case-model-check-") as raw:
+            temporary = Path(raw)
+            reports = {}
+            for slug, rows, columns, target in MODEL_CASES:
+                report = _generate_case(temporary, slug, rows, columns, target)
+                reports[slug] = report
+                for kind in ("cell_cnf", "column_lp"):
+                    name = Path(report[kind]["file"]).name
+                    generated = temporary / name
+                    destination = model_directory / name
+                    if (
+                        not destination.exists()
+                        or generated.read_bytes() != destination.read_bytes()
+                    ):
+                        print(
+                            json.dumps(
+                                {"status": "MISMATCH", "artifact": str(destination)},
+                                indent=2,
+                            )
+                        )
+                        return 1
+                    if report[kind]["sha256"] != _sha256(destination):
+                        raise AssertionError(f"stored hash mismatch: {destination}")
+            expected_manifest = (
+                json.dumps(_manifest(reports), indent=2, sort_keys=True) + "\n"
+            )
+            manifest_path = model_directory / "manifest.json"
+            if (
+                not manifest_path.exists()
+                or manifest_path.read_text(encoding="utf-8") != expected_manifest
+            ):
+                print(json.dumps({"status": "MISMATCH", "artifact": str(manifest_path)}, indent=2))
+                return 1
+        print(json.dumps({"status": "IDENTICAL", "cases": reports}, indent=2, sort_keys=True))
         return 0
 
-    reports = {
-        "cell_cnf": write_cell_cnf(destinations["cell_cnf"]),
-        "column_lp": write_column_type_lp(destinations["column_lp"]),
-    }
-    metadata_path = ROOT / "models" / "manifest.json"
-    metadata_path.write_text(
-        json.dumps(
-            {
-                "schema_version": 1,
-                "models": reports,
-                "monotonicity_note": (
-                    "Testing exactly 104 ones suffices: deleting ones preserves K_3,3-freeness, "
-                    "so any denser witness would contain a 104-one witness."
-                ),
-            },
-            indent=2,
-            sort_keys=True,
-        )
-        + "\n",
+    reports = {}
+    for slug, rows, columns, target in MODEL_CASES:
+        reports[slug] = _generate_case(model_directory, slug, rows, columns, target)
+    manifest_path = model_directory / "manifest.json"
+    manifest_path.write_text(
+        json.dumps(_manifest(reports), indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
-    print(json.dumps({"status": "GENERATED", "models": reports}, indent=2, sort_keys=True))
+    print(json.dumps({"status": "GENERATED", "cases": reports}, indent=2, sort_keys=True))
     return 0
 
 

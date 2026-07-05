@@ -22,6 +22,8 @@ $$
 
 Thus seven of the paper's 44 open cells are now closed by the paper and this repository, and **37 remain open**. This document does not claim values for those 37 cases.
 
+For case-by-case review, see the dedicated dossiers for [$Z(10,21,3,3)=106$](PROOF_Z10_21.md), [$Z(10,22,3,3)=110$](PROOF_Z10_22.md), and [$Z(11,20,3,3)=111$](PROOF_Z11_20.md).
+
 ## 2. The deletion lemma
 
 If $Z(m-1,n,3,3)\le B$, then
@@ -134,12 +136,15 @@ Run the complete standard-library check with:
 
 ```sh
 PYTHONPATH=src python3 scripts/check_extended_results.py --check
+PYTHONPATH=src python3 scripts/check_case_certificates.py --check
 python3 scripts/verify_extended_witnesses_independent.py
 ```
 
 The checker independently enumerates the four degree profiles, all 1,050 cases in the second residue argument, and all $77\times22{,}155$ cases in the third. It also verifies all three new matrices by row-triple capacity. The standalone verifier imports no project module and instead scans every candidate $3\times3$ submatrix.
 
 The finite enumeration is an exhaustive proof component, not a heuristic optimization run. No timeout, incumbent, or opaque `UNSAT` line is used in the claimed values above.
+
+The three results also have individual JSON certificates, excluded-target SAT/MIP formulations, and Lean arithmetic endpoints. Lean checks the four-profile classification and the reported finite minima but does not re-run the row-symmetry orbit search.
 
 ## 5. Remaining open cells
 

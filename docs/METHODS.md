@@ -52,7 +52,11 @@ $$
 
 row-triple/column-triple choices. Agreement between these algorithms reduces the risk of a shared representation error.
 
-## 4. Exact JSON certificate
+## 4. Case-specific JSON certificates
+
+[`scripts/check_case_certificates.py`](../scripts/check_case_certificates.py) regenerates one standalone certificate for each of the four exact values. Each certificate binds the complete witness report and SHA-256 digest to the case's own upper-bound mechanism: marked-row deficits, one deletion step, pair-deficit enumeration, or a two-step deletion chain. Stored fields are compared with recomputation, and mutation tests require all four schemas to reject altered values.
+
+The original detailed subcertificate, [`certificates/degree_deficit.json`](../certificates/degree_deficit.json), remains the arithmetic payload for the $(9,23)$ case.
 
 [`certificates/degree_deficit.json`](../certificates/degree_deficit.json) is a transparent mirror of the upper-bound arithmetic. It records:
 
@@ -71,11 +75,11 @@ $$
 
 Only after comparing the enumerated set with the JSON does it check each case. Consequently, deleting a difficult case from the certificate cannot make the checker pass.
 
-This exact-integer certificate is the replayable nonexistence certificate for the mathematical reduction. It is small enough to inspect by hand and uses only the Python standard library.
+This exact-integer subcertificate is the replayable nonexistence certificate for the marked-row reduction. The other three case certificates contain their corresponding deletion arithmetic or full four-profile report. All use only the Python standard library.
 
-## 5. Cell-level SAT model
+## 5. Cell-level SAT models
 
-The direct CNF in [`models/cells_9x23_exact_104.cnf`](../models/cells_9x23_exact_104.cnf) uses the base variable
+Each theorem has a direct cell CNF at its first excluded weight: 104, 107, 111, and 112 respectively. The $(9,23)$ model in [`models/cells_9x23_exact_104.cnf`](../models/cells_9x23_exact_104.cnf) illustrates the encoding and uses the base variable
 
 $$
 x_{r,c}=23r+c+1
@@ -93,11 +97,11 @@ There are 148,764 such clauses. They occur first in lexicographic combination or
 
 Exactly 104 cells are true. The generator encodes both an at-most-104 bound on the positive literals and an at-most-103 bound on their negations. Each bound uses a sequential threshold circuit in which every auxiliary variable is defined by an equivalence, not merely constrained by a one-way implication. This slightly larger encoding is easier to audit because a base assignment has a unique threshold extension.
 
-The final model has 32,654 variables and 277,931 clauses. [`scripts/generate_models.py`](../scripts/generate_models.py) regenerates it deterministically.
+That model has 32,654 variables and 277,931 clauses. [`scripts/generate_models.py`](../scripts/generate_models.py) regenerates all four cell CNFs deterministically; [`models/manifest.json`](../models/manifest.json) records every dimension and hash.
 
-## 6. Column-type integer model
+## 6. Column-type integer models
 
-For every bit mask $S\subseteq[9]$, the integer variable $x_S$ counts columns whose support is exactly $S$. The LP/MIP file imposes
+For each case and every bit mask $S$ on its row set, the integer variable $x_S$ counts columns whose support is exactly $S$. For the $(9,23)$ case the LP/MIP file imposes
 
 $$
 \sum_S x_S=23,
@@ -108,9 +112,9 @@ $$
 \quad(T\in\tbinom{[9]}3),
 $$
 
-with $0\le x_S\le23$ integral. It contains 512 integer variables, two structural equalities, and 84 row-triple inequalities. GLPK 5.0 independently parsed the stored model as 86 rows, 512 columns, and 6,399 nonzeros.
+with $0\le x_S\le23$ integral. The four stored LPs use 512, 1,024, 1,024, and 2,048 support variables according to their row counts. Each has two structural equalities and one inequality per row triple.
 
-The cell and column models use different base objects: individual entries versus exact column supports. Their shared semantic core is only the definition of a forbidden row triple.
+The cell and column models use different base objects: individual entries versus exact column supports. Their shared semantic core is only the definition of a forbidden row triple. None is presented as an UNSAT certificate for the claimed upper bound.
 
 ## 7. Encoding validation
 
@@ -153,16 +157,17 @@ All three integral 104-one profiles also satisfy every DGH inequality. This iden
 
 ## 10. Lean boundary
 
-The Lean subproject checks the arithmetic endpoint using Lean 4.29.0 and `Std` only. `chooseThree` and the penalty table are executable; kernel `decide` proves their ten finite identities. `omega` checks the Presburger degree classification and residue contradictions.
+The Lean subproject checks arithmetic endpoints for all four exact values using Lean 4.29.0 and `Std` only. The original library checks the $(9,23)$ penalty table, profile classification, and residue contradictions. The additional library checks both deletion chains plus the $(10,22)$ penalty table, four-profile classification, recorded orbit minima, divisibility contradiction, and three deficit contradictions. Kernel `decide` handles executable finite identities; `omega` checks the Presburger consequences.
 
 The following are not formalized in Lean:
 
 - the definition of a Boolean matrix;
 - the equivalence between $K_{3,3}$-freeness and row-triple capacity;
-- the two combinatorial double counts; and
-- the CSV witness.
+- the combinatorial double counts and deletion lemma;
+- the $Z(10,22)$ row-symmetry orbit enumeration; and
+- the four CSV witnesses.
 
-Those layers are human-readable and independently executable, but they remain outside the proof assistant. [`lean/README.md`](../lean/README.md) and [`lean/AxiomAudit.lean`](../lean/AxiomAudit.lean) make this boundary testable.
+Those layers are human-readable and independently executable, but they remain outside the proof assistant. [`lean/README.md`](../lean/README.md) and [`lean/AxiomAudit.lean`](../lean/AxiomAudit.lean) make the four-case boundary testable.
 
 ## 11. Additional finite-table certificate
 

@@ -14,6 +14,7 @@ witness:
 
 certificate:
 	$(PYTHON) scripts/check_proof_certificate.py
+	$(PYTHON) scripts/check_case_certificates.py --check
 
 extended:
 	$(PYTHON) scripts/check_extended_results.py --check

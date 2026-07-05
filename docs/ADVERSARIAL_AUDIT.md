@@ -79,6 +79,8 @@ The extended certificate independently enumerates the four possible degree profi
 
 The minimum residue sums are recomputed rather than trusted from JSON. The other two profiles are rejected by transparent divisibility and symmetric-difference arguments.
 
+Four case-specific wrapper certificates bind those upper-bound checks to the exact witness file, dimensions, weight, row and column sums, exhaustive row-triple result, and SHA-256 digest. The checker regenerates all fields, and mutation tests require an altered exact value to be rejected for every case.
+
 ## 4. Encoding audit
 
 The sequential threshold circuit was checked by a separate DPLL implementation on every assignment of one through six base variables, every possible bound, both positive and signed literals, and every exact target. The direct $K_{3,3}$ clauses were compared with an independently constructed set in a smaller model.
@@ -87,7 +89,7 @@ The known value $Z(3,4,3,3)=10$ was established by direct enumeration of all $2^
 
 Thirty seeded 5-by-6 matrices were fixed cell by cell. Direct semantics, CaDiCaL, and the column-support evaluator agreed on all 30. The sample includes both valid and invalid matrices. The seed and per-case outcomes are preserved in [`audit/model_validation.json`](../audit/model_validation.json).
 
-The stored target models regenerate byte-for-byte. GLPK 5.0 parses the column MIP with the expected dimensions. The repository audit parses every DIMACS clause independently, checks header counts and variable ranges, and compares the first 148,764 cell clauses against the lexicographically expected forbidden submatrices.
+All eight stored target models regenerate byte-for-byte. The repository audit parses every DIMACS clause independently, checks header counts and variable ranges, and compares every forbidden-clause prefix against a separately generated lexicographic sequence. It also checks each LP's support-variable count, row-triple count, terminator, and hash.
 
 ## 5. Proof-trace audit
 
@@ -101,7 +103,7 @@ The Lean project contains no `sorry`, `admit`, or declared project axiom. It has
 
 An early audit build used `native_decide` for two tiny finite computations. `#print axioms` revealed the generated native-evaluation trust axiom, even though the build was green. That implementation was rejected and replaced with kernel `decide`.
 
-The final axiom report is:
+The original marked-row axiom report is:
 
 - `penalty_eq_formula`: no axioms;
 - `penalty_table`: no axioms;
@@ -111,7 +113,9 @@ The final axiom report is:
 
 These are the standard dependencies of Lean's `omega` tactic, not project-added assumptions. [`lean/AxiomAudit.lean`](../lean/AxiomAudit.lean) reproduces the report.
 
-The audit also rejects a broader formalization claim: the combinatorial translation and witness are not represented in Lean. Both the README and Lean documentation state that limitation prominently.
+The additional Lean library checks the two deletion chains and the $(10,22)$ penalty table, four-profile classification, five orbit-minimum values, divisibility endpoint, and three deficit endpoints. Its executable quotient, penalty, and minima facts use no axioms; its `omega` theorems report only the same standard Lean principles.
+
+The audit also rejects a broader formalization claim: the combinatorial translations, deletion lemma, orbit enumeration, and witnesses are not represented in Lean. Both the README and Lean documentation state that limitation prominently.
 
 ## 7. Literature audit
 
@@ -138,9 +142,9 @@ The root Git commit contains only the human proof. This makes the requested proo
 The audit does not remove the need for external review. In particular:
 
 - no independent mathematician has yet signed off on the proofs;
-- the Lean development is an arithmetic formalization, not an end-to-end theorem;
+- the Lean development covers all four arithmetic kernels, not end-to-end matrix theorems;
 - no monolithic LRAT trace is provided for the raw 9-by-23 cell model;
-- the extended pair-deficit enumeration is checked by standard-library code but is not formalized in Lean;
+- the extended pair-deficit enumeration is checked by standard-library code; Lean checks its recorded minima and consequences but does not re-run the orbit search;
 - the DGH formula transcription was checked by exact tests and source comparison but is diagnostic, not part of the theorem;
 - the finite literature search cannot establish absolute priority; and
 - external replay tools add their own trusted implementations.

@@ -1,30 +1,20 @@
-# Exact decision models
+# Exact decision models for all four cases
 
-This directory contains deterministic formulations of the hypothetical 104-one matrix.
+Every equality has two deterministic formulations at the first excluded weight:
 
-## `cells_9x23_exact_104.cnf`
+| Exact value | Excluded target | Direct cell CNF | Column-support LP/MIP |
+|---|---:|---|---|
+| $Z(9,23,3,3)=103$ | 104 | [`cells_9x23_exact_104.cnf`](cells_9x23_exact_104.cnf) | [`column_types_9x23_exact_104.lp`](column_types_9x23_exact_104.lp) |
+| $Z(10,21,3,3)=106$ | 107 | [`cells_10x21_exact_107.cnf`](cells_10x21_exact_107.cnf) | [`column_types_10x21_exact_107.lp`](column_types_10x21_exact_107.lp) |
+| $Z(10,22,3,3)=110$ | 111 | [`cells_10x22_exact_111.cnf`](cells_10x22_exact_111.cnf) | [`column_types_10x22_exact_111.lp`](column_types_10x22_exact_111.lp) |
+| $Z(11,20,3,3)=111$ | 112 | [`cells_11x20_exact_112.cnf`](cells_11x20_exact_112.cnf) | [`column_types_11x20_exact_112.lp`](column_types_11x20_exact_112.lp) |
 
-The DIMACS file has one base variable per matrix cell, a clause for every forbidden all-one $3\times3$ submatrix, and a sequential threshold circuit imposing exactly 104 ones.
+The cell models contain one variable per matrix entry, every forbidden all-one $3\times3$ clause, and a fully defined exact-cardinality circuit. The column models contain one integer variable per possible exact support and one capacity constraint per row triple.
 
-Metadata in [`manifest.json`](manifest.json) records:
-
-- 207 base variables;
-- 32,654 total variables;
-- 148,764 forbidden-submatrix clauses; and
-- 277,931 total clauses.
-
-## `column_types_9x23_exact_104.lp`
-
-The LP/MIP file has one integer variable for each of the 512 column supports. It fixes 23 columns and total degree 104, then limits every one of the 84 row triples to two containing columns.
-
-## Terminal CNFs
-
-The three `terminal_*.cnf` files encode only the final aggregate contradictions from the degree-deficit proof. Their corresponding DRAT/LRAT traces are under [`certificates/`](../certificates/).
-
-## Regeneration
+[`manifest.json`](manifest.json) records dimensions and hashes for all eight models. Regenerate or byte-check them with:
 
 ```sh
 python3 scripts/generate_models.py --check
 ```
 
-Remove `--check` to rewrite the two main models and their manifest. The terminal CNFs are retained certificate inputs rather than products of this generator. Full specifications and trust boundaries are in [`docs/METHODS.md`](../docs/METHODS.md).
+These are transparent decision formulations and regression artifacts, not the logical basis of the upper bounds. The three historical `terminal_*.cnf` files remain scoped to the final marked-row aggregations.

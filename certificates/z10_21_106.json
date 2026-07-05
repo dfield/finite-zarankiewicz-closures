@@ -1,0 +1,75 @@
+{
+  "certificate_type": "exact_finite_zarankiewicz_case",
+  "conclusion": "Z(10,21,3,3)=106",
+  "lower_bound": {
+    "column_sums": [
+      4,
+      6,
+      5,
+      5,
+      5,
+      6,
+      5,
+      4,
+      5,
+      5,
+      5,
+      5,
+      6,
+      5,
+      4,
+      5,
+      5,
+      5,
+      4,
+      6,
+      6
+    ],
+    "columns": 21,
+    "file": "data/z10_21_106_matrix.csv",
+    "first_violation": null,
+    "maximum_common_columns": 2,
+    "ones": 106,
+    "row_sums": [
+      10,
+      11,
+      10,
+      11,
+      11,
+      10,
+      10,
+      11,
+      11,
+      11
+    ],
+    "row_triples_checked": 120,
+    "rows": 10,
+    "sha256": "14369479cd1b71105ef3295bbe938498ded7fc3dddbca5d0262ff9f2960ff2bb",
+    "valid": true
+  },
+  "parameters": {
+    "columns": 21,
+    "exact_value": 106,
+    "forbidden_columns": 3,
+    "forbidden_rows": 3,
+    "rows": 10
+  },
+  "schema_version": 1,
+  "slug": "z10_21_106",
+  "theorem": "Z(10,21,3,3)=106",
+  "upper_bound": {
+    "excluded_target": 107,
+    "lean_kernel": "ZarankiewiczFiniteClosures.ArithmeticKernels",
+    "method": "vertex_deletion",
+    "steps": [
+      {
+        "formula_denominator": 9,
+        "formula_numerator": 960,
+        "larger_part": 10,
+        "recomputed_upper_bound": 106,
+        "source": "Z(9,21,3,3)<=96",
+        "source_upper_bound": 96
+      }
+    ]
+  }
+}

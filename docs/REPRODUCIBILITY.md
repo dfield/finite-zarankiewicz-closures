@@ -22,7 +22,7 @@ From the repository root:
 make verify
 ```
 
-This runs tests, all four witness checks, both exact certificate paths, deterministic model regeneration, and the repository audit. It does not invoke external solvers or Lean.
+This runs tests, all four witness checks, all four case-certificate paths, deterministic model regeneration, and the repository audit. It does not invoke external solvers or Lean.
 
 ## Continuous integration
 
@@ -36,7 +36,7 @@ The GitHub Actions workflow runs `make verify` on Python 3.9 and 3.14 and builds
 make test
 ```
 
-Expected: 23 tests and `OK`. The test count is secondary; the named cases in [`tests/`](../tests/) define the coverage.
+Expected: 26 tests and `OK`. The test count is secondary; the named cases in [`tests/`](../tests/) define the coverage.
 
 ### Witness
 
@@ -64,7 +64,7 @@ Both reports must show the same SHA-256 digest.
 make certificate
 ```
 
-Expected: `status: VERIFIED`, `profiles_enumerated: 3`, and the three named cases `balanced`, `one_degree_3`, and `one_degree_6`.
+Expected: the detailed marked-row checker reports `VERIFIED` with three profiles, followed by four `VERIFIED` case certificates. The latter bind every witness hash to its case-specific upper-bound mechanism.
 
 ### Additional exact values
 
@@ -87,14 +87,14 @@ The independent checker must inspect 159,600 candidate submatrices for the $10\t
 make models
 ```
 
-Expected: `status: IDENTICAL` for both files. The target cell model metadata is:
+Expected: `status: IDENTICAL` for all eight files. The schema-v2 manifest covers four cell CNFs and four column-support LPs:
 
-- 207 base cell variables;
-- 32,654 total variables;
-- 148,764 forbidden-submatrix clauses; and
-- 277,931 total clauses.
-
-The target column model has 512 support variables and 84 row-triple constraints.
+| Case | Cell variables | Cell clauses | Support variables | Triple constraints |
+|---|---:|---:|---:|---:|
+| $(9,23)$ at 104 | 32,654 | 277,931 | 512 | 84 |
+| $(10,21)$ at 107 | 33,596 | 292,514 | 1,024 | 120 |
+| $(10,22)$ at 111 | 36,849 | 330,656 | 1,024 | 120 |
+| $(11,20)$ at 112 | 36,846 | 333,944 | 2,048 | 165 |
 
 To rewrite the artifacts intentionally:
 
@@ -118,7 +118,7 @@ lake build
 lake env lean AxiomAudit.lean
 ```
 
-Expected: a successful four-job build and the axiom boundary listed in [`ADVERSARIAL_AUDIT.md`](ADVERSARIAL_AUDIT.md).
+Expected: both Lean libraries build and the axiom audit prints the arithmetic theorems for all four results. The exact boundary is listed in [`ADVERSARIAL_AUDIT.md`](ADVERSARIAL_AUDIT.md).
 
 ## Optional independent tools
 

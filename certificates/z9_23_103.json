@@ -1,0 +1,74 @@
+{
+  "certificate_type": "exact_finite_zarankiewicz_case",
+  "conclusion": "Z(9,23,3,3)=103",
+  "lower_bound": {
+    "column_sums": [
+      4,
+      4,
+      4,
+      4,
+      4,
+      5,
+      4,
+      5,
+      4,
+      4,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      4,
+      4,
+      4,
+      5,
+      4
+    ],
+    "columns": 23,
+    "file": "data/z9_23_103_matrix.csv",
+    "first_violation": null,
+    "maximum_common_columns": 2,
+    "ones": 103,
+    "row_sums": [
+      11,
+      11,
+      11,
+      11,
+      11,
+      11,
+      12,
+      12,
+      13
+    ],
+    "row_triples_checked": 84,
+    "rows": 9,
+    "sha256": "e73b8bf4f784ea3761a3a56cc67683d6a9450e20900079c636dbc4f6cf002012",
+    "valid": true
+  },
+  "parameters": {
+    "columns": 23,
+    "exact_value": 103,
+    "forbidden_columns": 3,
+    "forbidden_rows": 3,
+    "rows": 9
+  },
+  "schema_version": 1,
+  "slug": "z9_23_103",
+  "theorem": "Z(9,23,3,3)=103",
+  "upper_bound": {
+    "detailed_certificate": "certificates/degree_deficit.json",
+    "detailed_certificate_sha256": "85605a9a73b4c8c67d4ec55e71fc55ff0dbde9f7344195caefd7cfa45ec0264d",
+    "excluded_target": 104,
+    "lean_kernel": "ZarankiewiczZ923.ArithmeticKernel",
+    "method": "marked_row_deficit",
+    "profiles_enumerated": 3,
+    "terminal_residue_lower_bounds": [
+      18,
+      15,
+      12
+    ]
+  }
+}

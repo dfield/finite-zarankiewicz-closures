@@ -3,11 +3,11 @@
 The cell model is a DIMACS CNF over one variable per matrix entry, plus a
 fully defined threshold circuit for the exact-weight constraint.  The
 column-type model is an LP/MIP file with one nonnegative integer variable for
-each of the 512 possible column supports.
+each possible column support.
 
-These generators are not needed for the human upper-bound proof.  They make
-the original decision problem reproducible and provide an independent way to
-cross-check the subset translation used by the proof.
+These generators are not the logical basis of the upper bounds.  They make all
+four excluded-target decision problems reproducible and cross-check the subset
+translation used by the proofs.
 """
 
 from __future__ import annotations
@@ -253,7 +253,7 @@ def write_column_type_lp(path: Path, *, rows: int = 9, columns: int = 23, target
 
 
 def column_counts(matrix: Sequence[Sequence[int]]) -> list[int]:
-    """Convert a Boolean matrix to the 512-entry support histogram."""
+    """Convert a Boolean matrix to its exact-support histogram."""
 
     if not matrix or not matrix[0]:
         raise ValueError("matrix must be nonempty")

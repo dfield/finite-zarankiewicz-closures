@@ -64,8 +64,8 @@ def main() -> int:
             "lrat-check models/terminal_CASE.cnf certificates/terminal_CASE.lrat",
         ],
         "scope": (
-            "These traces replay only the terminal integer aggregations. The independently "
-            "checked JSON certificate establishes the reduction from matrices to those cases."
+            "These traces replay only the three terminal Z(9,23) integer aggregations. The "
+            "four case-specific JSON certificates establish each result's separate evidence path."
         ),
     }
     rendered = json.dumps(result, indent=2, sort_keys=True) + "\n"

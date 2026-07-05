@@ -1,14 +1,17 @@
-# Lean arithmetic audit
+# Lean arithmetic audit for all four values
 
-This directory formalizes the finite arithmetic kernel of the proof in [`docs/PROOF.md`](../docs/PROOF.md). It checks:
+This directory formalizes the finite arithmetic kernels for every exact result in the repository.
 
-1. the ten values of $p(d)=\binom d3-6d+20$;
-2. the fact that the penalty budget leaves exactly three degree histograms; and
-3. the three modulo-three marked-row contradictions.
+| Result | Lean coverage |
+|---|---|
+| $Z(9,23,3,3)=103$ | penalty formula and table, three-profile classification, three marked-row contradictions |
+| $Z(10,21,3,3)=106$ | deletion-bound quotient and the excluded-target arithmetic contradiction |
+| $Z(10,22,3,3)=110$ | penalty formula and table, four-profile classification, case-B minima table, and four terminal contradictions |
+| $Z(11,20,3,3)=111$ | both deletion-bound quotients and both excluded-target arithmetic contradictions |
 
-It intentionally makes a narrower claim than “the theorem is fully formalized.” The translation from a Boolean matrix to triple capacities and marked-row deficits is still justified by the human double counts and checked independently in Python. Keeping that boundary explicit is preferable to presenting a formal arithmetic endpoint as a complete formalization.
+The project intentionally makes a narrower claim than “the four theorems are fully formalized.” The Boolean-matrix definitions, combinatorial double counts, deletion lemma, witness CSVs, and the $Z(10,22)$ row-symmetry orbit enumeration remain in the human-readable proofs and independently checked Python certificates. Lean checks the arithmetic consequences supplied by those layers.
 
-The project uses Lean 4.29.0 and only the bundled `Std` library. There are no external packages, custom axioms, or admitted results.
+The project pins Lean 4.29.0, uses only the bundled `Std` library, and contains no external packages, custom axioms, or admitted results.
 
 ## Build
 
@@ -16,14 +19,13 @@ From this directory:
 
 ```sh
 lake build
+lake env lean AxiomAudit.lean
 ```
 
-For the audit used in this repository:
+For the source-level admission guard used by the audit:
 
 ```sh
-lake env lean ZarankiewiczZ923/ArithmeticKernel.lean
-lake env lean AxiomAudit.lean
 rg -n '^[[:space:]]*(sorry|admit|axiom)\b|:=[[:space:]]*(by[[:space:]]+)?(sorry|admit)\b' . --glob '*.lean'
 ```
 
-The first command kernel-checks the source, the second prints every theorem's axiom dependencies, and the final command is a simple guard against accidentally weakening the formalization boundary.
+[`AxiomAudit.lean`](AxiomAudit.lean) prints every theorem's axiom dependencies. Executable tables and quotient computations use no axioms; the `omega` proofs use Lean's standard `propext`, `Classical.choice`, and `Quot.sound` principles where reported.

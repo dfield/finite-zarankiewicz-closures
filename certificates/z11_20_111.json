@@ -1,0 +1,83 @@
+{
+  "certificate_type": "exact_finite_zarankiewicz_case",
+  "conclusion": "Z(11,20,3,3)=111",
+  "lower_bound": {
+    "column_sums": [
+      5,
+      6,
+      6,
+      5,
+      6,
+      5,
+      5,
+      5,
+      6,
+      6,
+      5,
+      6,
+      6,
+      6,
+      5,
+      6,
+      5,
+      6,
+      5,
+      6
+    ],
+    "columns": 20,
+    "file": "data/z11_20_111_matrix.csv",
+    "first_violation": null,
+    "maximum_common_columns": 2,
+    "ones": 111,
+    "row_sums": [
+      10,
+      10,
+      9,
+      10,
+      9,
+      10,
+      11,
+      11,
+      10,
+      11,
+      10
+    ],
+    "row_triples_checked": 165,
+    "rows": 11,
+    "sha256": "900aee82bb430e3e68b3908d1fd104510e81f6177aec60466f8b60f2df4070b7",
+    "valid": true
+  },
+  "parameters": {
+    "columns": 20,
+    "exact_value": 111,
+    "forbidden_columns": 3,
+    "forbidden_rows": 3,
+    "rows": 11
+  },
+  "schema_version": 1,
+  "slug": "z11_20_111",
+  "theorem": "Z(11,20,3,3)=111",
+  "upper_bound": {
+    "excluded_target": 112,
+    "lean_kernel": "ZarankiewiczFiniteClosures.ArithmeticKernels",
+    "method": "vertex_deletion_chain",
+    "steps": [
+      {
+        "formula_denominator": 18,
+        "formula_numerator": 1919,
+        "larger_part": 19,
+        "recomputed_upper_bound": 106,
+        "source": "Z(11,18,3,3)<=101",
+        "source_upper_bound": 101
+      },
+      {
+        "formula_denominator": 19,
+        "formula_numerator": 2120,
+        "larger_part": 20,
+        "recomputed_upper_bound": 111,
+        "source": "Z(11,19,3,3)<=106",
+        "source_upper_bound": 106
+      }
+    ]
+  }
+}

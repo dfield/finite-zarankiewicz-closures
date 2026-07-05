@@ -1,4 +1,5 @@
 import ZarankiewiczZ923.ArithmeticKernel
+import ZarankiewiczFiniteClosures.ArithmeticKernels
 
 /-!
 This executable audit file is not part of the library API.  Running
@@ -15,3 +16,18 @@ prints the axioms used by every theorem that carries the mathematical load.
 #print axioms ZarankiewiczZ923.balanced_deficits_impossible
 #print axioms ZarankiewiczZ923.degree_three_deficits_impossible
 #print axioms ZarankiewiczZ923.degree_six_deficits_impossible
+
+#print axioms ZarankiewiczFiniteClosures.z10_21_deletion_bound
+#print axioms ZarankiewiczFiniteClosures.z11_19_deletion_bound
+#print axioms ZarankiewiczFiniteClosures.z11_20_deletion_bound
+#print axioms ZarankiewiczFiniteClosures.z10_21_excluded_target
+#print axioms ZarankiewiczFiniteClosures.z11_19_excluded_target
+#print axioms ZarankiewiczFiniteClosures.z11_20_excluded_target
+#print axioms ZarankiewiczFiniteClosures.z10_penalty_eq_formula
+#print axioms ZarankiewiczFiniteClosures.z10_penalty_table
+#print axioms ZarankiewiczFiniteClosures.classify_z10_22_degree_profile
+#print axioms ZarankiewiczFiniteClosures.z10_22_case_a_impossible
+#print axioms ZarankiewiczFiniteClosures.z10_22_case_b_orbit_minima
+#print axioms ZarankiewiczFiniteClosures.z10_22_case_b_impossible
+#print axioms ZarankiewiczFiniteClosures.z10_22_case_c_impossible
+#print axioms ZarankiewiczFiniteClosures.z10_22_case_d_impossible

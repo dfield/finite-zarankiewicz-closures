@@ -79,21 +79,21 @@ The logical role of computation differs across the four results:
 | Result or layer | What it establishes | Artifact |
 |---|---|---|
 | Human upper-bound proof | Excludes 104 ones for $(9,23)$ | [`docs/PROOF.md`](docs/PROOF.md) |
-| Deletion arguments | Give matching upper bounds for $(10,21)$ and $(11,20)$ | [`docs/EXTENDED_RESULTS.md`](docs/EXTENDED_RESULTS.md) |
-| Computer-assisted finite proof | Exhaustively excludes the four possible 111-one degree profiles for $(10,22)$ | [`docs/EXTENDED_RESULTS.md`](docs/EXTENDED_RESULTS.md), [`src/finite_zarankiewicz_closures/extended.py`](src/finite_zarankiewicz_closures/extended.py) |
+| Deletion arguments | Give matching upper bounds for $(10,21)$ and $(11,20)$ | [`docs/PROOF_Z10_21.md`](docs/PROOF_Z10_21.md), [`docs/PROOF_Z11_20.md`](docs/PROOF_Z11_20.md) |
+| Computer-assisted finite proof | Exhaustively excludes the four possible 111-one degree profiles for $(10,22)$ | [`docs/PROOF_Z10_22.md`](docs/PROOF_Z10_22.md), [`src/finite_zarankiewicz_closures/extended.py`](src/finite_zarankiewicz_closures/extended.py) |
 | Explicit constructions | Supply all four matching lower bounds | [`data/`](data/) |
 | Independent witness checks | Verify every stored matrix by row-triple capacity and direct $3\times3$ scans | [`scripts/`](scripts/) |
-| Exact arithmetic certificate | Recomputes every degree profile and contradiction for $(9,23)$ | [`certificates/degree_deficit.json`](certificates/degree_deficit.json) |
-| Lean | Kernel-checks the $(9,23)$ penalty table, degree classification, and terminal residue contradictions | [`lean/`](lean/) |
-| Decision models | Reconstruct the 207-cell SAT and 512-column-type MIP formulations for $(9,23)$ | [`models/`](models/) |
+| Case-specific certificates | Bind each witness hash to its own recomputed upper-bound mechanism | [`certificates/`](certificates/), [`scripts/check_case_certificates.py`](scripts/check_case_certificates.py) |
+| Lean | Kernel-checks the arithmetic endpoints, profile classifications, and terminal contradictions for all four results | [`lean/`](lean/) |
+| Decision models | Reconstruct cell-level SAT and column-type MIP formulations at all four excluded targets | [`models/`](models/) |
 | Standard proof traces | Replay the three terminal $(9,23)$ integer contradictions in DRAT and LRAT | [`certificates/`](certificates/) |
 | Adversarial audit | Records mutation tests, independent tools, trust assumptions, and limitations | [`docs/ADVERSARIAL_AUDIT.md`](docs/ADVERSARIAL_AUDIT.md) |
 
 Three boundaries are important:
 
 - The $(9,23)$ upper bound is entirely human-readable; its computation is corroborating rather than logically necessary.
-- The $(10,22)$ upper bound is computer-assisted: its exhaustive standard-library enumeration is a proof component. It is not formalized in Lean and is not presented as a solver certificate.
-- The Lean development formalizes only the $(9,23)$ arithmetic kernel, not the complete matrix-to-counting translation. The DRAT/LRAT files likewise certify only its three terminal aggregations, not the full 8.2 MB cell CNF.
+- The $(10,22)$ upper bound is computer-assisted: its exhaustive standard-library enumeration is a proof component. Lean checks the resulting profile classification and numerical minima, but does not re-run the orbit enumeration.
+- The Lean development formalizes the arithmetic kernels for all four results, not the Boolean-matrix reductions, witness CSVs, deletion lemma, or combinatorial double counts. The DRAT/LRAT files remain scoped to the three historical $(9,23)$ terminal aggregations.
 
 ## Quick verification
 
@@ -115,15 +115,15 @@ make verify
 
 Expected headline results are:
 
-- 23 Python tests pass;
+- 26 Python tests pass;
 - the two original witness verifiers accept the 103-one matrix, and the extended verifier accepts all three additional matrices;
-- the original certificate reports `VERIFIED` with three profiles, while the extended report is byte-identical and recomputes four profiles at 111 ones;
-- both generated decision models are byte-for-byte identical to the stored artifacts; and
+- all four case-specific certificates verify, including the three-profile and four-profile subcertificates;
+- all eight generated decision models are byte-for-byte identical to the stored artifacts; and
 - the repository audit reports `VERIFIED`.
 
 ### Lean
 
-Lean 4.29.0 is pinned inside the subproject and no external Lean package is required:
+Lean 4.29.0 is pinned inside the subproject and no external Lean package is required. The default build checks both arithmetic libraries:
 
 ```sh
 cd lean
@@ -131,7 +131,7 @@ lake build
 lake env lean AxiomAudit.lean
 ```
 
-The axiom report is discussed in the [adversarial audit](docs/ADVERSARIAL_AUDIT.md). The executable penalty computations use no axioms; the `omega` proofs use Lean's standard `propext`, `Classical.choice`, and `Quot.sound` principles and no project-specific axiom.
+The axiom report covers every load-bearing theorem for all four results and is discussed in the [adversarial audit](docs/ADVERSARIAL_AUDIT.md). Executable tables and quotient computations use no axioms; the `omega` proofs use Lean's standard `propext`, `Classical.choice`, and `Quot.sound` principles and no project-specific axiom.
 
 ### Optional external replays
 
@@ -163,14 +163,17 @@ The stored models are deterministic outputs. They are included for transparency 
 ├── README.md                    introduction and result status
 ├── docs/
 │   ├── PROOF.md                 human-readable proof, committed before code
+│   ├── PROOF_Z10_21.md          deletion proof and case evidence
+│   ├── PROOF_Z10_22.md          computer-assisted proof and case evidence
+│   ├── PROOF_Z11_20.md          two-step deletion proof and case evidence
 │   ├── EXTENDED_RESULTS.md      three further closures and open frontier
 │   ├── LITERATURE_REVIEW.md     prior work and dated status search
 │   ├── METHODS.md               models, certificates, and proof/code map
 │   ├── ADVERSARIAL_AUDIT.md     attack surface, tests, findings, limits
 │   └── REPRODUCIBILITY.md       commands and expected outputs
 ├── data/                        explicit matrices for all claimed lower bounds
-├── certificates/                exact JSON reduction and terminal traces
-├── models/                      deterministic SAT/MIP artifacts
+├── certificates/                four case certificates, detailed reduction, and terminal traces
+├── models/                      eight case-specific SAT/MIP artifacts
 ├── analysis/                    exact boundaries, kernel catalog, and table frontier
 ├── lean/                        formal arithmetic subproject
 ├── src/finite_zarankiewicz_closures/ documented standard-library package
@@ -185,7 +188,7 @@ The Git history itself records the proof-first workflow: the root commit contain
 
 All core generators are deterministic. The randomized model-validation sample uses the fixed seed `20260704`. Stored outputs contain no machine-specific paths or timestamps. Artifact hashes are collected in [`artifacts.sha256`](artifacts.sha256).
 
-Reviewers are encouraged to begin with the six-page-equivalent [$(9,23)$ proof](docs/PROOF.md) and the [three further closures](docs/EXTENDED_RESULTS.md), then run both certificate paths and all witness verifiers. The SAT/MIP and proof-trace layers are intentionally secondary. A suggested review sequence and issue-reporting guidance appear in [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Reviewers are encouraged to begin with the six-page-equivalent [$(9,23)$ proof](docs/PROOF.md) and the [three further closures](docs/EXTENDED_RESULTS.md), then run all four case certificates, both witness implementations, and the two Lean libraries. The SAT/MIP and proof-trace layers are intentionally secondary. A suggested review sequence and issue-reporting guidance appear in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Status and humility
 

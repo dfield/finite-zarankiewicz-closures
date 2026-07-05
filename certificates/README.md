@@ -1,21 +1,26 @@
-# Certificates
+# Case-specific certificates
 
-## Exact mathematical reduction
+Each exact value has a standalone JSON certificate:
 
-[`degree_deficit.json`](degree_deficit.json) records the complete finite arithmetic of the upper-bound proof. The checker does not trust its case list: it independently enumerates every degree histogram at weight 104 and penalty at most four, then recomputes all deficits, residues, lower bounds, and aggregate cuts.
+| Result | Certificate | Upper-bound mechanism |
+|---|---|---|
+| $Z(9,23,3,3)=103$ | [`z9_23_103.json`](z9_23_103.json) | marked-row deficit; binds the detailed [`degree_deficit.json`](degree_deficit.json) subcertificate |
+| $Z(10,21,3,3)=106$ | [`z10_21_106.json`](z10_21_106.json) | one vertex-deletion step |
+| $Z(10,22,3,3)=110$ | [`z10_22_110.json`](z10_22_110.json) | four-profile pair-deficit enumeration |
+| $Z(11,20,3,3)=111$ | [`z11_20_111.json`](z11_20_111.json) | two vertex-deletion steps |
+
+Every certificate includes the explicit witness's dimensions, weight, row and column sums, exhaustive row-triple result, and SHA-256 digest. The upper-bound section is specific to the case. The checker regenerates these fields rather than trusting the stored JSON:
 
 ```sh
-python3 scripts/check_proof_certificate.py
+python3 scripts/check_case_certificates.py --check
 ```
 
-This exact-integer JSON/checker pair is the primary replayable certificate for nonexistence at 104.
+Mutation tests alter each case certificate and require rejection.
 
 ## Terminal DRAT and LRAT
 
-For each of the three degree profiles, `terminal_CASE.drat` and `terminal_CASE.lrat` certify the unsatisfiability of `models/terminal_CASE.cnf`.
+The six historical DRAT/LRAT files replay the three terminal aggregations in the marked-row proof. They do not cover the other reductions or any raw cell CNF. The other three results instead have case-specific JSON certificates and Lean arithmetic endpoints; no broader proof-trace claim is made.
 
 ```sh
 python3 scripts/replay_certificates.py
 ```
-
-These traces cover only the last aggregate inequality. They are not a monolithic proof of the cell CNF. The distinction is intentional and documented in [`docs/METHODS.md`](../docs/METHODS.md).
