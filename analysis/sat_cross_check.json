@@ -1,7 +1,7 @@
 {
  "description": "Per-profile SAT verdicts from the 2026-07-05 session. Solver: CaDiCaL 1.9.5 via PySAT; encoding: triple-coverage at-most-2 (sequential counter), exact column degrees, double-lex symmetry breaking. NO proof traces were retained: these verdicts are corroborating evidence only and no repository claim rests on them. See docs/NEW_BOUNDS.md section 6.",
  "frontier_observations": {
-  "10,23 at 113 (21 of 24 UNSAT at 2M conflicts; 3 pending)": {
+  "10,23 at 113": {
    "2x1,4x1,5x19,6x2": "UNSAT",
    "2x1,4x1,5x20,7x1": "UNSAT",
    "2x1,4x2,5x17,6x3": "UNSAT",
@@ -12,13 +12,13 @@
    "3x1,4x3,5x16,6x3": "UNSAT",
    "3x1,4x3,5x17,6x1,7x1": "UNSAT",
    "3x1,4x4,5x14,6x4": "UNSAT",
-   "3x1,5x22": "UNKNOWN",
+   "3x1,5x22": "UNSAT",
    "3x2,4x1,5x17,6x3": "UNSAT",
    "3x2,4x2,5x15,6x4": "UNSAT",
    "3x2,5x19,6x2": "UNSAT",
    "3x2,5x20,7x1": "UNSAT",
-   "4x2,5x21": "UNKNOWN",
-   "4x3,5x19,6x1": "UNKNOWN",
+   "4x2,5x21": "UNSAT",
+   "4x3,5x19,6x1": "UNSAT",
    "4x4,5x17,6x2": "UNSAT",
    "4x4,5x18,7x1": "UNSAT",
    "4x5,5x15,6x3": "UNSAT",
@@ -39,7 +39,8 @@
    "4x3,5x19,7x1": "UNSAT",
    "4x4,5x16,6x3": "UNSAT",
    "4x5,5x14,6x4": "UNSAT"
-  }
+  },
+  "implication": "All 11 profiles at 114 and all 24 profiles at 113 returned UNSAT, so modulo solver correctness Z(10,23,3,3) <= 112; Bhan--Nobili--Langer's 112-one construction then gives Z(10,23,3,3) = 112. This solver-assisted value is deliberately NOT entered in analysis/new_bounds.json, which stays solver-free."
  },
  "repository_targets_cross_check": {
   "10,21,107": {
