@@ -1,32 +1,36 @@
 > **Attribution:** The proof, formal arithmetic, verification code, and repository were produced by **GPT 5.6-Sol**. This is a research artifact awaiting independent expert review, not a peer-reviewed publication.
 
-# Closing the finite case $Z(9,23,3,3)$
+# Four exact finite Zarankiewicz numbers
 
-This repository presents a reproducible proof that
+This repository presents reproducible proofs of four exact values:
 
 $$
-\boxed{Z(9,23,3,3)=103}.
+\begin{aligned}
+Z(9,23,3,3)&=103, & Z(10,21,3,3)&=106,\\
+Z(10,22,3,3)&=110, & Z(11,20,3,3)&=111.
+\end{aligned}
 $$
 
-In plain language: place as many ones as possible in a 9-row, 23-column zero-one matrix, subject to the rule that no choice of three rows and three columns may form an all-one square. The answer is 103. A concrete 103-one matrix exists, while the proof shows that 104 ones are impossible.
+Here $Z(m,n,3,3)$ is the largest number of ones in an $m\times n$ zero-one matrix with no all-one $3\times3$ submatrix. Each equality comes with an explicit extremal matrix and a reproducible upper-bound certificate.
 
-The upper bound is an elementary counting argument, not a solver verdict. Computation is used to check the witness, mirror the finite arithmetic, reproduce the original decision formulations, and provide additional certificate layers.
+The four upper bounds use three complementary mechanisms: a marked-row deficit argument for $(9,23)$, vertex-deletion bounds for $(10,21)$ and $(11,20)$, and an exhaustive pair-deficit certificate for $(10,22)$. Computation checks the witnesses and finite arithmetic; no claimed equality rests on an opaque solver verdict.
 
-## Why this case mattered
+## Why these cases mattered
 
 The Zarankiewicz problem is a classical question in extremal combinatorics. Reading a Boolean matrix as the adjacency matrix of a bipartite graph turns an all-one $3\times3$ submatrix into a copy of the complete bipartite graph $K_{3,3}$.
 
-Immediately before this work, the public literature gave
+The 2026 table of Jay Bhan, Nicole Nobili, and Patrick Langer left these four cells as intervals rather than exact values:
 
-$$
-103\le Z(9,23,3,3)\le104.
-$$
+| Cell | Previously reported interval | Closure in this repository |
+|---|---:|---|
+| $Z(9,23,3,3)$ | $103\text{--}104$ | marked-row deficits exclude 104 |
+| $Z(10,21,3,3)$ | $106\text{--}108$ | deletion from $Z(9,21,3,3)=96$ gives the matching upper bound |
+| $Z(10,22,3,3)$ | $110\text{--}111$ | pair-deficit enumeration excludes 111 |
+| $Z(11,20,3,3)$ | $111\text{--}112$ | two deletion steps from $Z(11,18,3,3)=101$ give the matching upper bound |
 
-The 104 upper bound comes from the degree-counting method of Steven Roman. The 103 lower bound was reported in 2026 by Jay Bhan, Nicole Nobili, and Patrick Langer using LLM-guided evolutionary search. Their paper displayed the one-edge gap rather than claiming this cell was exact. Jeremy Tan's earlier SAT table likewise listed 104 as an upper bound, and the strengthened linear program of Sara Davies, Peter Gill, and Daniel Horsley does not remove the last edge.
+Credit for the four previously public lower bounds belongs to Bhan--Nobili--Langer. The contribution presented here is to prove matching upper bounds and independently verify explicit witnesses. Together with the three cells made exact in their paper, these results close seven of that paper's 44 open cells; **37 remain open**. See the [literature review](docs/LITERATURE_REVIEW.md) for the complete attribution chain and the [extended-results proof](docs/EXTENDED_RESULTS.md) for the precise claim boundary.
 
-Credit for the previously public 103 lower bound belongs to Bhan--Nobili--Langer. The contribution presented here is the upper-bound proof excluding 104, together with a deliberately redundant verification package. See the [literature review](docs/LITERATURE_REVIEW.md) for the complete attribution chain and dated search protocol.
-
-## The proof idea
+## The $Z(9,23,3,3)$ proof idea
 
 Treat each column as the set $E_j$ of rows containing a one, and let $d_j=|E_j|$. Every triple of rows may occur together in at most two columns; otherwise those rows and three such columns form a forbidden $3\times3$ block. Therefore
 
@@ -56,9 +60,9 @@ Now mark one row and count unused row-triple capacity through that row. Contribu
 
 That is the entire upper-bound mechanism. The [full proof](docs/PROOF.md) supplies every definition and double count.
 
-## Follow-on finite closures
+## The other three closures
 
-Propagating vertex-deletion bounds through the 44 open cells in Bhan--Nobili--Langer's 2026 table and applying a new pair-deficit certificate gives three additional exact values:
+Propagating vertex-deletion bounds through Bhan--Nobili--Langer's table and applying a new pair-deficit certificate gives the other three values:
 
 $$
 Z(10,21,3,3)=106,
@@ -66,7 +70,7 @@ Z(10,21,3,3)=106,
 \qquad Z(11,20,3,3)=111.
 $$
 
-The first and third follow from the elementary deletion lemma. The middle value has an explicit 110-one matrix and a standard-library enumeration excluding all four possible 111-one degree profiles. Together with the paper's three exact values and this repository's original $(9,23)$ result, seven of the paper's 44 open cells are closed and **37 remain open**. See [the extended-results proof and precise claim boundary](docs/EXTENDED_RESULTS.md).
+The first and third follow from the elementary deletion lemma. The middle value has an explicit 110-one matrix and a standard-library enumeration excluding all four possible 111-one degree profiles. See [the extended-results proof and precise claim boundary](docs/EXTENDED_RESULTS.md).
 
 ## Evidence and trust boundaries
 

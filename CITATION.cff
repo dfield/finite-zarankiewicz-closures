@@ -2,13 +2,13 @@ cff-version: 1.2.0
 message: >-
   If you use this proof or its verification artifacts, please cite this
   repository and the prior lower-bound work identified in the literature review.
-title: "Closing the finite Zarankiewicz case Z(9,23,3,3)"
+title: "Four exact finite Zarankiewicz numbers"
 type: software
 authors:
   - family-names: "GPT 5.6-Sol"
 version: 1.1.0
 date-released: 2026-07-04
-repository-code: "https://github.com/dfield/zarankiewicz-z9-23"
+repository-code: "https://github.com/dfield/finite-zarankiewicz-closures"
 license: MIT
 keywords:
   - Zarankiewicz problem
@@ -17,11 +17,10 @@ keywords:
   - formal verification
   - SAT certificates
 abstract: >-
-  A human-readable proof that Z(9,23,3,3)=103, accompanied by an explicit
-  extremal matrix, independent verifiers, exact arithmetic certificates,
-  deterministic SAT/MIP models, a Lean arithmetic audit, and a literature review.
-  Follow-on certificates establish Z(10,21,3,3)=106, Z(10,22,3,3)=110, and
-  Z(11,20,3,3)=111 while retaining an explicit 37-case open frontier.
+  Reproducible proofs that Z(9,23,3,3)=103, Z(10,21,3,3)=106,
+  Z(10,22,3,3)=110, and Z(11,20,3,3)=111, accompanied by explicit extremal
+  matrices, independent verifiers, exact arithmetic certificates, deterministic
+  SAT/MIP models, a Lean arithmetic audit, and an explicit 37-case open frontier.
 references:
   - type: article
     authors:

@@ -168,8 +168,8 @@ Reports from external tools retain semantic outcomes and tool versions while omi
 For the strongest local reproduction:
 
 ```sh
-git clone git@github.com:dfield/zarankiewicz-z9-23.git
-cd zarankiewicz-z9-23
+git clone git@github.com:dfield/finite-zarankiewicz-closures.git
+cd finite-zarankiewicz-closures
 make verify
 cd lean && lake build && lake env lean AxiomAudit.lean
 ```
