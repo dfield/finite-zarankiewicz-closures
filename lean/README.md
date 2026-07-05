@@ -2,7 +2,7 @@
 
 This directory formalizes the finite arithmetic kernel of the proof in [`docs/PROOF.md`](../docs/PROOF.md). It checks:
 
-1. the ten values of \(p(d)=\binom d3-6d+20\);
+1. the ten values of $p(d)=\binom d3-6d+20$;
 2. the fact that the penalty budget leaves exactly three degree histograms; and
 3. the three modulo-three marked-row contradictions.
 

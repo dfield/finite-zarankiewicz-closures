@@ -11,7 +11,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from zarankiewicz_z9_23.certificate import CertificateError, verify_certificate  # noqa: E402
+from finite_zarankiewicz_closures.certificate import (  # noqa: E402
+    CertificateError,
+    verify_certificate,
+)
 
 
 def main() -> int:

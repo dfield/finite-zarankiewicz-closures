@@ -2,7 +2,7 @@
 
 ## Audit objective
 
-This audit asks how the claimed value \(Z(9,23,3,3)=103\) and the three follow-on closures could be wrong even if ordinary happy-path tests pass. It treats prose, data, generators, certificates, formal code, and literature claims as separate attack surfaces.
+This audit asks how any of the four claimed exact values could be wrong even if ordinary happy-path tests pass. It treats prose, data, generators, certificates, formal code, and literature claims as separate attack surfaces.
 
 The audit was completed against the repository state dated 2026-07-04. “Full” here means every evidence layer shipped by the repository was placed in scope; it does not mean the work has received external peer review or that every possible implementation has been verified.
 
@@ -17,22 +17,22 @@ The principal failure modes considered were:
 5. Lean succeeds because of an admission, custom axiom, or inaccurately stated boundary;
 6. a literature table is misread as exact;
 7. generated evidence depends on a local path, timestamp, random seed, or unavailable private source; or
-8. documentation silently upgrades corroborating computation into the theorem's logical basis.
-9. the follow-on table is mistranscribed, a deletion bound is rounded incorrectly, or a symmetry orbit is omitted from the $Z(10,22)$ certificate.
+8. documentation silently upgrades corroborating computation into a theorem's logical basis; or
+9. the extended table is mistranscribed, a deletion bound is rounded incorrectly, or a symmetry orbit is omitted from the $Z(10,22)$ certificate.
 
-## 1. Human-proof audit
+## 1. Original human-proof audit
 
 The proof was written and committed before implementation. The audit independently checked the following numerical identities:
 
-- \(2\binom93=168\);
-- \(6\cdot104-20\cdot23=164\);
-- the penalty table \((20,14,8,3,0,0,4,13,28,50)\);
+- $2\binom93=168$;
+- $6\cdot104-20\cdot23=164$;
+- the penalty table $(20,14,8,3,0,0,4,13,28,50)$;
 - the only degree histograms under penalty four;
 - triple-incidence totals 164, 167, and 168;
 - exact marked-deficit totals 12, 3, and 0; and
 - residue lower bounds 18, 15, and 12.
 
-The central congruence was checked in both directions: a marked degree-four column contributes \(\binom32=3\), and a marked degree-five column contributes \(\binom42=6\), both zero modulo three. The exceptional marked contributions are 1 for degree three and 10 for degree six, yielding residue one inside either exceptional support and residue two outside.
+The central congruence was checked in both directions: a marked degree-four column contributes $\binom32=3$, and a marked degree-five column contributes $\binom42=6$, both zero modulo three. The exceptional marked contributions are 1 for degree three and 10 for degree six, yielding residue one inside either exceptional support and residue two outside.
 
 No hidden existence assumption is used in passing from a denser matrix to weight 104: changing ones to zero cannot create an all-one submatrix.
 
@@ -49,10 +49,12 @@ Negative tests include:
 - wrong expected weight;
 - a non-Boolean in-memory entry;
 - CSV spellings `2`, `1.0`, `+1`, a space-prefixed one, an empty field, and `true`;
-- a deliberately forced all-one \(3\times3\) block; and
+- a deliberately forced all-one $3\times3$ block; and
 - every zero-to-one extension of the 103-one witness.
 
 Every one-bit extension is rejected with an actual forbidden submatrix, not merely a weight mismatch. This also checks that the construction is maximal under adding a single one.
+
+The three additional matrices are checked twice: the package verifier recomputes row-triple capacities, while the standalone verifier scans 159,600, 184,800, and 188,100 candidate submatrices respectively without importing project code.
 
 ## 3. Exact-certificate audit
 
@@ -70,7 +72,7 @@ The checker independently enumerates degree histograms rather than iterating ove
 
 The enumeration uses only nonnegative integer arithmetic and produces exactly three profiles. Category sizes are derived from the exceptional degree, so a certificate cannot choose how many rows are “inside” the exceptional column.
 
-The follow-on certificate independently enumerates the four possible degree profiles at 111 ones for a 10-by-22 matrix. Its two finite residue searches cover:
+The extended certificate independently enumerates the four possible degree profiles at 111 ones for a 10-by-22 matrix. Its two finite residue searches cover:
 
 - every intersection size $2,3,4,5,6$ for the two degree-six columns and all 210 degree-four columns in profile $4^1 5^{19}6^2$; and
 - 77 row-symmetry orbits for three degree-six columns, with all 22,155 unordered degree-four multisets in each orbit, in profile $4^2 5^{17}6^3$.
@@ -79,9 +81,9 @@ The minimum residue sums are recomputed rather than trusted from JSON. The other
 
 ## 4. Encoding audit
 
-The sequential threshold circuit was checked by a separate DPLL implementation on every assignment of one through six base variables, every possible bound, both positive and signed literals, and every exact target. The direct \(K_{3,3}\) clauses were compared with an independently constructed set in a smaller model.
+The sequential threshold circuit was checked by a separate DPLL implementation on every assignment of one through six base variables, every possible bound, both positive and signed literals, and every exact target. The direct $K_{3,3}$ clauses were compared with an independently constructed set in a smaller model.
 
-The known value \(Z(3,4,3,3)=10\) was established by direct enumeration of all \(2^{12}\) matrices. CaDiCaL 3.0.0 then reported SAT at weight 10 and UNSAT at weight 11 for generated CNFs.
+The known value $Z(3,4,3,3)=10$ was established by direct enumeration of all $2^{12}$ matrices. CaDiCaL 3.0.0 then reported SAT at weight 10 and UNSAT at weight 11 for generated CNFs.
 
 Thirty seeded 5-by-6 matrices were fixed cell by cell. Direct semantics, CaDiCaL, and the column-support evaluator agreed on all 30. The sample includes both valid and invalid matrices. The seed and per-case outcomes are preserved in [`audit/model_validation.json`](../audit/model_validation.json).
 
@@ -115,13 +117,13 @@ The audit also rejects a broader formalization claim: the combinatorial translat
 
 The three table-level claims most relevant to the previous one-edge gap were checked against rendered primary sources, not search snippets:
 
-- Tan's \(z_3(9,23)=104\) entry is not marked exact;
+- Tan's $z_3(9,23)=104$ entry is not marked exact;
 - Davies--Gill--Horsley do not list an improvement for this cell; and
 - Bhan--Nobili--Langer display upper 104 over lower 103 without a tightness mark.
 
 The search included exact parameter variants, paper titles, DOI and arXiv records, and forward-looking queries through 2026-07-04. No earlier closure was located. The repository describes this as a dated search conclusion and explicitly invites earlier references.
 
-The follow-on audit transcribes all 44 cells that the paper identifies as previously open and checks the set cardinality directly. After the paper's three closures, the original $(9,23)$ result, and three follow-on closures, set subtraction leaves 37 cells. The documentation expressly retains their open status.
+The extended audit transcribes all 44 cells that the paper identifies as previously open and checks the set cardinality directly. After the paper's three closures and this repository's four closures, set subtraction leaves 37 cells. The documentation expressly retains their open status.
 
 ## 8. Portability and provenance audit
 
@@ -135,15 +137,15 @@ The root Git commit contains only the human proof. This makes the requested proo
 
 The audit does not remove the need for external review. In particular:
 
-- no independent mathematician has yet signed off on the proof;
+- no independent mathematician has yet signed off on the proofs;
 - the Lean development is an arithmetic formalization, not an end-to-end theorem;
 - no monolithic LRAT trace is provided for the raw 9-by-23 cell model;
-- the follow-on pair-deficit enumeration is checked by standard-library code but is not formalized in Lean;
+- the extended pair-deficit enumeration is checked by standard-library code but is not formalized in Lean;
 - the DGH formula transcription was checked by exact tests and source comparison but is diagnostic, not part of the theorem;
 - the finite literature search cannot establish absolute priority; and
 - external replay tools add their own trusted implementations.
 
-These limitations do not appear to leave a gap in the elementary proof, but they define the claims that this repository does and does not make.
+These limitations do not presently reveal a gap in the claimed proofs, but they define the claims that this repository does and does not make.
 
 ## Audit verdict
 

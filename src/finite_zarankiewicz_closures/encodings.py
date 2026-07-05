@@ -1,4 +1,4 @@
-"""Deterministic generators for the two exact decision formulations.
+"""Deterministic generators for two exact decision formulations.
 
 The cell model is a DIMACS CNF over one variable per matrix entry, plus a
 fully defined threshold circuit for the exact-weight constraint.  The

@@ -13,7 +13,10 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from zarankiewicz_z9_23.encodings import write_cell_cnf, write_column_type_lp  # noqa: E402
+from finite_zarankiewicz_closures.encodings import (  # noqa: E402
+    write_cell_cnf,
+    write_column_type_lp,
+)
 
 
 def _sha256(path: Path) -> str:

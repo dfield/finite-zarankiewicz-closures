@@ -1,4 +1,4 @@
-> **Attribution:** The proof, formal arithmetic, verification code, and repository were produced by **GPT 5.6-Sol**. This is a research artifact awaiting independent expert review, not a peer-reviewed publication.
+> **Attribution:** The proofs, formal arithmetic, verification code, and repository were produced by **GPT 5.6-Sol**. This is a research artifact awaiting independent expert review, not a peer-reviewed publication.
 
 # Four exact finite Zarankiewicz numbers
 
@@ -74,24 +74,26 @@ The first and third follow from the elementary deletion lemma. The middle value 
 
 ## Evidence and trust boundaries
 
-No single program is asked to carry the theorem. The repository separates the evidence into layers:
+The logical role of computation differs across the four results:
 
-| Layer | What it establishes | Artifact |
+| Result or layer | What it establishes | Artifact |
 |---|---|---|
-| Human proof | No 104-one matrix can exist | [`docs/PROOF.md`](docs/PROOF.md) |
-| Explicit construction | A 103-one matrix exists | [`data/z9_23_103_matrix.csv`](data/z9_23_103_matrix.csv) |
-| Independent witness checks | Row-triple capacities and all 148,764 candidate submatrices both pass | [`scripts/verify_witness.py`](scripts/verify_witness.py), [`scripts/verify_witness_independent.py`](scripts/verify_witness_independent.py) |
-| Exact arithmetic certificate | Independently enumerates all degree profiles and checks each contradiction | [`certificates/degree_deficit.json`](certificates/degree_deficit.json) |
-| Lean | Kernel-checks the penalty table, degree-profile classification, and terminal residue contradictions | [`lean/`](lean/) |
-| Decision models | Reconstructs the 207-cell SAT and 512-column-type MIP formulations | [`models/`](models/) |
-| Standard proof traces | Replays the three terminal integer contradictions in DRAT and LRAT | [`certificates/`](certificates/) |
+| Human upper-bound proof | Excludes 104 ones for $(9,23)$ | [`docs/PROOF.md`](docs/PROOF.md) |
+| Deletion arguments | Give matching upper bounds for $(10,21)$ and $(11,20)$ | [`docs/EXTENDED_RESULTS.md`](docs/EXTENDED_RESULTS.md) |
+| Computer-assisted finite proof | Exhaustively excludes the four possible 111-one degree profiles for $(10,22)$ | [`docs/EXTENDED_RESULTS.md`](docs/EXTENDED_RESULTS.md), [`src/finite_zarankiewicz_closures/extended.py`](src/finite_zarankiewicz_closures/extended.py) |
+| Explicit constructions | Supply all four matching lower bounds | [`data/`](data/) |
+| Independent witness checks | Verify every stored matrix by row-triple capacity and direct $3\times3$ scans | [`scripts/`](scripts/) |
+| Exact arithmetic certificate | Recomputes every degree profile and contradiction for $(9,23)$ | [`certificates/degree_deficit.json`](certificates/degree_deficit.json) |
+| Lean | Kernel-checks the $(9,23)$ penalty table, degree classification, and terminal residue contradictions | [`lean/`](lean/) |
+| Decision models | Reconstruct the 207-cell SAT and 512-column-type MIP formulations for $(9,23)$ | [`models/`](models/) |
+| Standard proof traces | Replay the three terminal $(9,23)$ integer contradictions in DRAT and LRAT | [`certificates/`](certificates/) |
 | Adversarial audit | Records mutation tests, independent tools, trust assumptions, and limitations | [`docs/ADVERSARIAL_AUDIT.md`](docs/ADVERSARIAL_AUDIT.md) |
-| Follow-on finite certificate | Closes $(10,21)$, $(10,22)$, and $(11,20)$ and records the 37-cell frontier | [`docs/EXTENDED_RESULTS.md`](docs/EXTENDED_RESULTS.md), [`analysis/extended_results.json`](analysis/extended_results.json) |
 
-Two boundaries are important:
+Three boundaries are important:
 
-- The Lean development formalizes the arithmetic kernel, not the complete matrix-to-counting translation. The repository does not call this a fully formalized theorem.
-- The DRAT/LRAT files certify the three terminal aggregations, not the full 8.2 MB cell CNF. The independently checked JSON certificate covers the mathematical reduction. There is no claim of a monolithic raw-cell LRAT proof.
+- The $(9,23)$ upper bound is entirely human-readable; its computation is corroborating rather than logically necessary.
+- The $(10,22)$ upper bound is computer-assisted: its exhaustive standard-library enumeration is a proof component. It is not formalized in Lean and is not presented as a solver certificate.
+- The Lean development formalizes only the $(9,23)$ arithmetic kernel, not the complete matrix-to-counting translation. The DRAT/LRAT files likewise certify only its three terminal aggregations, not the full 8.2 MB cell CNF.
 
 ## Quick verification
 
@@ -101,6 +103,7 @@ The core audit needs only Python 3.9 or later and the standard library:
 make test
 make witness
 make certificate
+make extended
 make models
 ```
 
@@ -112,9 +115,9 @@ make verify
 
 Expected headline results are:
 
-- 19 Python tests pass;
-- both witness verifiers report `valid: true`;
-- the exact certificate reports `VERIFIED` and three enumerated profiles;
+- 23 Python tests pass;
+- the two original witness verifiers accept the 103-one matrix, and the extended verifier accepts all three additional matrices;
+- the original certificate reports `VERIFIED` with three profiles, while the extended report is byte-identical and recomputes four profiles at 111 ones;
 - both generated decision models are byte-for-byte identical to the stored artifacts; and
 - the repository audit reports `VERIFIED`.
 
@@ -160,7 +163,7 @@ The stored models are deterministic outputs. They are included for transparency 
 ├── README.md                    introduction and result status
 ├── docs/
 │   ├── PROOF.md                 human-readable proof, committed before code
-│   ├── EXTENDED_RESULTS.md      three follow-on closures and open frontier
+│   ├── EXTENDED_RESULTS.md      three further closures and open frontier
 │   ├── LITERATURE_REVIEW.md     prior work and dated status search
 │   ├── METHODS.md               models, certificates, and proof/code map
 │   ├── ADVERSARIAL_AUDIT.md     attack surface, tests, findings, limits
@@ -170,7 +173,7 @@ The stored models are deterministic outputs. They are included for transparency 
 ├── models/                      deterministic SAT/MIP artifacts
 ├── analysis/                    exact boundaries, kernel catalog, and table frontier
 ├── lean/                        formal arithmetic subproject
-├── src/zarankiewicz_z9_23/      documented standard-library package
+├── src/finite_zarankiewicz_closures/ documented standard-library package
 ├── scripts/                     small command-line entry points
 ├── tests/                       adversarial and semantic regression tests
 └── audit/                       recorded external-tool reports
@@ -182,18 +185,18 @@ The Git history itself records the proof-first workflow: the root commit contain
 
 All core generators are deterministic. The randomized model-validation sample uses the fixed seed `20260704`. Stored outputs contain no machine-specific paths or timestamps. Artifact hashes are collected in [`artifacts.sha256`](artifacts.sha256).
 
-Reviewers are encouraged to begin with the six-page-equivalent [proof](docs/PROOF.md), then run the two witness verifiers and the exact certificate checker. The SAT/MIP and proof-trace layers are intentionally secondary. A suggested review sequence and issue-reporting guidance appear in [`CONTRIBUTING.md`](CONTRIBUTING.md).
+Reviewers are encouraged to begin with the six-page-equivalent [$(9,23)$ proof](docs/PROOF.md) and the [three further closures](docs/EXTENDED_RESULTS.md), then run both certificate paths and all witness verifiers. The SAT/MIP and proof-trace layers are intentionally secondary. A suggested review sequence and issue-reporting guidance appear in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Status and humility
 
-The repository's internal checks support the main exact value 103 and the three follow-on closures, and no mathematical gap is presently known. Nevertheless:
+The repository's internal checks support all four exact values, and no mathematical gap is presently known. Nevertheless:
 
 - this work has not yet been independently peer reviewed;
 - the literature search cannot exclude unpublished or poorly indexed prior work;
 - the novelty assessment is therefore dated and provisional; and
 - any correction, simplification, or earlier reference is welcome.
 
-The exact claim should be judged from the proof, not from the amount of automation surrounding it.
+The exact claims should be judged from the stated proof and trust boundaries, not from the amount of automation surrounding them.
 
 ## Citation and license
 

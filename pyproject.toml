@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "finite-zarankiewicz-closures"
-version = "1.1.0"
+version = "1.2.0"
 description = "Reproducible proofs and certificates for four exact finite Zarankiewicz numbers"
 readme = "README.md"
 requires-python = ">=3.9"
@@ -19,6 +19,10 @@ classifiers = [
   "Programming Language :: Python :: 3",
   "Topic :: Scientific/Engineering :: Mathematics",
 ]
+
+[project.urls]
+Repository = "https://github.com/dfield/finite-zarankiewicz-closures"
+Issues = "https://github.com/dfield/finite-zarankiewicz-closures/issues"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -13,7 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from zarankiewicz_z9_23.boundary import (  # noqa: E402
+from finite_zarankiewicz_closures.boundary import (  # noqa: E402
     KERNEL_FIELDS,
     boundary_report,
     kernel_catalog_rows,

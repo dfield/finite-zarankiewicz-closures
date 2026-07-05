@@ -1,6 +1,6 @@
 """Strict parsing and row-triple verification of Boolean matrices.
 
-The main verifier implements the subset formulation from Section 2 of the
+The primary verifier implements the subset formulation from Section 2 of the
 human proof.  For every triple of rows it counts columns containing that
 triple; a count of three would be a forbidden all-one 3-by-3 submatrix.
 

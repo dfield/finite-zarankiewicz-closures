@@ -2,9 +2,9 @@
 
 [`z9_23_103_matrix.csv`](z9_23_103_matrix.csv) is the explicit lower-bound witness for
 
-\[
+$$
 Z(9,23,3,3)\ge103.
-\]
+$$
 
 The file has exactly nine rows, 23 comma-separated Boolean entries per row, and 103 ones. Row and column indices used by programs are zero-based; the proof uses ordinary one-based mathematical labels.
 
@@ -15,13 +15,13 @@ python3 scripts/verify_witness.py
 python3 scripts/verify_witness_independent.py
 ```
 
-The first checks the 84 row-triple capacities. The second is standalone and examines all 148,764 candidate \(3\times3\) submatrices. The matrix is also maximal: changing any one of its zero entries to one creates a forbidden submatrix, as tested in `tests/test_matrix.py`.
+The first checks the 84 row-triple capacities. The second is standalone and examines all 148,764 candidate $3\times3$ submatrices. The matrix is also maximal: changing any one of its zero entries to one creates a forbidden submatrix, as tested in `tests/test_matrix.py`.
 
 Bhan, Nobili, and Langer publicly established the 103 lower bound before this repository. See [`docs/LITERATURE_REVIEW.md`](../docs/LITERATURE_REVIEW.md) for attribution and source details.
 
-## Follow-on witnesses
+## Additional witnesses
 
-Two further matrices support the extended finite-table results:
+Three further matrices support the extended finite-table results:
 
 | File | Dimensions | Ones | Role |
 |---|---:|---:|---|
@@ -29,7 +29,7 @@ Two further matrices support the extended finite-table results:
 | [`z10_22_110_matrix.csv`](z10_22_110_matrix.csv) | $10\times22$ | 110 | Lower bound matching the pair-deficit upper bound |
 | [`z11_20_111_matrix.csv`](z11_20_111_matrix.csv) | $11\times20$ | 111 | Lower bound matching the two-step deletion upper bound |
 
-The 110-one matrix is row-regular with row sum 11, and every row triple occurs in exactly two columns. Verify both matrices independently with:
+The 110-one matrix is row-regular with row sum 11, and every row triple occurs in exactly two columns. Verify all three matrices independently with:
 
 ```sh
 PYTHONPATH=src python3 scripts/check_extended_results.py --check

@@ -22,7 +22,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from zarankiewicz_z9_23.encodings import (  # noqa: E402
+from finite_zarankiewicz_closures.encodings import (  # noqa: E402
     build_cell_cnf,
     cell_variable,
     column_constraints_hold,

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check the follow-on exact values, frontier, and finite certificate."""
+"""Check the additional exact values, frontier, and finite certificate."""
 
 from __future__ import annotations
 
@@ -11,11 +11,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from zarankiewicz_z9_23.extended import (  # noqa: E402
+from finite_zarankiewicz_closures.extended import (  # noqa: E402
     extended_frontier_report,
     z10_22_certificate_report,
 )
-from zarankiewicz_z9_23.matrix import read_boolean_csv, verify_by_row_triples  # noqa: E402
+from finite_zarankiewicz_closures.matrix import (  # noqa: E402
+    read_boolean_csv,
+    verify_by_row_triples,
+)
 
 
 WITNESSES = (

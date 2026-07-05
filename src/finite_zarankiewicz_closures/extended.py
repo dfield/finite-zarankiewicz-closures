@@ -1,7 +1,7 @@
-"""Exact follow-on results and finite certificates for the 2026 table.
+"""Exact finite results and certificates for the 2026 table.
 
-The original repository proves ``Z(9,23,3,3)=103``.  This module records
-three further closures found while propagating and checking the open table in
+Alongside the marked-row proof of ``Z(9,23,3,3)=103``, this module records
+three further closures obtained by propagating and checking the open table in
 Bhan--Nobili--Langer (2026): ``Z(10,21)=106``, ``Z(10,22)=110``, and
 ``Z(11,20)=111``.  The first and third follow from vertex deletion.  The
 middle value uses a finite degree-profile and pair-deficit certificate.

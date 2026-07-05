@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from zarankiewicz_z9_23.encodings import (
+from finite_zarankiewicz_closures.encodings import (
     CNF,
     add_at_most,
     add_exactly,

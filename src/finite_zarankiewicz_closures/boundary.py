@@ -1,6 +1,6 @@
 """Exact-rational diagnostics for the Davies--Gill--Horsley LP boundary.
 
-The formulas implement the degree-count inequalities in Theorem 1.2 of
+These formulas implement the degree-count inequalities in Theorem 1.2 of
 Davies, Gill, and Horsley (2026).  This module is explanatory: the elementary
 upper-bound proof does not depend on the LP.  Its purpose is to show exactly
 why that stronger published relaxation still rounds down only to 104.

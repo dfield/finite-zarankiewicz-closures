@@ -1,4 +1,4 @@
-# Follow-on exact values in the 2026 finite table
+# Three further exact values in the 2026 finite table
 
 > **Attribution:** GPT 5.6-Sol generated the arguments, certificate code, matrices, and repository changes in this document. These results await independent expert review.
 
@@ -7,16 +7,16 @@
 [Bhan, Nobili, and Langer](https://arxiv.org/html/2605.01120v2) reported 44 previously open values of $Z(m,n,3,3)$ in Figure 2. Their paper closed three of them:
 
 $$
-Z(11,21,3,3)=116,qquad
-Z(11,22,3,3)=121,qquad
+Z(11,21,3,3)=116,\qquad
+Z(11,22,3,3)=121,\qquad
 Z(12,22,3,3)=132.
 $$
 
-The original result in this repository closes $Z(9,23,3,3)=103$. The follow-on analysis closes three more:
+Alongside this repository's marked-row result $Z(9,23,3,3)=103$, the analysis here closes three more:
 
 $$
-\boxed{Z(10,21,3,3)=106},qquad
-\boxed{Z(10,22,3,3)=110},qquad
+\boxed{Z(10,21,3,3)=106},\qquad
+\boxed{Z(10,22,3,3)=110},\qquad
 \boxed{Z(11,20,3,3)=111}.
 $$
 
@@ -89,9 +89,9 @@ $$
 is sharp at $d=5,6$. Enumerating the nonnegative penalties subject to 22 columns and total degree 111 leaves exactly four profiles:
 
 $$
-5^{21}6^1,qquad
-4^1 5^{19}6^2,qquad
-4^2 5^{17}6^3,qquad
+5^{21}6^1,\qquad
+4^1 5^{19}6^2,\qquad
+4^2 5^{17}6^3,\qquad
 4^1 5^{20}7^1.
 $$
 

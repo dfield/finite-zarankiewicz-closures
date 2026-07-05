@@ -22,12 +22,15 @@ from typing import Iterator
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
-from zarankiewicz_z9_23.certificate import verify_certificate  # noqa: E402
-from zarankiewicz_z9_23.extended import (  # noqa: E402
+from finite_zarankiewicz_closures.certificate import verify_certificate  # noqa: E402
+from finite_zarankiewicz_closures.extended import (  # noqa: E402
     extended_frontier_report,
     z10_22_certificate_report,
 )
-from zarankiewicz_z9_23.matrix import read_boolean_csv, verify_by_row_triples  # noqa: E402
+from finite_zarankiewicz_closures.matrix import (  # noqa: E402
+    read_boolean_csv,
+    verify_by_row_triples,
+)
 
 
 EXPECTED_FILES = (
@@ -136,7 +139,7 @@ def check_python_documentation() -> dict[str, object]:
     modules = 0
     public_objects = 0
     missing: list[str] = []
-    package = ROOT / "src" / "zarankiewicz_z9_23"
+    package = ROOT / "src" / "finite_zarankiewicz_closures"
     for path in sorted(package.glob("*.py")):
         modules += 1
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))

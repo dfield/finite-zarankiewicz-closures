@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from zarankiewicz_z9_23.matrix import read_boolean_csv, verify_by_row_triples
+from finite_zarankiewicz_closures.matrix import read_boolean_csv, verify_by_row_triples
 
 
 ROOT = Path(__file__).resolve().parents[1]

@@ -4,7 +4,7 @@ This directory contains deterministic formulations of the hypothetical 104-one m
 
 ## `cells_9x23_exact_104.cnf`
 
-The DIMACS file has one base variable per matrix cell, a clause for every forbidden all-one \(3\times3\) submatrix, and a sequential threshold circuit imposing exactly 104 ones.
+The DIMACS file has one base variable per matrix cell, a clause for every forbidden all-one $3\times3$ submatrix, and a sequential threshold circuit imposing exactly 104 ones.
 
 Metadata in [`manifest.json`](manifest.json) records:
 

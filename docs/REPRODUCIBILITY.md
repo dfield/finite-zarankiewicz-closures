@@ -12,6 +12,8 @@ Lean is optional for checking the mathematical result but required to rebuild th
 
 External SAT, MIP, DRAT, and LRAT tools are optional corroborating checks.
 
+Python 3.9 is retained deliberately as an archival compatibility floor even though upstream support ended in October 2025. Continuous integration checks both Python 3.9 and current stable Python 3.14; the core has no third-party Python dependencies.
+
 ## One-command core gate
 
 From the repository root:
@@ -20,7 +22,11 @@ From the repository root:
 make verify
 ```
 
-This runs tests, the original and follow-on witness checks, both exact certificates, deterministic model regeneration, and the repository audit. It does not invoke external solvers or Lean.
+This runs tests, all four witness checks, both exact certificate paths, deterministic model regeneration, and the repository audit. It does not invoke external solvers or Lean.
+
+## Continuous integration
+
+The GitHub Actions workflow runs `make verify` on Python 3.9 and 3.14 and builds the Lean arithmetic kernel on every push and pull request. It can also be started manually with `workflow_dispatch`.
 
 ## Individual commands and expected facts
 
@@ -60,7 +66,7 @@ make certificate
 
 Expected: `status: VERIFIED`, `profiles_enumerated: 3`, and the three named cases `balanced`, `one_degree_3`, and `one_degree_6`.
 
-### Follow-on exact values
+### Additional exact values
 
 ```sh
 make extended
@@ -71,7 +77,7 @@ Expected from the primary checker:
 - `status: IDENTICAL`;
 - `source_open_cases: 44`;
 - `remaining_open_cases: 37`; and
-- three verified follow-on witnesses.
+- three verified additional witnesses.
 
 The independent checker must inspect 159,600 candidate submatrices for the $10\times21$ matrix, 184,800 for the $10\times22$ matrix, and 188,100 for the $11\times20$ matrix. The standard-library upper-bound certificate must enumerate four degree profiles, 1,050 profile-B cases, and $77\times22{,}155$ profile-C cases.
 
@@ -157,7 +163,7 @@ The following outputs are byte-deterministic:
 - column-type LP;
 - model metadata;
 - exact DGH boundary report;
-- local-kernel catalog; and
+- local-kernel catalog;
 - extended finite-table report; and
 - artifact checksum file.
 

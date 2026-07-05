@@ -1,4 +1,4 @@
-"""Independent checker for the exact degree-deficit certificate.
+"""Exact checker for the independent degree-deficit certificate.
 
 The JSON certificate is treated as untrusted input.  In particular, this
 module enumerates the feasible degree histograms itself instead of accepting

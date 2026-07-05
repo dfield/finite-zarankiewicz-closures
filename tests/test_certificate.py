@@ -5,13 +5,13 @@ import json
 import unittest
 from pathlib import Path
 
-from zarankiewicz_z9_23.certificate import (
+from finite_zarankiewicz_closures.certificate import (
     CertificateError,
     enumerate_degree_profiles,
     penalty,
     verify_certificate,
 )
-from zarankiewicz_z9_23.boundary import boundary_report, kernel_catalog_rows
+from finite_zarankiewicz_closures.boundary import boundary_report, kernel_catalog_rows
 
 
 ROOT = Path(__file__).resolve().parents[1]
