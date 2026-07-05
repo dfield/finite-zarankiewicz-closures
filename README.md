@@ -30,7 +30,7 @@ The 2026 table of Jay Bhan, Nicole Nobili, and Patrick Langer left these four ce
 
 Credit for the four previously public lower bounds belongs to Bhan--Nobili--Langer. The contribution presented here is to prove matching upper bounds and independently verify explicit witnesses. Together with the three cells made exact in their paper, these results close seven of that paper's 44 open cells; **37 remain open**. See the [literature review](docs/LITERATURE_REVIEW.md) for the complete attribution chain and the [extended-results proof](docs/EXTENDED_RESULTS.md) for the precise claim boundary.
 
-> **Update (2026-07-05).** A follow-up session closed a fifth cell, $Z(11,19,3,3)=106$, proved two further elementary upper bounds $Z(12,23,3,3)\le135$ and $Z(13,23,3,3)\le144$, and tightened many published intervals by closing the table under deletion and two-one-line extension, leaving **36 cells open**. See [`docs/NEW_BOUNDS.md`](docs/NEW_BOUNDS.md) and run `make new-bounds`. The four-result documents above are kept as originally stated.
+> **Update (2026-07-05).** A follow-up session closed two more cells, $Z(11,19,3,3)=106$ (new explicit witness) and $Z(12,23,3,3)=134$ (new two-step deficit theorem), proved the further elementary bound $Z(13,23,3,3)\le144$, and tightened many published intervals by closing the table under deletion and two-one-line extension, leaving **35 cells open**. See [`docs/NEW_BOUNDS.md`](docs/NEW_BOUNDS.md) and run `make new-bounds`. The four-result documents above are kept as originally stated.
 
 ## The $Z(9,23,3,3)$ proof idea
 
