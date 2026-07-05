@@ -30,6 +30,8 @@ The 2026 table of Jay Bhan, Nicole Nobili, and Patrick Langer left these four ce
 
 Credit for the four previously public lower bounds belongs to Bhan--Nobili--Langer. The contribution presented here is to prove matching upper bounds and independently verify explicit witnesses. Together with the three cells made exact in their paper, these results close seven of that paper's 44 open cells; **37 remain open**. See the [literature review](docs/LITERATURE_REVIEW.md) for the complete attribution chain and the [extended-results proof](docs/EXTENDED_RESULTS.md) for the precise claim boundary.
 
+> **Update (2026-07-05).** A follow-up session closed a fifth cell, $Z(11,19,3,3)=106$, proved two further elementary upper bounds $Z(12,23,3,3)\le135$ and $Z(13,23,3,3)\le144$, and tightened many published intervals by closing the table under deletion and two-one-line extension, leaving **36 cells open**. See [`docs/NEW_BOUNDS.md`](docs/NEW_BOUNDS.md) and run `make new-bounds`. The four-result documents above are kept as originally stated.
+
 ## The $Z(9,23,3,3)$ proof idea
 
 Treat each column as the set $E_j$ of rows containing a one, and let $d_j=|E_j|$. Every triple of rows may occur together in at most two columns; otherwise those rows and three such columns form a forbidden $3\times3$ block. Therefore
