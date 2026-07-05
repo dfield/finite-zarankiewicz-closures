@@ -396,6 +396,19 @@ def check_lean_source_boundary() -> dict[str, object]:
 def check_proof_first_history() -> dict[str, object]:
     """Verify that the root Git commit contains the human proof and no code."""
 
+    shallow = subprocess.run(
+        ["git", "rev-parse", "--is-shallow-repository"],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    if shallow == "true":
+        raise AssertionError(
+            "proof-first history cannot be audited in a shallow clone; "
+            "fetch the full Git history"
+        )
+
     root_commit = subprocess.run(
         ["git", "rev-list", "--max-parents=0", "HEAD"],
         cwd=ROOT,

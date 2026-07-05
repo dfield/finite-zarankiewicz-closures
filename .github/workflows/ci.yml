@@ -25,6 +25,9 @@ jobs:
         python-version: ["3.9", "3.14"]
     steps:
       - uses: actions/checkout@v7
+        with:
+          # The repository audit verifies the proof-only root commit.
+          fetch-depth: 0
       - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
@@ -43,8 +46,7 @@ jobs:
           build: true
           test: false
           use-mathlib-cache: false
-          nanoda: true
-          nanoda-allow-sorry: false
+          leanchecker: true
       - name: Print theorem axiom dependencies
         working-directory: lean
         run: lake env lean AxiomAudit.lean
