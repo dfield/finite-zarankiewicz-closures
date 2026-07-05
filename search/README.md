@@ -13,6 +13,7 @@ library only), and every witness matrix is checked by exhaustive scan.
 | `drive.py` | profile enumeration + parallel search driver + independent verifier | Python 3.9+ |
 | `filters.py` | the general row/pair deficit profile filter behind the two new upper-bound theorems | Python 3.9+ |
 | `sat_tool.py` | per-profile SAT feasibility (sequential-counter cardinalities, double-lex symmetry breaking) | `pip install python-sat` |
+| `tier2.py` | configuration-level residue filter (found the five profile kills behind the $Z(12,23,3,3)\le134$ theorem) | Python 3.9+ |
 | `lp_dgh.py` | exact-rational Davies--Gill--Horsley LP, reproduces their published table | Python 3.9+ |
 
 Build the annealers with:

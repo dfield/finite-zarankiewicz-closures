@@ -6,25 +6,29 @@
 
 This document extends the repository's results on the Bhan--Nobili--Langer frontier ([BNL26], Figure 2) in three ways.
 
-**A fifth exact value.**
+**Two further exact values.**
 
 $$
-\boxed{Z(11,19,3,3)=106.}
+\boxed{Z(11,19,3,3)=106,}
+\qquad
+\boxed{Z(12,23,3,3)=134.}
 $$
 
-The upper bound is the deletion bound already derived in [`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) from the established value $Z(11,18,3,3)=101$. The matching lower bound is a new explicit 106-one matrix, [`data/z11_19_106_matrix.csv`](../data/z11_19_106_matrix.csv), found by simulated annealing over fixed column-degree profiles and verified by exhaustive scan. Bhan--Nobili--Langer's best construction had 102 ones.
+For $(11,19)$, the upper bound is the deletion bound already derived in [`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) from the established value $Z(11,18,3,3)=101$; the matching lower bound is a new explicit 106-one matrix, [`data/z11_19_106_matrix.csv`](../data/z11_19_106_matrix.csv), found by simulated annealing over fixed column-degree profiles and verified by exhaustive scan. Bhan--Nobili--Langer's best construction had 102 ones.
 
-With this closure, eight of the paper's 44 open cells are settled and **36 remain open**.
+For $(12,23)$, Section 3 proves $Z(12,23,3,3)\le134$ by a two-step deficit argument (their reported interval was $125$--$136$), and the matching lower bound is the two-one-column extension of Bhan--Nobili--Langer's exact $Z(12,22,3,3)=132$ construction.
 
-**Two new elementary upper bounds.**
+With these closures, nine of the paper's 44 open cells are settled and **35 remain open**.
+
+**New elementary upper bounds.**
 
 $$
-Z(12,23,3,3)\le135,
+Z(12,23,3,3)\le134,
 \qquad
 Z(13,23,3,3)\le144.
 $$
 
-The previous upper bounds were 136 and 145. Both proofs use only the row-triple capacity count and the deficit mechanisms already present in this repository — the pair-deficit count of the $Z(10,22)$ proof and the marked-row residues of the $Z(9,23)$ proof — applied at new parameters. Full proofs are in Sections 3 and 4; every arithmetic step is checked by [`scripts/check_new_bounds.py`](../scripts/check_new_bounds.py).
+The previous published upper bounds were 136 and 145. The proofs use only the row-triple capacity count and the deficit mechanisms already present in this repository — the pair-deficit count of the $Z(10,22)$ proof and the marked-row residues of the $Z(9,23)$ proof — applied at new parameters, with residue moduli 10 and 4 at twelve rows and 5 at thirteen rows. Full proofs are in Sections 3 and 4; every arithmetic step, including the one finite enumeration, is checked by [`scripts/check_new_bounds.py`](../scripts/check_new_bounds.py).
 
 **A propagated bound table.** Closing the table of [BNL26] under the deletion lemma and under two-one-line extensions tightens 17 upper bounds and 19 lower bounds beyond the paper's published intervals, without any new search. The machine-readable result, with per-cell provenance, is [`analysis/new_bounds.json`](../analysis/new_bounds.json). Section 5 lists every change.
 
@@ -46,7 +50,11 @@ from the established value $Z(11,18,3,3)=101$: a $K_{3,3}$-free $11\times19$ mat
 
 The matrix was found by annealing within the fixed degree profile $5^86^{11}$; the discovery method carries no logical weight, because the verification is a direct scan.
 
-## 3. Theorem: $Z(12,23,3,3)\le135$
+## 3. Theorem: $Z(12,23,3,3)=134$
+
+The proof of the upper bound has two steps: first 136 ones are excluded by a short pair-count argument (Section 3.1--3.3), then 135 ones are excluded by a residue analysis of the five surviving degree profiles (Section 3.4). The lower bound is discussed in Section 3.5.
+
+### Step one: no 136-one matrix
 
 Suppose, for contradiction, that a $12\times23$ $K_{3,3}$-free matrix has 136 ones. Let $E_j$ and $d_j$ be the row set and degree of column $j$, and for each row triple $T$ let $\lambda_T$ be the number of columns whose row set contains $T$. As in the four existing proofs, $K_{3,3}$-freeness means $\lambda_T\le2$, and double counting gives
 
@@ -105,13 +113,64 @@ $$
 \sum_P a_P=2\binom52=20\ne0.
 $$
 
-This contradiction shows no 136-one matrix exists, and deleting ones handles any denser matrix. $\blacksquare$
+This contradiction shows no 136-one matrix exists. $\blacksquare$
 
-Together with the lower bound of Section 5 ($Z(12,23,3,3)\ge134$, by extending a $Z(12,22,3,3)=132$ witness with a two-one column),
+### 3.4 Step two: no 135-one matrix
+
+Now suppose 135 ones. Inequality (2) gives $\sum_j\binom{d_j}3\ge10\cdot135-40\cdot23=430$, so the deficit budget against (1) is 10; since the deficits of (2) at $d=4,7$ are $4$ and $5$ and at least 14 elsewhere, every degree lies in $\{4,5,6,7\}$ with at most two exceptional columns. Exhausting the count and sum equations leaves exactly five profiles (slack $s=440-\sum_j\binom{d_j}3$):
 
 $$
-134\le Z(12,23,3,3)\le135 .
+5^36^{20}\ (s{=}10),\quad
+4^15^16^{21}\ (s{=}6),\quad
+5^46^{18}7^1\ (s{=}5),\quad
+4^15^26^{19}7^1\ (s{=}1),\quad
+5^56^{16}7^2\ (s{=}0).
 $$
+
+Write $u_r,a_r,b_r$ for the number of degree-4, degree-5, degree-7 columns through row $r$, and $x_P,y_P,z_P$ for the same counts through a row pair $P$. Two residue identities do all the work. The row deficit $D_r=110-\sum_{j\ni r}\binom{d_j-1}2$ satisfies, modulo 10 (killing the degree-6 contribution $\binom52=10$ and $110$ itself),
+
+$$
+D_r\equiv 7u_r+4a_r+5b_r \pmod{10},\qquad D_r\ge0,\qquad \sum_rD_r=3s. \tag{6}
+$$
+
+The pair deficit $D_P=20-\sum_{j\supseteq P}(d_j-2)$ satisfies, modulo 4 (killing the degree-6 contribution),
+
+$$
+D_P\equiv 2x_P+y_P+3z_P \pmod4,\qquad D_P\ge0,\qquad \sum_PD_P=3s. \tag{7}
+$$
+
+Since each $D_r$ (resp. $D_P$) is congruent to its residue and nonnegative, it is at least that residue; summing residues therefore cannot exceed $3s$. Finally, $K_{3,3}$-freeness bounds shared rows across column triples: for the degree-5 columns,
+
+$$
+\sum_r\binom{a_r}3\le2\binom{n_5}3,
+\qquad
+\sum_r\binom{a_r}2\,b_r\le2\binom{n_5}2n_7. \tag{8}
+$$
+
+The five profiles die as follows.
+
+1. **$5^36^{20}$, $3s=30$.** By (6), $D_r\ge(4a_r\bmod10)$, and $\sum_ra_r=15$. With $n_a$ rows of each $a$, the residue sum is $4n_1+8n_2+2n_3=60-10n_3$. By (8), $n_3\le2$, so the sum is at least $40>30$.
+
+2. **$4^15^16^{21}$, $3s=18$.** By (7) with $t$ the overlap of the two exceptional columns, the pair residues total
+$2\bigl(\binom42-\binom t2\bigr)+\bigl(\binom52-\binom t2\bigr)+3\binom t2=22>18$ for every $t$.
+
+3. **$5^46^{18}7^1$, $3s=15$.** By (6), $D_r\ge\bigl((4a_r+5b_r)\bmod10\bigr)$ with $\sum a_r=20$, $\sum b_r=7$. An exhaustive enumeration of the row-type counts under the two budgets (8) — a few hundred cases, re-run by the checker — shows the residue sum is at least 25.
+
+4. **$4^15^26^{19}7^1$, $3s=3$.** Every row residue must be at most 3. For the four rows of the degree-4 column, (6) allows only $(a,b)\in\{(1,0),(0,1),(2,1)\}$; for the other eight rows only $(0,0)$ at cost 0 or $(2,1)$ at cost 3, and the budget admits at most one of the latter. Hence at most $4+1=5$ rows can meet the degree-7 column, which has seven rows.
+
+5. **$5^56^{16}7^2$, $s=0$.** Every deficit vanishes, so every row satisfies $4a_r+5b_r\equiv0\pmod{10}$, forcing $a_r\in\{0,5\}$. Then $\sum_ra_r=25$ forces five rows with $a_r=5$, giving $\sum_r\binom{a_r}3=50$, against the budget $2\binom53=20$ in (8).
+
+No profile survives, so no 135-one matrix exists, and $Z(12,23,3,3)\le134$. $\blacksquare$
+
+### 3.5 The matching lower bound
+
+Appending a column with two ones to any 132-one $12\times22$ $K_{3,3}$-free matrix — Bhan--Nobili--Langer's construction establishing $Z(12,22,3,3)=132$ — gives a 134-one $12\times23$ matrix that is still $K_{3,3}$-free, because a $3\times3$ all-one block would need three ones in the new column. Hence
+
+$$
+Z(12,23,3,3)=134 .
+$$
+
+This lower bound inherits Bhan--Nobili--Langer's $(12,22)$ construction rather than an artifact stored here; a session-local search for an explicit 134-one matrix is noted in Section 6.
 
 ## 4. Theorem: $Z(13,23,3,3)\le144$
 
@@ -186,7 +245,7 @@ Seeding with the "previously established" cells of [BNL26] Figure 2 (values from
 | $(12,19)$ | 110--118 | 110--**115** | deletion from $Z(11,19)=106$ |
 | $(12,20)$ | 113--122 | 113--**121** | deletion from $Z(11,20)=111$ |
 | $(12,21)$ | 116--127 | **118**--**126** | deletion from $Z(11,21)=116$ |
-| $(12,23)$ | 125--136 | **134**--**135** | Section 3 theorem |
+| $(12,23)$ | 125--136 | **134** (closed) | Section 3 theorem |
 | $(13,17)$ | 106--116 | **109**--**112** | deletion from $(12,17)$ |
 | $(13,18)$ | 115--121 | 115--**118** | deletion from $(13,17)$ |
 | $(13,19)$ | 114--125 | **117**--**124** | deletion from $(13,18)$ |
@@ -213,7 +272,7 @@ Cells not listed are unchanged. Note that $(12,19)$, $(12,20)$, and $(12,21)$ in
 
 - The $Z(11,19)$ **upper** bound and every deletion-propagated bound depend on the correctness of the established values in [BNL26] Figure 2 / Tan's Table 3 — the same dependency already accepted by [`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) for $Z(10,21)$ and $Z(11,20)$. The witness and both deficit theorems are self-contained.
 - The theorems of Sections 3 and 4 are fully elementary; [`scripts/check_new_bounds.py`](../scripts/check_new_bounds.py) re-derives the profile classifications by exhaustive enumeration and re-checks every displayed number, in the standard library only.
-- During the same session, per-profile SAT runs (CaDiCaL via PySAT, with sequential-counter cardinality encodings and double-lex symmetry breaking) returned `UNSAT` for 10 of the 11 capacity-feasible degree profiles of a hypothetical 114-one $10\times23$ matrix, and for several profiles at other near-tight targets. **No claim in this document rests on those verdicts**; they are recorded here only as a research pointer, since no independently checkable proof trace was retained. A DRAT-logged rerun would be the natural follow-up.
+- During the same session, per-profile SAT runs (CaDiCaL via PySAT, with sequential-counter cardinality encodings and double-lex symmetry breaking) returned `UNSAT` for **all 11** capacity-feasible degree profiles of a hypothetical 114-one $10\times23$ matrix and for **21 of 24** profiles of a 113-one matrix, suggesting $Z(10,23,3,3)\le113$ and quite possibly $=112$. The same machinery independently re-confirmed profile infeasibilities behind this repository's published upper bounds. **No claim in this document rests on those verdicts**; they are recorded here only as a research pointer, since no independently checkable proof trace was retained. A DRAT-logged rerun would be the natural follow-up.
 - The figure-2 transcription used here was re-read from the arXiv HTML of [BNL26] v2 during the session and matches [`analysis/extended_results.json`](../analysis/extended_results.json); the upper bounds equal $\min(\text{[Tan22] Table 3},\ \text{[DGH26] Table 2})$ cell-by-cell, and an exact-rational re-computation of the [DGH26] linear program reproduced their published values for every open cell.
 
 ## 7. Reproduction

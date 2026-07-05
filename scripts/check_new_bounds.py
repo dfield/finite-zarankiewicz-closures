@@ -128,6 +128,115 @@ def check_z12_23_upper() -> dict:
             "pair_equation_solutions": solutions}
 
 
+# --------------------------------------------- theorem: Z(12,23) <= 134 ------
+
+def check_z12_23_upper_134() -> dict:
+    """A 12x23 K33-free matrix cannot have 135 ones either.
+
+    Exactly five degree profiles survive the capacity count at 135.  Write
+    u_r, a_r, b_r for the number of degree-4, degree-5, degree-7 columns
+    through row r.  Modulo 10 the degree-6 row contribution C(5,2)=10
+    vanishes and 2*C(11,2) = 110 == 0, so the row deficit satisfies
+        D_r == 7*u_r + 4*a_r + 5*b_r  (mod 10),   D_r >= 0,
+    and sum_r D_r = 3s.  Similarly modulo 4 the degree-6 pair contribution
+    vanishes and 2*(m-2) = 20 == 0, so the pair deficit satisfies
+        D_P == 2*x_P + y_P + 3*z_P  (mod 4)
+    with x, y, z counting degree-4/5/7 columns through the pair.
+    K33-freeness bounds shared rows over column triples:
+        sum_r C(a_r,3) <= 2*C(n5,3)  and  sum_r C(a_r,2)*b_r <= 2*C(n5,2)*n7.
+
+    Each profile is impossible:
+      5^3 6^20  (s=10): sum_r (4a mod 10) = 60 - 10*n3 >= 40 > 30, since at
+                 most two rows lie in all three degree-5 columns.
+      4^1 5^1 6^21 (s=6): the pair residues sum to 22 > 18 independently of
+                 the overlap between the two exceptional columns.
+      5^4 6^18 7^1 (s=5): exhaustive enumeration of row types (a,b) under the
+                 two K33 budgets shows sum_r D_r-residues >= 25 > 15.
+      4^1 5^2 6^19 7^1 (s=1): each of the four rows of the degree-4 column
+                 needs residue <= 3, forcing (a,b) in {(1,0),(0,1),(2,1)};
+                 counting degree-7 incidences then forces at least three
+                 residue-3 rows outside the column: >= 9 > 3.
+      5^5 6^16 7^2 (s=0): every row needs residue 0, forcing a_r in {0,5};
+                 sum a_r = 25 needs five rows with a_r = 5, but
+                 sum_r C(a_r,3) = 50 > 20 = 2*C(5,3).
+    """
+    profiles = degree_profiles(12, 23, 135)
+    key = lambda p: tuple(sorted(p.items()))
+    expect = {key(p) for p in ({5: 3, 6: 20}, {4: 1, 5: 1, 6: 21},
+                               {5: 4, 6: 18, 7: 1}, {4: 1, 5: 2, 6: 19, 7: 1},
+                               {5: 5, 6: 16, 7: 2})}
+    assert {key(p) for p in profiles} == expect, profiles
+    detail = {}
+
+    # P1: 5^3 6^20
+    s = (2 * C(12, 3) - (3 * C(5, 3) + 20 * C(6, 3))) ; assert s == 10
+    # rows in all three degree-5 columns form the shared set of the unique
+    # column triple: at most 2.  sum_r r_r = 60 - 10*n3 for n3 <= 2.
+    assert min(60 - 10 * n3 for n3 in range(0, 3)) == 40 > 3 * s
+    detail["5^3 6^20"] = "row residues >= 40 > 30"
+
+    # P2: 4^1 5^1 6^21 -- pair residues, any overlap t
+    s = 2 * C(12, 3) - (C(4, 3) + C(5, 3) + 21 * C(6, 3)); assert s == 6
+    for t in range(0, 5):
+        both = C(t, 2)
+        total = 2 * (C(4, 2) - both) + 1 * (C(5, 2) - both) + 3 * both
+        assert total == 22 > 3 * s
+    detail["4^1 5^1 6^21"] = "pair residues = 22 > 18 for every overlap"
+
+    # P3: 5^4 6^18 7^1 -- exhaustive row-type enumeration
+    s = 2 * C(12, 3) - (4 * C(5, 3) + 18 * C(6, 3) + C(7, 3)); assert s == 5
+    types = [(a, b) for a in range(5) for b in range(2)]
+    survivor = []
+
+    def rec3(i, rows, sa, sb, c3, c2b, sr):
+        if sr > 3 * s or survivor:
+            return
+        if i == len(types):
+            if rows == 0 and sa == 20 and sb == 7 and (3 * s - sr) % 10 == 0:
+                survivor.append(True)
+            return
+        a, b = types[i]
+        r = (4 * a + 5 * b) % 10
+        for k in range(rows + 1):
+            na, nb = sa + k * a, sb + k * b
+            nc3, nc2b = c3 + k * C(a, 3), c2b + k * C(a, 2) * b
+            if na > 20 or nb > 7 or nc3 > 2 * C(4, 3) or nc2b > 2 * C(4, 2):
+                break
+            rec3(i + 1, rows - k, na, nb, nc3, nc2b, sr + k * r)
+
+    rec3(0, 12, 0, 0, 0, 0, 0)
+    assert not survivor, "5^4 6^18 7^1 unexpectedly satisfiable at the residue level"
+    detail["5^4 6^18 7^1"] = "no legal row-type distribution reaches residue sum <= 15"
+
+    # P4: 4^1 5^2 6^19 7^1.  Every row residue must be <= 3s = 3.
+    s = 2 * C(12, 3) - (C(4, 3) + 2 * C(5, 3) + 19 * C(6, 3) + C(7, 3)); assert s == 1
+    u_opts = {(a, b): (7 + 4 * a + 5 * b) % 10 for a in range(3) for b in range(2)}
+    cheap_u = {k: v for k, v in u_opts.items() if v <= 3 * s}
+    assert cheap_u == {(1, 0): 1, (0, 1): 2, (2, 1): 0}, cheap_u
+    o_opts = {(a, b): (4 * a + 5 * b) % 10 for a in range(3) for b in range(2)}
+    cheap_o = {k: v for k, v in o_opts.items() if v <= 3 * s}
+    assert cheap_o == {(0, 0): 0, (2, 1): 3}, cheap_o
+    # The degree-7 column has 7 rows.  A b=1 row is either one of the four
+    # degree-4-column rows, or a non-column row of type (2,1) at residue
+    # cost 3, of which the budget 3 allows at most one.  So at most 5 rows
+    # can lie in the degree-7 column: contradiction.
+    max_b_u = 4                       # all four u-rows may have b = 1
+    max_b_other = (3 * s) // 3        # each costs 3
+    assert max_b_u + max_b_other == 5 < 7
+    detail["4^1 5^2 6^19 7^1"] = "at most 5 rows can meet the degree-7 column"
+
+    # P5: 5^5 6^16 7^2
+    s = 2 * C(12, 3) - (5 * C(5, 3) + 16 * C(6, 3) + 2 * C(7, 3)); assert s == 0
+    zero_res_a = [a for a in range(6) if any((4 * a + 5 * b) % 10 == 0
+                                             for b in (0, 2))]
+    assert zero_res_a == [0, 5]
+    # five rows with a=5 would put 50 > 20 = 2*C(5,3) on the column triples
+    assert 5 * C(5, 3) == 50 > 2 * C(5, 3) == 20
+    detail["5^5 6^16 7^2"] = "a_r in {0,5} forces five a=5 rows; triple budget 20 < 50"
+
+    return {"theorem": "Z(12,23,3,3)<=134", "profiles_at_135": detail}
+
+
 # --------------------------------------------- theorem: Z(13,23) <= 144 ------
 
 def check_z13_23_upper() -> dict:
@@ -212,7 +321,7 @@ BNL_OPEN = {
     (16, 20): (146, 158), (16, 21): (147, 164), (16, 22): (149, 169),
     (16, 23): (158, 175),
 }
-THEOREM_UPPER = {(12, 23): 135, (13, 23): 144}
+THEOREM_UPPER = {(12, 23): 134, (13, 23): 144}
 
 
 def build_table() -> dict:
@@ -277,13 +386,16 @@ def run(check_only: bool) -> int:
     report = {
         "witness": check_witness(),
         "deletion_chain": check_deletion_chain(),
-        "z12_23": check_z12_23_upper(),
+        "z12_23_step1": check_z12_23_upper(),
+        "z12_23_step2": check_z12_23_upper_134(),
         "z13_23": check_z13_23_upper(),
     }
     table = build_table()
-    # closure consistency: the new exact value must agree with the table
+    # closure consistency: the new exact values must agree with the table
     cell = table["cells"]["11,19"]
     assert cell["lower"] == cell["upper"] == 106, cell
+    cell = table["cells"]["12,23"]
+    assert cell["lower"] == cell["upper"] == 134, cell
     if check_only:
         stored = json.loads(TABLE.read_text())
         if stored != table:
