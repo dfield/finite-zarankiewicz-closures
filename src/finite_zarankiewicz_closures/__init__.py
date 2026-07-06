@@ -1,4 +1,4 @@
-"""Auditable utilities for four exact finite Zarankiewicz results.
+"""Auditable utilities for six exact finite Zarankiewicz results.
 
 The package intentionally uses only the Python standard library.  Its role is
 verification, not discovery: the mathematical argument is written first in

@@ -34,3 +34,18 @@ python3 drive.py 11 19 106 60
 `filters.py` run as a script re-derives the profile kills used in the two
 theorems. `sat_tool.py` exits 0/1/2 for SAT/UNSAT/unknown; its verdicts are
 recorded in `docs/NEW_BOUNDS.md` only as research pointers.
+
+For an auditable SAT rerun, emit the exact DIMACS input first. At 113 ones,
+the established neighboring values imply that every row has degree at least
+10 and every column has degree at least 3; profiles violating the latter bound
+should be eliminated before solving.
+
+```sh
+python3 sat_tool.py 10 23 "4x2,5x21" \
+  --min-row-degree 10 --cnf profile.cnf --emit-only
+cadical profile.cnf profile.drat
+drat-trim profile.cnf profile.drat
+```
+
+An `UNSAT` line without the emitted formula, its hash, and a checked proof
+trace is not accepted as a repository theorem.

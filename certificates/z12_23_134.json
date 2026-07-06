@@ -1,0 +1,151 @@
+{
+  "certificate_type": "exact_finite_zarankiewicz_case",
+  "conclusion": "Z(12,23,3,3)=134",
+  "lower_bound": {
+    "column_sums": [
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      5,
+      5,
+      4
+    ],
+    "columns": 23,
+    "file": "data/z12_23_134_matrix.csv",
+    "first_violation": null,
+    "maximum_common_columns": 2,
+    "ones": 134,
+    "row_sums": [
+      11,
+      11,
+      11,
+      11,
+      11,
+      11,
+      12,
+      11,
+      11,
+      11,
+      11,
+      12
+    ],
+    "row_triples_checked": 220,
+    "rows": 12,
+    "sha256": "d99ab00ef9289eecbf44951b38b5bd45b9e1546fd53a7657d1f8a9c3b515e28f",
+    "valid": true
+  },
+  "parameters": {
+    "columns": 23,
+    "exact_value": 134,
+    "forbidden_columns": 3,
+    "forbidden_rows": 3,
+    "rows": 12
+  },
+  "schema_version": 1,
+  "slug": "z12_23_134",
+  "theorem": "Z(12,23,3,3)=134",
+  "upper_bound": {
+    "computer_assisted_component": "finite row-type enumeration for profile 5^4 6^18 7^1",
+    "detailed_report": {
+      "at_135": {
+        "cases": {
+          "4^1 5^1 6^21": {
+            "deficit_budget": 18,
+            "pair_residue_sums_by_overlap": {
+              "0": 22,
+              "1": 22,
+              "2": 22,
+              "3": 22,
+              "4": 22
+            }
+          },
+          "4^1 5^2 6^19 7^1": {
+            "maximum_degree_seven_rows": 5,
+            "required_degree_seven_rows": 7
+          },
+          "5^3 6^20": {
+            "deficit_budget": 30,
+            "minimum_row_residue_sum": 40
+          },
+          "5^4 6^18 7^1": {
+            "deficit_budget": 15,
+            "minimum_row_residue_sum": 25
+          },
+          "5^5 6^16 7^2": {
+            "available_triple_incidence": 20,
+            "forced_triple_incidence": 50
+          }
+        },
+        "degree_profiles": [
+          {
+            "5": 3,
+            "6": 20
+          },
+          {
+            "4": 1,
+            "5": 1,
+            "6": 21
+          },
+          {
+            "5": 4,
+            "6": 18,
+            "7": 1
+          },
+          {
+            "4": 1,
+            "5": 2,
+            "6": 19,
+            "7": 1
+          },
+          {
+            "5": 5,
+            "6": 16,
+            "7": 2
+          }
+        ]
+      },
+      "at_136": {
+        "degree_five_pair_incidences": 20,
+        "degree_profiles": [
+          {
+            "5": 2,
+            "6": 21
+          }
+        ],
+        "pair_equation": "3*a_P + 4*b_P = 20",
+        "pair_equation_solutions": [
+          [
+            0,
+            5
+          ]
+        ]
+      },
+      "excluded_targets": [
+        136,
+        135
+      ],
+      "problem": "Z(12,23,3,3)",
+      "status": "VERIFIED"
+    },
+    "excluded_target": 135,
+    "lean_kernel": "ZarankiewiczFiniteClosures.ArithmeticKernels",
+    "method": "two_stage_row_pair_deficit"
+  }
+}

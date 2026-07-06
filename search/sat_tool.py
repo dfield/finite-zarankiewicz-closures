@@ -12,7 +12,8 @@ Encoding:
 Usage: sat_tool.py m n "5x21,6x1" [--solve SOLVER] [--out out.csv] [--time LIMIT]
 Exit codes: 0 SAT (witness written), 1 UNSAT, 2 unknown/timeout.
 """
-import sys, argparse, itertools
+import sys, argparse, itertools, hashlib
+from pathlib import Path
 from pysat.formula import CNF, IDPool
 from pysat.card import CardEnc, EncType
 from pysat.solvers import Solver
@@ -74,6 +75,14 @@ def main():
     ap.add_argument("--out", default=None)
     ap.add_argument("--time", type=float, default=0, help="soft budget: conflict limit heuristic")
     ap.add_argument("--conflicts", type=int, default=0)
+    ap.add_argument(
+        "--min-row-degree",
+        type=int,
+        default=0,
+        help="valid neighboring-bound reduction imposed on every row",
+    )
+    ap.add_argument("--cnf", type=Path, help="write the deterministic DIMACS formula")
+    ap.add_argument("--emit-only", action="store_true", help="write/describe the CNF without solving")
     args = ap.parse_args()
     degs = []
     for tok in args.profile.split(","):
@@ -82,6 +91,25 @@ def main():
     degs.sort(reverse=True)
     assert len(degs) == args.n, f"{len(degs)} cols vs n={args.n}"
     cnf, X = build(args.m, args.n, degs)
+    if args.min_row_degree:
+        if not 0 <= args.min_row_degree <= args.n:
+            raise ValueError("minimum row degree is outside 0..n")
+        for row in X:
+            bound = CardEnc.atleast(
+                lits=row,
+                bound=args.min_row_degree,
+                top_id=cnf.nv,
+                encoding=EncType.seqcounter,
+            )
+            cnf.extend(bound.clauses)
+    if args.cnf:
+        cnf.to_file(str(args.cnf))
+        digest = hashlib.sha256(args.cnf.read_bytes()).hexdigest()
+        print(f"CNF vars={cnf.nv} clauses={len(cnf.clauses)} sha256={digest}")
+    if args.emit_only:
+        if not args.cnf:
+            print(f"CNF vars={cnf.nv} clauses={len(cnf.clauses)}")
+        return
     with Solver(name=args.solver, bootstrap_with=cnf.clauses) as s:
         if args.conflicts:
             s.conf_budget(args.conflicts)

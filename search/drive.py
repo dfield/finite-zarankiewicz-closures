@@ -6,7 +6,7 @@ import sys, math, itertools, subprocess, os, csv, tempfile
 S = os.path.dirname(os.path.abspath(__file__))
 C = math.comb
 
-def profiles(m, n, T, dmin=2, dmax=None, cap_slack=None):
+def profiles(m, n, T, dmin=0, dmax=None, cap_slack=None):
     dmax = dmax or min(m, 9)
     cap = 2*C(m,3)
     out = []

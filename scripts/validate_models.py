@@ -154,7 +154,7 @@ def main() -> int:
         "random_fixed_matrices": random_reports,
         "scope": (
             "Small-instance semantic validation only; the mathematical proofs, not raw-cell "
-            "solver runs, establish the four excluded-target impossibility claims."
+            "solver runs, establish the six excluded-target impossibility claims."
         ),
     }
     rendered = json.dumps(result, indent=2, sort_keys=True) + "\n"

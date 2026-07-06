@@ -16,7 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class CaseCertificateTests(unittest.TestCase):
-    def test_all_four_stored_certificates_pass(self) -> None:
+    def test_all_stored_certificates_pass(self) -> None:
         for case in CASE_SPECS:
             with self.subTest(case=case.slug):
                 path = ROOT / "certificates" / f"{case.slug}.json"
@@ -43,9 +43,15 @@ class CaseCertificateTests(unittest.TestCase):
             "z10_22_110": lambda c: c["upper_bound"]["detailed_report"]["case_c"].__setitem__(
                 "minimum_pair_residue_sum", 11
             ),
+            "z11_19_106": lambda c: c["upper_bound"]["steps"][0].__setitem__(
+                "source_upper_bound", 102
+            ),
             "z11_20_111": lambda c: c["upper_bound"]["steps"][1].__setitem__(
                 "recomputed_upper_bound", 112
             ),
+            "z12_23_134": lambda c: c["upper_bound"]["detailed_report"]["at_135"][
+                "cases"
+            ]["5^4 6^18 7^1"].__setitem__("minimum_row_residue_sum", 24),
         }
         for case in CASE_SPECS:
             with self.subTest(case=case.slug):

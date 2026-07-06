@@ -31,6 +31,9 @@ from finite_zarankiewicz_closures.case_certificates import (  # noqa: E402
 from finite_zarankiewicz_closures.extended import (  # noqa: E402
     extended_frontier_report,
     z10_22_certificate_report,
+    z12_23_certificate_report,
+    z13_23_upper_report,
+    verify_z13_23_upper_certificate,
 )
 from finite_zarankiewicz_closures.matrix import (  # noqa: E402
     read_boolean_csv,
@@ -43,7 +46,12 @@ EXPECTED_FILES = (
     "docs/PROOF.md",
     "docs/PROOF_Z10_21.md",
     "docs/PROOF_Z10_22.md",
+    "docs/PROOF_Z11_19.md",
     "docs/PROOF_Z11_20.md",
+    "docs/PROOF_Z12_23.md",
+    "docs/BOUND_Z13_23.md",
+    "docs/NEW_BOUNDS.md",
+    "docs/SAT_Z10_23_STATUS.md",
     "docs/LITERATURE_REVIEW.md",
     "docs/METHODS.md",
     "docs/ADVERSARIAL_AUDIT.md",
@@ -52,23 +60,34 @@ EXPECTED_FILES = (
     "data/z9_23_103_matrix.csv",
     "data/z10_21_106_matrix.csv",
     "data/z10_22_110_matrix.csv",
+    "data/z11_19_106_matrix.csv",
     "data/z11_20_111_matrix.csv",
+    "data/z12_23_134_matrix.csv",
     "certificates/degree_deficit.json",
     "certificates/z9_23_103.json",
     "certificates/z10_21_106.json",
     "certificates/z10_22_110.json",
+    "certificates/z11_19_106.json",
     "certificates/z11_20_111.json",
+    "certificates/z12_23_134.json",
+    "certificates/z13_23_upper_144.json",
     "models/cells_9x23_exact_104.cnf",
     "models/column_types_9x23_exact_104.lp",
     "models/cells_10x21_exact_107.cnf",
     "models/column_types_10x21_exact_107.lp",
     "models/cells_10x22_exact_111.cnf",
     "models/column_types_10x22_exact_111.lp",
+    "models/cells_11x19_exact_107.cnf",
+    "models/column_types_11x19_exact_107.lp",
     "models/cells_11x20_exact_112.cnf",
     "models/column_types_11x20_exact_112.lp",
+    "models/cells_12x23_exact_135.cnf",
+    "models/column_types_12x23_exact_135.lp",
     "analysis/dgh_boundary.json",
     "analysis/local_kernel_catalog.csv",
     "analysis/extended_results.json",
+    "analysis/new_bounds.json",
+    "analysis/sat_cross_check.json",
     "lean/ZarankiewiczZ923/ArithmeticKernel.lean",
     "lean/ZarankiewiczFiniteClosures/ArithmeticKernels.lean",
     "artifacts.sha256",
@@ -251,7 +270,7 @@ def check_models() -> dict[str, object]:
     if manifest.get("schema_version") != 2 or set(manifest.get("cases", {})) != {
         case.slug for case in CASE_SPECS
     }:
-        raise AssertionError("model manifest does not cover all four cases")
+        raise AssertionError("model manifest does not cover every exact case")
     case_reports = {}
     for case in CASE_SPECS:
         entry = manifest["cases"][case.slug]
@@ -332,7 +351,9 @@ def check_mathematical_artifacts() -> dict[str, object]:
     for filename, rows, columns, ones in (
         ("z10_21_106_matrix.csv", 10, 21, 106),
         ("z10_22_110_matrix.csv", 10, 22, 110),
+        ("z11_19_106_matrix.csv", 11, 19, 106),
         ("z11_20_111_matrix.csv", 11, 20, 111),
+        ("z12_23_134_matrix.csv", 12, 23, 134),
     ):
         path = ROOT / "data" / filename
         report = verify_by_row_triples(
@@ -348,8 +369,18 @@ def check_mathematical_artifacts() -> dict[str, object]:
     extended_certificate = z10_22_certificate_report()
     if extended_certificate["status"] != "VERIFIED":
         raise AssertionError("extended exact certificate failed")
+    z12_certificate = z12_23_certificate_report()
+    if z12_certificate["status"] != "VERIFIED":
+        raise AssertionError("Z(12,23) exact certificate failed")
+    z13_certificate = z13_23_upper_report()
+    if z13_certificate["status"] != "VERIFIED":
+        raise AssertionError("Z(13,23) upper-bound certificate failed")
+    stored_z13_certificate = json.loads(
+        (ROOT / "certificates" / "z13_23_upper_144.json").read_text(encoding="utf-8")
+    )
+    verify_z13_23_upper_certificate(stored_z13_certificate)
     frontier = extended_frontier_report()
-    if frontier["source_open_cases"] != 44 or frontier["remaining_open_cases"] != 37:
+    if frontier["source_open_cases"] != 44 or frontier["remaining_open_cases"] != 35:
         raise AssertionError("extended frontier count mismatch")
     case_certificate_reports = []
     for case in CASE_SPECS:
@@ -365,6 +396,8 @@ def check_mathematical_artifacts() -> dict[str, object]:
         "row_triples_checked": matrix_report.row_triples_checked,
         "profiles_enumerated": certificate_report["profiles_enumerated"],
         "extended_profiles_enumerated": len(extended_certificate["degree_profiles"]),
+        "z12_profiles_enumerated": len(z12_certificate["at_135"]["degree_profiles"]),
+        "z13_profiles_enumerated": len(z13_certificate["cases"]),
         "remaining_open_cases": frontier["remaining_open_cases"],
         "case_certificates_verified": len(case_certificate_reports),
     }

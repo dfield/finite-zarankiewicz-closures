@@ -22,7 +22,7 @@ From the repository root:
 make verify
 ```
 
-This runs tests, all four witness checks, all four case-certificate paths, deterministic model regeneration, and the repository audit. It does not invoke external solvers or Lean.
+This runs tests, all six witness checks, all six case-certificate paths, deterministic model regeneration, and the repository audit. It does not invoke external solvers or Lean.
 
 ## Continuous integration
 
@@ -36,7 +36,7 @@ The GitHub Actions workflow runs `make verify` on Python 3.9 and 3.14 and builds
 make test
 ```
 
-Expected: 26 tests and `OK`. The test count is secondary; the named cases in [`tests/`](../tests/) define the coverage.
+Expected: 33 tests and `OK`. The test count is secondary; the named cases in [`tests/`](../tests/) define the coverage.
 
 ### Witness
 
@@ -64,7 +64,7 @@ Both reports must show the same SHA-256 digest.
 make certificate
 ```
 
-Expected: the detailed marked-row checker reports `VERIFIED` with three profiles, followed by four `VERIFIED` case certificates. The latter bind every witness hash to its case-specific upper-bound mechanism.
+Expected: the detailed marked-row checker reports `VERIFIED` with three profiles, followed by six `VERIFIED` case certificates. The latter bind every witness hash to its case-specific upper-bound mechanism.
 
 ### Additional exact values
 
@@ -76,10 +76,10 @@ Expected from the primary checker:
 
 - `status: IDENTICAL`;
 - `source_open_cases: 44`;
-- `remaining_open_cases: 37`; and
-- three verified additional witnesses.
+- `remaining_open_cases: 35`; and
+- five verified additional witnesses.
 
-The independent checker must inspect 159,600 candidate submatrices for the $10\times21$ matrix, 184,800 for the $10\times22$ matrix, and 188,100 for the $11\times20$ matrix. The standard-library upper-bound certificate must enumerate four degree profiles, 1,050 profile-B cases, and $77\times22{,}155$ profile-C cases.
+The independent checker must inspect the complete candidate sets for all five additional matrices, including 159,885 for $11\times19$ and 389,620 for $12\times23$. The standard-library upper-bound certificates must reproduce the four $(10,22)$ profiles, five $(12,23)$ profiles at 135, and three $(13,23)$ profiles at 145.
 
 ### Decision models
 
@@ -87,14 +87,16 @@ The independent checker must inspect 159,600 candidate submatrices for the $10\t
 make models
 ```
 
-Expected: `status: IDENTICAL` for all eight files. The schema-v2 manifest covers four cell CNFs and four column-support LPs:
+Expected: `status: IDENTICAL` for all twelve files. The schema-v2 manifest covers six cell CNFs and six column-support LPs:
 
 | Case | Cell variables | Cell clauses | Support variables | Triple constraints |
 |---|---:|---:|---:|---:|
 | $(9,23)$ at 104 | 32,654 | 277,931 | 512 | 84 |
 | $(10,21)$ at 107 | 33,596 | 292,514 | 1,024 | 120 |
 | $(10,22)$ at 111 | 36,849 | 330,656 | 1,024 | 120 |
+| $(11,19)$ at 107 | 33,277 | 291,530 | 2,048 | 165 |
 | $(11,20)$ at 112 | 36,846 | 333,944 | 2,048 | 165 |
+| $(12,23)$ at 135 | 57,813 | 618,940 | 4,096 | 220 |
 
 To rewrite the artifacts intentionally:
 
@@ -118,7 +120,7 @@ lake build
 lake env lean AxiomAudit.lean
 ```
 
-Expected: both Lean libraries build and the axiom audit prints the arithmetic theorems for all four results. The exact boundary is listed in [`ADVERSARIAL_AUDIT.md`](ADVERSARIAL_AUDIT.md).
+Expected: both Lean libraries build and the axiom audit prints the arithmetic theorems for all six exact results and the additional frontier bound. The exact boundary is listed in [`ADVERSARIAL_AUDIT.md`](ADVERSARIAL_AUDIT.md).
 
 ## Optional independent tools
 

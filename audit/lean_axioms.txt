@@ -19,3 +19,19 @@
 'ZarankiewiczFiniteClosures.z10_22_case_b_impossible' depends on axioms: [propext, Quot.sound]
 'ZarankiewiczFiniteClosures.z10_22_case_c_impossible' depends on axioms: [propext, Quot.sound]
 'ZarankiewiczFiniteClosures.z10_22_case_d_impossible' depends on axioms: [propext, Quot.sound]
+'ZarankiewiczFiniteClosures.z12_penalty_eq_formula' does not depend on any axioms
+'ZarankiewiczFiniteClosures.z12_penalty_table' does not depend on any axioms
+'ZarankiewiczFiniteClosures.z12_23_at_136_profile' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ZarankiewiczFiniteClosures.z12_23_at_136_pair_equation' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ZarankiewiczFiniteClosures.z12_23_penalty_budget_structure' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ZarankiewiczFiniteClosures.classify_z12_23_degree_profile' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ZarankiewiczFiniteClosures.z12_23_case_one_impossible' depends on axioms: [propext, Quot.sound]
+'ZarankiewiczFiniteClosures.z12_23_case_two_impossible' depends on axioms: [propext, Quot.sound]
+'ZarankiewiczFiniteClosures.z12_23_case_three_minimum' does not depend on any axioms
+'ZarankiewiczFiniteClosures.z12_23_case_four_impossible' depends on axioms: [propext, Quot.sound]
+'ZarankiewiczFiniteClosures.z12_23_case_five_impossible' depends on axioms: [propext, Quot.sound]
+'ZarankiewiczFiniteClosures.z13_penalty_eq_formula' does not depend on any axioms
+'ZarankiewiczFiniteClosures.z13_23_penalty_budget_structure' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ZarankiewiczFiniteClosures.classify_z13_23_degree_profile' depends on axioms: [propext, Classical.choice, Quot.sound]
+'ZarankiewiczFiniteClosures.z13_23_clean_row_contradiction' depends on axioms: [propext, Quot.sound]
+'ZarankiewiczFiniteClosures.z13_23_case_deficit_bounds' does not depend on any axioms

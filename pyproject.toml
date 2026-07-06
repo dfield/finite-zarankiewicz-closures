@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "finite-zarankiewicz-closures"
-version = "1.3.1"
-description = "Reproducible proofs and certificates for four exact finite Zarankiewicz numbers"
+version = "1.4.0"
+description = "Reproducible proofs and certificates for six exact finite Zarankiewicz numbers"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}

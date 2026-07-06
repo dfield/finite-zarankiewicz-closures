@@ -1,4 +1,4 @@
-"""Uniform, case-specific certificates for the four exact values.
+"""Uniform, case-specific certificates for the six exact values.
 
 Each stored JSON certificate is treated as untrusted.  This module rebuilds
 the witness invariants and the appropriate upper-bound certificate, then
@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from .certificate import verify_certificate
-from .extended import deletion_upper, z10_22_certificate_report
+from .extended import deletion_upper, z10_22_certificate_report, z12_23_certificate_report
 from .matrix import read_boolean_csv, verify_by_row_triples
 
 
@@ -45,7 +45,9 @@ CASE_SPECS = (
     CaseSpec("z9_23_103", 9, 23, 103, "data/z9_23_103_matrix.csv"),
     CaseSpec("z10_21_106", 10, 21, 106, "data/z10_21_106_matrix.csv"),
     CaseSpec("z10_22_110", 10, 22, 110, "data/z10_22_110_matrix.csv"),
+    CaseSpec("z11_19_106", 11, 19, 106, "data/z11_19_106_matrix.csv"),
     CaseSpec("z11_20_111", 11, 20, 111, "data/z11_20_111_matrix.csv"),
+    CaseSpec("z12_23_134", 12, 23, 134, "data/z12_23_134_matrix.csv"),
 )
 CASE_BY_SLUG = {case.slug: case for case in CASE_SPECS}
 
@@ -114,6 +116,25 @@ def _upper_certificate(root: Path, case: CaseSpec) -> dict[str, Any]:
                 "case-B and case-C row-symmetry orbit enumeration"
             ),
         }
+    if case.slug == "z11_19_106":
+        bound = deletion_upper(101, 19)
+        if bound != 106:
+            raise CaseCertificateError("unexpected Z(11,19) deletion bound")
+        return {
+            "method": "vertex_deletion",
+            "excluded_target": 107,
+            "steps": [
+                {
+                    "source": "Z(11,18,3,3)<=101",
+                    "source_upper_bound": 101,
+                    "larger_part": 19,
+                    "formula_numerator": 1919,
+                    "formula_denominator": 18,
+                    "recomputed_upper_bound": bound,
+                }
+            ],
+            "lean_kernel": "ZarankiewiczFiniteClosures.ArithmeticKernels",
+        }
     if case.slug == "z11_20_111":
         first = deletion_upper(101, 19)
         second = deletion_upper(first, 20)
@@ -141,6 +162,16 @@ def _upper_certificate(root: Path, case: CaseSpec) -> dict[str, Any]:
                 },
             ],
             "lean_kernel": "ZarankiewiczFiniteClosures.ArithmeticKernels",
+        }
+    if case.slug == "z12_23_134":
+        return {
+            "method": "two_stage_row_pair_deficit",
+            "excluded_target": 135,
+            "detailed_report": z12_23_certificate_report(),
+            "lean_kernel": "ZarankiewiczFiniteClosures.ArithmeticKernels",
+            "computer_assisted_component": (
+                "finite row-type enumeration for profile 5^4 6^18 7^1"
+            ),
         }
     raise CaseCertificateError(f"unknown case: {case.slug}")
 

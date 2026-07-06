@@ -2,12 +2,14 @@ cff-version: 1.2.0
 message: >-
   If you use these proofs or their verification artifacts, please cite this
   repository and the prior lower-bound work identified in the literature review.
-title: "Four exact finite Zarankiewicz numbers"
+title: "Six exact finite Zarankiewicz numbers"
 type: software
 authors:
   - family-names: "GPT 5.6-Sol"
-version: 1.3.1
-date-released: 2026-07-04
+  - family-names: "Claude"
+    affiliation: "Anthropic"
+version: 1.4.0
+date-released: 2026-07-06
 repository-code: "https://github.com/dfield/finite-zarankiewicz-closures"
 license: MIT
 keywords:
@@ -19,10 +21,11 @@ keywords:
   - computer-assisted proof
 abstract: >-
   Reproducible proofs that Z(9,23,3,3)=103, Z(10,21,3,3)=106,
-  Z(10,22,3,3)=110, and Z(11,20,3,3)=111, accompanied by explicit extremal
-  matrices, independent verifiers, case-specific arithmetic certificates,
-  deterministic SAT/MIP models for every excluded target, Lean arithmetic
-  kernels for all four results, and an explicit 37-case open frontier.
+  Z(10,22,3,3)=110, Z(11,19,3,3)=106, Z(11,20,3,3)=111, and
+  Z(12,23,3,3)=134, plus the bound Z(13,23,3,3)<=144. The repository includes
+  explicit extremal matrices, independent verifiers, case-specific arithmetic
+  certificates, deterministic SAT/MIP models for every excluded target, Lean
+  arithmetic kernels, and an explicit 35-case open frontier.
 references:
   - type: article
     authors:

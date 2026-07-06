@@ -1,6 +1,6 @@
-# Three further exact values in the 2026 finite table
+# Five further exact values in the 2026 finite table
 
-> **Attribution:** GPT 5.6-Sol generated the arguments, certificate code, matrices, and repository changes in this document. These results await independent expert review.
+> **Attribution:** GPT 5.6-Sol generated the original three extensions. Claude (Anthropic) produced the later $Z(11,19)$ witness and $Z(12,23)$ proof and witness; those additions were independently audited and integrated into the repository's verification layers. These results await independent expert review.
 
 ## 1. Scope and status
 
@@ -12,17 +12,22 @@ Z(11,22,3,3)=121,\qquad
 Z(12,22,3,3)=132.
 $$
 
-Alongside this repository's marked-row result $Z(9,23,3,3)=103$, the analysis here closes three more:
+Alongside this repository's marked-row result $Z(9,23,3,3)=103$, the extended analysis closes five more:
 
 $$
 \boxed{Z(10,21,3,3)=106},\qquad
 \boxed{Z(10,22,3,3)=110},\qquad
-\boxed{Z(11,20,3,3)=111}.
+\boxed{Z(11,19,3,3)=106},
 $$
 
-Thus seven of the paper's 44 open cells are now closed by the paper and this repository, and **37 remain open**. This document does not claim values for those 37 cases.
+$$
+\boxed{Z(11,20,3,3)=111},\qquad
+\boxed{Z(12,23,3,3)=134}.
+$$
 
-For case-by-case review, see the dedicated dossiers for [$Z(10,21,3,3)=106$](PROOF_Z10_21.md), [$Z(10,22,3,3)=110$](PROOF_Z10_22.md), and [$Z(11,20,3,3)=111$](PROOF_Z11_20.md).
+Thus nine of the paper's 44 open cells are now closed by the paper and this repository, and **35 remain open**. This document does not claim exact values for those 35 cases.
+
+For case-by-case review, see the dedicated dossiers for [$Z(10,21,3,3)=106$](PROOF_Z10_21.md), [$Z(10,22,3,3)=110$](PROOF_Z10_22.md), [$Z(11,19,3,3)=106$](PROOF_Z11_19.md), [$Z(11,20,3,3)=111$](PROOF_Z11_20.md), and [$Z(12,23,3,3)=134$](PROOF_Z12_23.md).
 
 ## 2. The deletion lemma
 
@@ -60,7 +65,7 @@ Z(11,20,3,3)
 =111.
 $$
 
-The explicit matrix [`z11_20_111_matrix.csv`](../data/z11_20_111_matrix.csv) proves equality in the last bound and independently reproduces the paper's reported lower bound.
+The explicit matrices [`z11_19_106_matrix.csv`](../data/z11_19_106_matrix.csv) and [`z11_20_111_matrix.csv`](../data/z11_20_111_matrix.csv) prove equality in both deletion bounds.
 
 ## 3. The value $Z(10,22,3,3)=110$
 
@@ -140,19 +145,19 @@ PYTHONPATH=src python3 scripts/check_case_certificates.py --check
 python3 scripts/verify_extended_witnesses_independent.py
 ```
 
-The checker independently enumerates the four degree profiles, all 1,050 cases in the second residue argument, and all $77\times22{,}155$ cases in the third. It also verifies all three new matrices by row-triple capacity. The standalone verifier imports no project module and instead scans every candidate $3\times3$ submatrix.
+The checker independently enumerates the $(10,22)$ and $(12,23)$ degree profiles and every finite residue case. It also verifies all five additional matrices by row-triple capacity. The standalone verifier imports no project module and instead scans every candidate $3\times3$ submatrix.
 
 The finite enumeration is an exhaustive proof component, not a heuristic optimization run. No timeout, incumbent, or opaque `UNSAT` line is used in the claimed values above.
 
-The three results also have individual JSON certificates, excluded-target SAT/MIP formulations, and Lean arithmetic endpoints. Lean checks the four-profile classification and the reported finite minima but does not re-run the row-symmetry orbit search.
+All five results also have individual JSON certificates, excluded-target SAT/MIP formulations, and Lean arithmetic endpoints. Lean checks the profile classifications and reported finite minima but does not rerun the row-symmetry or row-type searches.
 
 ## 5. Remaining open cells
 
-After these closures, the 37 unresolved cells from the paper are:
+After these closures, the 35 unresolved cells from the paper are:
 
 - $(10,23)$;
-- $(11,19)$ and $(11,23)$;
-- $(12,n)$ for $n\in\{17,18,19,20,21,23\}$; and
+- $(11,23)$;
+- $(12,n)$ for $n\in\{17,18,19,20,21\}$; and
 - $(m,n)$ for $13\le m\le16$ and $17\le n\le23$.
 
 The machine-readable boundary and the original Figure 2 intervals are stored in [`extended_results.json`](../analysis/extended_results.json).

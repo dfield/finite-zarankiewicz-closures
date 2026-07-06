@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Verify the 2026-07-05 frontier extension: the fifth closure Z(11,19,3,3)=106,
-two new elementary upper bounds Z(12,23,3,3)<=135 and Z(13,23,3,3)<=144, and the
-propagated bound table in analysis/new_bounds.json.
+"""Verify the 2026-07-05 frontier extension: Z(11,19,3,3)=106,
+Z(12,23,3,3)=134, the upper bound Z(13,23,3,3)<=144, and the propagated
+bound table in analysis/new_bounds.json.
 
 Standard library only.  Usage:
     python3 scripts/check_new_bounds.py --check    # verify everything
@@ -21,6 +21,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 TABLE = ROOT / "analysis" / "new_bounds.json"
+SAT_RECORD = ROOT / "analysis" / "sat_cross_check.json"
 
 C = math.comb
 
@@ -59,6 +60,26 @@ def check_witness() -> dict:
     }
 
 
+def check_sat_record_catalog() -> dict[str, object]:
+    """Check profile completeness while keeping unlogged verdicts non-load-bearing."""
+
+    record = json.loads(SAT_RECORD.read_text(encoding="utf-8"))
+    assert record["evidence_status"] == "UNVERIFIED_SESSION_RECORD"
+    observations = record["frontier_observations"]
+    counts = {}
+    for total, expected_count in ((113, 25), (114, 11)):
+        generated = {
+            ",".join(f"{degree}x{count}" for degree, count in sorted(profile.items()))
+            for profile in degree_profiles(10, 23, total)
+        }
+        recorded = set(observations[f"10,23 at {total}"])
+        assert generated == recorded
+        assert len(generated) == expected_count
+        counts[str(total)] = expected_count
+    assert observations["10,23 at 113"]["1x1,5x20,6x2"] == "FILTER-KILLED"
+    return {"evidence_status": record["evidence_status"], "profile_counts": counts}
+
+
 # ------------------------------------------------- upper bound Z(11,19) ------
 
 def check_deletion_chain() -> dict:
@@ -80,12 +101,25 @@ def degree_profiles(m: int, n: int, total: int):
     cap = 2 * C(m, 3)
     out = []
 
+    def minimum_triple_cost(ncols: int, degree_sum: int) -> int:
+        """Minimum convex triple cost for ``ncols`` degrees with this sum."""
+
+        if ncols == 0:
+            return 0 if degree_sum == 0 else cap + 1
+        q, r = divmod(degree_sum, ncols)
+        if q > m or (q == m and r):
+            return cap + 1
+        return (ncols - r) * C(q, 3) + r * C(q + 1, 3)
+
     def rec(d, ncols, tot, used, cur):
+        remaining = total - tot
+        if remaining < d * ncols or remaining > m * ncols:
+            return
+        if used + minimum_triple_cost(ncols, remaining) > cap:
+            return
         if ncols == 0:
             if tot == total:
                 out.append(dict(cur))
-            return
-        if tot + m * ncols < total or tot > total:
             return
         if d > m:
             return
@@ -93,6 +127,15 @@ def degree_profiles(m: int, n: int, total: int):
             t2, u2 = tot + k * d, used + k * C(d, 3)
             if t2 > total or u2 > cap:
                 break
+            remaining_columns = ncols - k
+            remaining_degree = total - t2
+            if remaining_columns:
+                if not ((d + 1) * remaining_columns <= remaining_degree <= m * remaining_columns):
+                    continue
+                if u2 + minimum_triple_cost(remaining_columns, remaining_degree) > cap:
+                    continue
+            elif remaining_degree:
+                continue
             if k:
                 cur[d] = k
             rec(d + 1, ncols - k, t2, u2, cur)
@@ -396,6 +439,7 @@ def run(check_only: bool) -> int:
         "z12_23_step1": check_z12_23_upper(),
         "z12_23_step2": check_z12_23_upper_134(),
         "z13_23": check_z13_23_upper(),
+        "sat_record_catalog": check_sat_record_catalog(),
     }
     table = build_table()
     # closure consistency: the new exact values must agree with the table

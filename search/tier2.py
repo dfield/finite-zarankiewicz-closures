@@ -13,7 +13,7 @@ g_row (resp. g_pair):
       and any pattern multiset where 3+ rows share 3+ common columns is illegal.
   For each configuration:
     row residues  r_r = (2*C(m-1,2) - sum_{i in A_r} C(e_i - 1, 2)) mod g_row
-    pair residues r_P = (2*(m-2)   - sum_{i in A_a ^ A_b} ... ) computed from
+    pair residues r_P = (2*(m-2)   - sum_{i in A_a & A_b} ... ) computed from
                   common membership of the two rows, mod g_pair
   Since all base contributions vanish mod g, D_r == r_r (mod g_row) with D_r>=0,
   so sum_r D_r = 3s forces  sum_r r_r <= 3s  and  sum_r r_r == 3s (mod g_row);

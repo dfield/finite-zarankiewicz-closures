@@ -1,8 +1,10 @@
 {
- "description": "Per-profile SAT verdicts from the 2026-07-05 session. Solver: CaDiCaL 1.9.5 via PySAT; encoding: triple-coverage at-most-2 (sequential counter), exact column degrees, double-lex symmetry breaking. NO proof traces were retained: these verdicts are corroborating evidence only and no repository claim rests on them. See docs/NEW_BOUNDS.md section 6.",
+    "description": "Per-profile SAT verdicts from the 2026-07-05 session. Solver: CaDiCaL 1.9.5 via PySAT; encoding: triple-coverage at-most-2 (sequential counter), exact column degrees, double-lex symmetry breaking. NO proof traces were retained: these verdicts are corroborating evidence only and no repository claim rests on them. See docs/NEW_BOUNDS.md section 6.",
+    "evidence_status": "UNVERIFIED_SESSION_RECORD",
  "frontier_observations": {
-  "10,23 at 113": {
-   "2x1,4x1,5x19,6x2": "UNSAT",
+        "10,23 at 113": {
+            "1x1,5x20,6x2": "FILTER-KILLED",
+            "2x1,4x1,5x19,6x2": "UNSAT",
    "2x1,4x1,5x20,7x1": "UNSAT",
    "2x1,4x2,5x17,6x3": "UNSAT",
    "2x1,5x21,6x1": "UNSAT",
@@ -40,9 +42,9 @@
    "4x4,5x16,6x3": "UNSAT",
    "4x5,5x14,6x4": "UNSAT"
   },
-  "implication": "All 11 profiles at 114 and all 24 profiles at 113 returned UNSAT, so modulo solver correctness Z(10,23,3,3) <= 112; Bhan--Nobili--Langer's 112-one construction then gives Z(10,23,3,3) = 112. This solver-assisted value is deliberately NOT entered in analysis/new_bounds.json, which stays solver-free."
+        "implication": "All 11 profiles at 114 returned UNSAT. At 113, 24 profiles returned UNSAT and the remaining profile 1x1,5x20,6x2 is excluded by the repository's arithmetic profile filter (equivalently, deleting its degree-one column contradicts Z(10,22,3,3)=110). Modulo the unlogged solver verdicts, Z(10,23,3,3) <= 112; Bhan--Nobili--Langer's 112-one construction then gives Z(10,23,3,3) = 112. This solver-assisted value is deliberately NOT entered in analysis/new_bounds.json, which stays solver-free."
  },
- "repository_targets_cross_check": {
+    "repository_targets_cross_check": {
   "10,21,107": {
    "4x1,5x17,6x3": "UNSAT",
    "4x1,5x18,6x1,7x1": "UNSAT",
@@ -68,6 +70,7 @@
    "3x1,4x9,5x13": "FILTER-KILLED",
    "4x11,5x12": "FILTER-KILLED",
    "4x12,5x10,6x1": "FILTER-KILLED"
-  }
- }
+    },
+    "review_note": "The degree-profile catalogs and encoding were independently checked during the 2026-07-06 integration review, but the large UNSAT verdicts could not be certified because the original run retained no formulas, logs, or proof traces. Z(10,23,3,3)=112 is therefore not a repository theorem."
+}
 }

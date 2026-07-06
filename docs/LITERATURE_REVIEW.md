@@ -2,24 +2,25 @@
 
 ## Scope and search date
 
-This review records the literature relevant to the four exact finite values established in this repository:
+This review records the literature relevant to the six exact finite values established in this repository:
 
 $$
 \begin{aligned}
 Z(9,23,3,3)&=103, & Z(10,21,3,3)&=106,\\
-Z(10,22,3,3)&=110, & Z(11,20,3,3)&=111.
+Z(10,22,3,3)&=110, & Z(11,19,3,3)&=106,\\
+Z(11,20,3,3)&=111, & Z(12,23,3,3)&=134.
 \end{aligned}
 $$
 
-The search cutoff is **2026-07-04**. The review treats in greatest depth the chain of published and publicly posted results leading to the original one-edge interval
+The original four-result search cutoff was **2026-07-04**; a targeted follow-up search for the two later closures and the $Z(13,23)$ bound was performed on **2026-07-06**. The review treats in greatest depth the chain of published and publicly posted results leading to the original one-edge interval
 
 $$
 103\le Z(9,23,3,3)\le104,
 $$
 
-and separately records the source intervals and neighboring exact values used to close the other three cells. The Zarankiewicz literature is much larger than these four finite problems, so the discussion of general asymptotic theory and geometric variants is necessarily selective. Füredi and Simonovits's historical survey is a suitable entry point for that broader literature [FS13].
+and separately records the source intervals and neighboring exact values used to close the other five cells. The Zarankiewicz literature is much larger than these six finite problems, so the discussion of general asymptotic theory and geometric variants is necessarily selective. Füredi and Simonovits's historical survey is a suitable entry point for that broader literature [FS13].
 
-The search covered exact-title, exact-parameter, author, DOI, arXiv, and citation-forward queries. Variants of all four parameter pairs were checked, including `Z(9,23,3,3)`, `Z(10,21,3,3)`, `Z(10,22,3,3)`, and `Z(11,20,3,3)`, as were later references to Tan [Tan22], Davies--Gill--Horsley [DGH26], and Bhan--Nobili--Langer [BNL26]. No public source located by that search identified any of the four values as exact before the present work. That statement is deliberately dated: it cannot rule out unpublished work, an unindexed source, or a later revision.
+The search covered exact-title, exact-parameter, author, DOI, arXiv, and citation-forward queries. Variants of all six parameter pairs were checked, as were later references to Tan [Tan22], Davies--Gill--Horsley [DGH26], and Bhan--Nobili--Langer [BNL26]. No public source located by those searches identified the six values as exact before the corresponding repository work. That statement is deliberately dated: it cannot rule out unpublished work, an unindexed source, or a later revision.
 
 ## 1. The problem in context
 
@@ -97,17 +98,22 @@ The construction in this repository independently certifies the same lower bound
 
 ## 6. Review of the other closures and remaining finite table
 
-Figure 2 of Bhan--Nobili--Langer contains 44 cells that were open at the paper's stated literature boundary. The paper closes three of those cells. This repository closes four more: the marked-row argument handles $(9,23)$, while [`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) handles the other three:
+Figure 2 of Bhan--Nobili--Langer contains 44 cells that were open at the paper's stated literature boundary. The paper closes three of those cells. This repository closes six more: the marked-row argument handles $(9,23)$, while the extended proof documents handle the other five:
 
 $$
 Z(10,21,3,3)=106,
 \qquad Z(10,22,3,3)=110,
-\qquad Z(11,20,3,3)=111.
+\qquad Z(11,19,3,3)=106,
 $$
 
-The first and third follow by propagating the classical minimum-degree deletion bound from established neighboring values. The middle result combines a 110-one construction with a degree-profile and pair-deficit argument excluding 111. These additions leave 37 of the paper's original 44 open cells unresolved. No exact value is asserted for those cases.
+$$
+Z(11,20,3,3)=111,
+\qquad Z(12,23,3,3)=134.
+$$
 
-This four-result status was checked against the paper's rendered Figure 2 with a cutoff of **2026-07-04**. The search located no later arXiv source closing the remaining cells, but this negative literature finding remains provisional.
+Three values use the classical minimum-degree deletion bound. The other two extended closures combine explicit constructions with finite degree-profile and deficit arguments. These additions leave 35 of the paper's original 44 open cells unresolved. No exact value is asserted for those cases.
+
+The original four-result status was checked against the paper's rendered Figure 2 with a cutoff of **2026-07-04**; the two later parameters were checked again on **2026-07-06**. The searches located no later arXiv source containing those closures, but this negative literature finding remains provisional.
 
 ## 7. Relation of the marked-row proof to prior methods
 
@@ -139,14 +145,16 @@ The detailed history of the original marked-row case is:
 | 2026 | Bhan--Nobili--Langer [BNL26] | New 103-one construction | Establishes $103\le Z\le104$ |
 | This repository | Elementary proof and checked witness | Excludes 104 and verifies 103 | $Z(9,23,3,3)=103$ |
 
-The four source intervals and present exact values are:
+The six source intervals and present exact values are:
 
 | Cell | Bhan--Nobili--Langer v2 interval | Closure supplied here | Exact value |
 |---|---:|---|---:|
 | $Z(9,23,3,3)$ | $103\text{--}104$ | Marked-row deficit argument | 103 |
 | $Z(10,21,3,3)$ | $106\text{--}108$ | Vertex deletion from $Z(9,21,3,3)=96$ | 106 |
 | $Z(10,22,3,3)$ | $110\text{--}111$ | Computer-assisted pair-deficit enumeration | 110 |
+| $Z(11,19,3,3)$ | $102\text{--}108$ | Vertex deletion plus a new checked witness | 106 |
 | $Z(11,20,3,3)$ | $111\text{--}112$ | Two vertex-deletion steps from $Z(11,18,3,3)=101$ | 111 |
+| $Z(12,23,3,3)$ | $125\text{--}136$ | Two-stage row/pair-deficit certificate | 134 |
 
 ## 9. Reproducibility of the literature claims
 

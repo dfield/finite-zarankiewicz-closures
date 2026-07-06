@@ -1,0 +1,55 @@
+{
+  "certificate_type": "finite_zarankiewicz_upper_bound",
+  "conclusion": "Z(13,23,3,3)<=144",
+  "lean_kernel": "ZarankiewiczFiniteClosures.ArithmeticKernels",
+  "parameters": {
+    "columns": 23,
+    "excluded_target": 145,
+    "forbidden_columns": 3,
+    "forbidden_rows": 3,
+    "rows": 13
+  },
+  "schema_version": 1,
+  "slug": "z13_23_upper_144",
+  "theorem": "Z(13,23,3,3)<=144",
+  "upper_bound": {
+    "cases": [
+      {
+        "clean_rows": 13,
+        "deficit_budget": 21,
+        "forced_deficit": 26,
+        "profile": {
+          "6": 16,
+          "7": 7
+        },
+        "slack": 7
+      },
+      {
+        "clean_rows": 8,
+        "deficit_budget": 6,
+        "forced_deficit": 16,
+        "profile": {
+          "5": 1,
+          "6": 14,
+          "7": 8
+        },
+        "slack": 2
+      },
+      {
+        "clean_rows": 5,
+        "deficit_budget": 3,
+        "forced_deficit": 10,
+        "profile": {
+          "6": 17,
+          "7": 5,
+          "8": 1
+        },
+        "slack": 1
+      }
+    ],
+    "excluded_target": 145,
+    "problem": "Z(13,23,3,3)",
+    "status": "VERIFIED",
+    "upper_bound": 144
+  }
+}

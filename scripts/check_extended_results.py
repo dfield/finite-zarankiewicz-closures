@@ -14,6 +14,8 @@ sys.path.insert(0, str(ROOT / "src"))
 from finite_zarankiewicz_closures.extended import (  # noqa: E402
     extended_frontier_report,
     z10_22_certificate_report,
+    z12_23_certificate_report,
+    z13_23_upper_report,
 )
 from finite_zarankiewicz_closures.matrix import (  # noqa: E402
     read_boolean_csv,
@@ -24,7 +26,9 @@ from finite_zarankiewicz_closures.matrix import (  # noqa: E402
 WITNESSES = (
     ("z10_21_106_matrix.csv", 10, 21, 106),
     ("z10_22_110_matrix.csv", 10, 22, 110),
+    ("z11_19_106_matrix.csv", 11, 19, 106),
     ("z11_20_111_matrix.csv", 11, 20, 111),
+    ("z12_23_134_matrix.csv", 12, 23, 134),
 )
 
 
@@ -48,6 +52,8 @@ def report() -> dict[str, object]:
         "status": "VERIFIED",
         "frontier": extended_frontier_report(),
         "z10_22_upper_certificate": z10_22_certificate_report(),
+        "z12_23_upper_certificate": z12_23_certificate_report(),
+        "z13_23_upper_certificate": z13_23_upper_report(),
         "witnesses": witnesses,
     }
 

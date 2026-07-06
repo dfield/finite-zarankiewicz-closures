@@ -1,10 +1,12 @@
-"""Exact finite results and certificates for the 2026 table.
+"""Exact finite results, frontier bounds, and certificates for the 2026 table.
 
 Alongside the marked-row proof of ``Z(9,23,3,3)=103``, this module records
-three further closures obtained by propagating and checking the open table in
-Bhan--Nobili--Langer (2026): ``Z(10,21)=106``, ``Z(10,22)=110``, and
-``Z(11,20)=111``.  The first and third follow from vertex deletion.  The
-middle value uses a finite degree-profile and pair-deficit certificate.
+five further closures obtained by propagating and checking the open table in
+Bhan--Nobili--Langer (2026): ``Z(10,21)=106``, ``Z(10,22)=110``,
+``Z(11,19)=106``, ``Z(11,20)=111``, and ``Z(12,23)=134``.  The deletion
+closures use established neighboring values; the other cases use finite
+degree-profile and deficit certificates.  The module also checks the improved
+upper bound ``Z(13,23)<=144``.
 
 Only the standard library is used.  In particular, the certificate checker
 does not trust an external integer-programming or SAT solver.
@@ -14,7 +16,7 @@ from __future__ import annotations
 
 import itertools
 import math
-from typing import Iterable
+from typing import Iterable, Mapping, Any
 
 
 PAPER_OPEN_BOUNDS: dict[tuple[int, int], tuple[int, int]] = {
@@ -70,8 +72,12 @@ REPOSITORY_EXACT_VALUES = {
     (9, 23): 103,
     (10, 21): 106,
     (10, 22): 110,
+    (11, 19): 106,
     (11, 20): 111,
+    (12, 23): 134,
 }
+
+REPOSITORY_UPPER_BOUNDS = {(13, 23): 144}
 
 
 def deletion_upper(smaller_bound: int, larger_part: int) -> int:
@@ -339,6 +345,254 @@ def z10_22_certificate_report() -> dict[str, object]:
     }
 
 
+def z12_23_certificate_report() -> dict[str, object]:
+    """Recompute the complete elementary upper-bound certificate at 135 ones.
+
+    The report first excludes 136 ones using the forced profile ``5^2 6^21``
+    and a row-pair congruence.  It then classifies the five profiles at 135
+    ones and verifies the row/pair-deficit contradiction for each profile.
+    """
+
+    profiles_136 = [profile_dict(profile) for profile in enumerate_degree_profiles(12, 23, 136)]
+    if profiles_136 != [{5: 2, 6: 21}]:
+        raise AssertionError(f"unexpected profiles at 136: {profiles_136}")
+    pair_solutions = [
+        (degree_five, degree_six)
+        for degree_five in range(3)
+        for degree_six in range(6)
+        if 3 * degree_five + 4 * degree_six == 20
+    ]
+    if pair_solutions != [(0, 5)]:
+        raise AssertionError(f"unexpected pair-equation solutions: {pair_solutions}")
+
+    profiles_135 = [profile_dict(profile) for profile in enumerate_degree_profiles(12, 23, 135)]
+    expected_135 = [
+        {5: 3, 6: 20},
+        {4: 1, 5: 1, 6: 21},
+        {5: 4, 6: 18, 7: 1},
+        {4: 1, 5: 2, 6: 19, 7: 1},
+        {5: 5, 6: 16, 7: 2},
+    ]
+    if profiles_135 != expected_135:
+        raise AssertionError(f"unexpected profiles at 135: {profiles_135}")
+
+    first_slack = 2 * math.comb(12, 3) - (
+        3 * math.comb(5, 3) + 20 * math.comb(6, 3)
+    )
+    first_residue_minimum = min(60 - 10 * triple_rows for triple_rows in range(3))
+    if first_slack != 10 or first_residue_minimum != 40:
+        raise AssertionError("unexpected 5^3 6^20 residue calculation")
+
+    second_slack = 2 * math.comb(12, 3) - (
+        math.comb(4, 3) + math.comb(5, 3) + 21 * math.comb(6, 3)
+    )
+    second_residues = {}
+    for overlap in range(5):
+        shared_pairs = math.comb(overlap, 2)
+        second_residues[overlap] = (
+            2 * (math.comb(4, 2) - shared_pairs)
+            + (math.comb(5, 2) - shared_pairs)
+            + 3 * shared_pairs
+        )
+    if second_slack != 6 or set(second_residues.values()) != {22}:
+        raise AssertionError("unexpected 4^1 5^1 6^21 pair residues")
+
+    third_slack = 2 * math.comb(12, 3) - (
+        4 * math.comb(5, 3) + 18 * math.comb(6, 3) + math.comb(7, 3)
+    )
+    row_types = [(degree_five, degree_seven) for degree_five in range(5) for degree_seven in range(2)]
+    third_minimum = math.inf
+
+    def visit_row_types(
+        index: int,
+        rows_left: int,
+        five_incidences: int,
+        seven_incidences: int,
+        five_triple_budget: int,
+        mixed_triple_budget: int,
+        residue_sum: int,
+    ) -> None:
+        nonlocal third_minimum
+        if residue_sum >= third_minimum:
+            return
+        if index == len(row_types):
+            if rows_left == 0 and five_incidences == 20 and seven_incidences == 7:
+                third_minimum = residue_sum
+            return
+        degree_five, degree_seven = row_types[index]
+        residue = (4 * degree_five + 5 * degree_seven) % 10
+        for multiplicity in range(rows_left + 1):
+            new_five = five_incidences + multiplicity * degree_five
+            new_seven = seven_incidences + multiplicity * degree_seven
+            new_five_budget = five_triple_budget + multiplicity * math.comb(degree_five, 3)
+            new_mixed_budget = (
+                mixed_triple_budget
+                + multiplicity * math.comb(degree_five, 2) * degree_seven
+            )
+            if (
+                new_five > 20
+                or new_seven > 7
+                or new_five_budget > 2 * math.comb(4, 3)
+                or new_mixed_budget > 2 * math.comb(4, 2)
+            ):
+                break
+            visit_row_types(
+                index + 1,
+                rows_left - multiplicity,
+                new_five,
+                new_seven,
+                new_five_budget,
+                new_mixed_budget,
+                residue_sum + multiplicity * residue,
+            )
+
+    visit_row_types(0, 12, 0, 0, 0, 0, 0)
+    if third_slack != 5 or third_minimum != 25:
+        raise AssertionError(f"unexpected 5^4 6^18 7^1 minimum: {third_minimum}")
+
+    fourth_slack = 2 * math.comb(12, 3) - (
+        math.comb(4, 3)
+        + 2 * math.comb(5, 3)
+        + 19 * math.comb(6, 3)
+        + math.comb(7, 3)
+    )
+    maximum_seven_rows = 4 + (3 * fourth_slack) // 3
+    if fourth_slack != 1 or maximum_seven_rows != 5:
+        raise AssertionError("unexpected 4^1 5^2 6^19 7^1 incidence bound")
+
+    fifth_slack = 2 * math.comb(12, 3) - (
+        5 * math.comb(5, 3) + 16 * math.comb(6, 3) + 2 * math.comb(7, 3)
+    )
+    zero_residue_five_counts = [
+        count for count in range(6) if any((4 * count + 5 * b) % 10 == 0 for b in range(3))
+    ]
+    forced_triple_incidence = 5 * math.comb(5, 3)
+    available_triple_incidence = 2 * math.comb(5, 3)
+    if (
+        fifth_slack != 0
+        or zero_residue_five_counts != [0, 5]
+        or forced_triple_incidence <= available_triple_incidence
+    ):
+        raise AssertionError("unexpected 5^5 6^16 7^2 residue calculation")
+
+    return {
+        "status": "VERIFIED",
+        "problem": "Z(12,23,3,3)",
+        "excluded_targets": [136, 135],
+        "at_136": {
+            "degree_profiles": [{str(d): count for d, count in profiles_136[0].items()}],
+            "pair_equation": "3*a_P + 4*b_P = 20",
+            "pair_equation_solutions": [list(solution) for solution in pair_solutions],
+            "degree_five_pair_incidences": 2 * math.comb(5, 2),
+        },
+        "at_135": {
+            "degree_profiles": [
+                {str(d): count for d, count in profile.items()} for profile in profiles_135
+            ],
+            "cases": {
+                "5^3 6^20": {
+                    "deficit_budget": 3 * first_slack,
+                    "minimum_row_residue_sum": first_residue_minimum,
+                },
+                "4^1 5^1 6^21": {
+                    "deficit_budget": 3 * second_slack,
+                    "pair_residue_sums_by_overlap": {
+                        str(key): value for key, value in second_residues.items()
+                    },
+                },
+                "5^4 6^18 7^1": {
+                    "deficit_budget": 3 * third_slack,
+                    "minimum_row_residue_sum": int(third_minimum),
+                },
+                "4^1 5^2 6^19 7^1": {
+                    "required_degree_seven_rows": 7,
+                    "maximum_degree_seven_rows": maximum_seven_rows,
+                },
+                "5^5 6^16 7^2": {
+                    "forced_triple_incidence": forced_triple_incidence,
+                    "available_triple_incidence": available_triple_incidence,
+                },
+            },
+        },
+    }
+
+
+def z13_23_upper_report() -> dict[str, object]:
+    """Recompute the marked-row certificate proving ``Z(13,23)<=144``."""
+
+    profiles = [profile_dict(profile) for profile in enumerate_degree_profiles(13, 23, 145)]
+    expected = [
+        {6: 16, 7: 7},
+        {5: 1, 6: 14, 7: 8},
+        {6: 17, 7: 5, 8: 1},
+    ]
+    if profiles != expected:
+        raise AssertionError(f"unexpected profiles at Z(13,23)=145: {profiles}")
+    cases = []
+    for profile in profiles:
+        slack = 2 * math.comb(13, 3) - sum(
+            count * math.comb(degree, 3) for degree, count in profile.items()
+        )
+        exceptional_rows = sum(
+            degree * count for degree, count in profile.items() if degree in (5, 8)
+        )
+        clean_rows = 13 - exceptional_rows
+        forced_deficit = 2 * clean_rows
+        budget = 3 * slack
+        if forced_deficit <= budget:
+            raise AssertionError(f"profile was not excluded: {profile}")
+        cases.append(
+            {
+                "profile": {str(d): count for d, count in profile.items()},
+                "slack": slack,
+                "clean_rows": clean_rows,
+                "forced_deficit": forced_deficit,
+                "deficit_budget": budget,
+            }
+        )
+    return {
+        "status": "VERIFIED",
+        "problem": "Z(13,23,3,3)",
+        "excluded_target": 145,
+        "upper_bound": 144,
+        "cases": cases,
+    }
+
+
+def z13_23_upper_certificate() -> dict[str, object]:
+    """Return the standalone certificate for the non-exact frontier bound."""
+
+    return {
+        "schema_version": 1,
+        "certificate_type": "finite_zarankiewicz_upper_bound",
+        "slug": "z13_23_upper_144",
+        "theorem": "Z(13,23,3,3)<=144",
+        "parameters": {
+            "rows": 13,
+            "columns": 23,
+            "forbidden_rows": 3,
+            "forbidden_columns": 3,
+            "excluded_target": 145,
+        },
+        "upper_bound": z13_23_upper_report(),
+        "lean_kernel": "ZarankiewiczFiniteClosures.ArithmeticKernels",
+        "conclusion": "Z(13,23,3,3)<=144",
+    }
+
+
+def verify_z13_23_upper_certificate(certificate: Mapping[str, Any]) -> dict[str, object]:
+    """Verify an untrusted standalone ``Z(13,23)`` certificate."""
+
+    expected = z13_23_upper_certificate()
+    if dict(certificate) != expected:
+        raise ValueError("Z(13,23) upper-bound certificate differs from recomputation")
+    return {
+        "status": "VERIFIED",
+        "slug": expected["slug"],
+        "theorem": expected["theorem"],
+    }
+
+
 def extended_frontier_report() -> dict[str, object]:
     """Return the dated status of all 44 cases open at the paper boundary."""
 
@@ -355,6 +609,10 @@ def extended_frontier_report() -> dict[str, object]:
         "repository_exact_values": {
             f"{rows},{columns}": value
             for (rows, columns), value in sorted(REPOSITORY_EXACT_VALUES.items())
+        },
+        "repository_upper_bounds": {
+            f"{rows},{columns}": value
+            for (rows, columns), value in sorted(REPOSITORY_UPPER_BOUNDS.items())
         },
         "remaining_open_cases": len(remaining),
         "remaining_parameters": [f"{rows},{columns}" for rows, columns in remaining],

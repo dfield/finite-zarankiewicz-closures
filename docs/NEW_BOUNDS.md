@@ -1,4 +1,4 @@
-# A fifth closure and new bounds on the 2026 frontier
+# Two further closures and new bounds on the 2026 frontier
 
 > **Attribution:** The results in this document were produced by **Claude (Anthropic)** in a verification-and-extension session dated 2026-07-05, building directly on this repository's four closures and on the sources cited in the [literature review](LITERATURE_REVIEW.md). They await independent expert review.
 
@@ -30,7 +30,7 @@ $$
 
 The previous published upper bounds were 136 and 145. The proofs use only the row-triple capacity count and the deficit mechanisms already present in this repository — the pair-deficit count of the $Z(10,22)$ proof and the marked-row residues of the $Z(9,23)$ proof — applied at new parameters, with residue moduli 10 and 4 at twelve rows and 5 at thirteen rows. Full proofs are in Sections 3 and 4; every arithmetic step, including the one finite enumeration, is checked by [`scripts/check_new_bounds.py`](../scripts/check_new_bounds.py).
 
-**A propagated bound table.** Closing the table of [BNL26] under the deletion lemma and under two-one-line extensions tightens 17 upper bounds and 19 lower bounds beyond the paper's published intervals, without any new search. The machine-readable result, with per-cell provenance, is [`analysis/new_bounds.json`](../analysis/new_bounds.json). Section 5 lists every change.
+**A propagated bound table.** Closing the table of [BNL26] under the deletion lemma and under two-one-line extensions tightens 20 upper bounds and 17 lower bounds beyond the paper's published intervals, without any new search. The machine-readable result, with per-cell provenance, is [`analysis/new_bounds.json`](../analysis/new_bounds.json). Section 5 lists every change.
 
 ## 2. The value $Z(11,19,3,3)=106$
 
@@ -46,9 +46,9 @@ from the established value $Z(11,18,3,3)=101$: a $K_{3,3}$-free $11\times19$ mat
 
 ### 2.2 Lower bound
 
-[`data/z11_19_106_matrix.csv`](../data/z11_19_106_matrix.csv) is an $11\times19$ Boolean matrix with 106 ones, column degrees $5^86^{11}$, and row degrees $(8,9,9,9,10,10,10,10,10,10,11)$. Exhaustive inspection of all $\binom{11}{3}\binom{19}{3}=160{,}215$ candidate $3\times3$ submatrices confirms that none is all one; equivalently, every row triple occurs in at most two columns (the used triple capacity is $8\binom53+11\binom63=300$ of the available $2\binom{11}3=330$).
+[`data/z11_19_106_matrix.csv`](../data/z11_19_106_matrix.csv) is an $11\times19$ Boolean matrix with 106 ones, column degrees $5^86^{11}$, and row degrees $(8,9,9,9,10,10,10,10,10,10,11)$. Exhaustive inspection of all $\binom{11}{3}\binom{19}{3}=159{,}885$ candidate $3\times3$ submatrices confirms that none is all one; equivalently, every row triple occurs in at most two columns (the used triple capacity is $8\binom53+11\binom63=300$ of the available $2\binom{11}3=330$).
 
-The matrix was found by annealing within the fixed degree profile $5^86^{11}$; the discovery method carries no logical weight, because the verification is a direct scan.
+The matrix was found by annealing within the fixed degree profile $5^86^{11}$; the discovery method carries no logical weight, because verification is a direct exhaustive scan.
 
 ## 3. Theorem: $Z(12,23,3,3)=134$
 
@@ -274,9 +274,9 @@ Cells not listed are unchanged. Note that $(12,19)$, $(12,20)$, and $(12,21)$ in
 - The theorems of Sections 3 and 4 are fully elementary; [`scripts/check_new_bounds.py`](../scripts/check_new_bounds.py) re-derives the profile classifications by exhaustive enumeration and re-checks every displayed number, in the standard library only.
 - During the same session, per-profile SAT runs (CaDiCaL via PySAT, with sequential-counter cardinality encodings and double-lex symmetry breaking) produced two families of verdicts, recorded in [`analysis/sat_cross_check.json`](../analysis/sat_cross_check.json):
   - **Cross-check of this repository.** Every capacity-feasible column-degree profile at all four previously excluded targets — $(9,23)$ at 104, $(10,21)$ at 107, $(10,22)$ at 111, and $(11,20)$ at 112 — returned `UNSAT`. This confirms the four published upper bounds by a mechanism independent of the marked-row, deletion, and pair-deficit proofs.
-  - **Frontier observations.** All 11 profiles of a hypothetical 114-one $10\times23$ matrix returned `UNSAT`, as did **all 24** profiles at 113 ones. Modulo solver correctness this gives $Z(10,23,3,3)\le112$, and Bhan--Nobili--Langer's 112-one construction then closes the cell at $Z(10,23,3,3)=112$.
+  - **Frontier observations.** All 11 profiles of a hypothetical 114-one $10\times23$ matrix returned `UNSAT`. At 113 ones, 24 profiles returned `UNSAT`; the twenty-fifth profile, $1^15^{20}6^2$, is killed arithmetically (and is also impossible because deleting its degree-one column would leave 112 ones in a $10\times22$ matrix, contradicting $Z(10,22,3,3)=110$). Modulo the unlogged solver verdicts this gives $Z(10,23,3,3)\le112$, and Bhan--Nobili--Langer's 112-one construction then closes the cell at $Z(10,23,3,3)=112$.
 
-  **No claim in the solver-free table rests on those verdicts** — in particular the $(10,23)$ value is deliberately *not* entered in [`analysis/new_bounds.json`](../analysis/new_bounds.json), because no independently checkable proof trace was retained. A DRAT-logged rerun (and, for the two profiles the tier-1 filter already kills, the elementary arguments) would upgrade it to the repository's evidence standard.
+  **No claim in the solver-free table rests on those verdicts** — in particular the $(10,23)$ value is deliberately *not* entered in [`analysis/new_bounds.json`](../analysis/new_bounds.json), because no independently checkable proof trace was retained. The 2026-07-06 integration audit checked the profile catalog and small instances of the encoding but could not certify the recorded large UNSAT outcomes. Thus $Z(10,23,3,3)=112$ is a research lead, not a repository theorem. A proof-logged rerun (plus the elementary elimination of the one degree-one profile) would be required to upgrade it; see [`SAT_Z10_23_STATUS.md`](SAT_Z10_23_STATUS.md).
 - The figure-2 transcription used here was re-read from the arXiv HTML of [BNL26] v2 during the session and matches [`analysis/extended_results.json`](../analysis/extended_results.json); the upper bounds equal $\min(\text{[Tan22] Table 3},\ \text{[DGH26] Table 2})$ cell-by-cell, and an exact-rational re-computation of the [DGH26] linear program reproduced their published values for every open cell.
 
 ## 7. Reproduction
@@ -289,4 +289,4 @@ python3 scripts/check_new_bounds.py --check
 python3 scripts/check_new_bounds.py --write
 ```
 
-The checker requires only Python 3.9+ and finishes in well under a minute.
+The checker requires only Python 3.9+. Its profile enumerator uses convexity and degree-sum pruning so the complete check remains suitable for the repository's CI matrix.

@@ -1,16 +1,16 @@
 # Reviewing and contributing
 
-Independent scrutiny is especially welcome because this repository presents four new exact finite results and has not yet completed peer review.
+Independent scrutiny is especially welcome because this repository presents six new exact finite results and has not yet completed peer review.
 
 ## Suggested review order
 
 1. Read [`docs/PROOF.md`](docs/PROOF.md) without consulting the code. Check the two double counts, the penalty-based degree classification, and each marked-row residue.
 2. Run `make witness` and inspect the explicit matrix in [`data/`](data/).
-3. Run `make certificate` and compare all four case certificates with their proof sections.
+3. Run `make certificate` and compare all six case certificates with their proof sections.
 4. Run `make test`; the tests include deliberate corruptions and exhaustive small cardinality checks.
-5. Inspect the four-case formalization boundary in [`lean/README.md`](lean/README.md), then run `lake build` inside `lean/`.
+5. Inspect the arithmetic formalization boundary in [`lean/README.md`](lean/README.md), then run `lake build` inside `lean/`.
 6. Treat the SAT/MIP models and DRAT/LRAT traces as corroborating evidence, not substitutes for Step 1.
-7. For the three additional results, read [`docs/EXTENDED_RESULTS.md`](docs/EXTENDED_RESULTS.md), run `make extended`, and inspect the explicit 37-cell claim boundary.
+7. For the five additional results and the new frontier bound, read [`docs/EXTENDED_RESULTS.md`](docs/EXTENDED_RESULTS.md) and [`docs/NEW_BOUNDS.md`](docs/NEW_BOUNDS.md), run `make extended`, and inspect the explicit 35-cell claim boundary.
 
 ## Useful issue reports
 
@@ -18,7 +18,7 @@ Please open an issue for any of the following:
 
 - a mathematical gap or ambiguous quantifier in either proof document;
 - an earlier source that closes any of these exact cases or contains one of the arguments;
-- a missing or previously solved cell in the remaining 37-case frontier;
+- a missing or previously solved cell in the remaining 35-case frontier;
 - a witness checker or certificate mutation that is incorrectly accepted;
 - a mismatch between a proof equation and its Python or Lean counterpart;
 - a deterministic artifact that does not regenerate byte-for-byte; or

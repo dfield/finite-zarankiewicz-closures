@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate or byte-check exact decision models for all four cases."""
+"""Generate or byte-check exact decision models for every exact case."""
 
 from __future__ import annotations
 
@@ -23,7 +23,9 @@ MODEL_CASES = (
     ("z9_23_103", 9, 23, 104),
     ("z10_21_106", 10, 21, 107),
     ("z10_22_110", 10, 22, 111),
+    ("z11_19_106", 11, 19, 107),
     ("z11_20_111", 11, 20, 112),
+    ("z12_23_134", 12, 23, 135),
 )
 
 
@@ -77,7 +79,7 @@ def main() -> int:
     model_directory = ROOT / "models"
 
     if args.check:
-        with tempfile.TemporaryDirectory(prefix="four-case-model-check-") as raw:
+        with tempfile.TemporaryDirectory(prefix="exact-case-model-check-") as raw:
             temporary = Path(raw)
             reports = {}
             for slug, rows, columns, target in MODEL_CASES:

@@ -56,6 +56,34 @@
       "rows": 10,
       "slug": "z10_22_110"
     },
+    "z11_19_106": {
+      "cell_cnf": {
+        "base_cell_variables": 209,
+        "clauses_total": 291530,
+        "columns": 19,
+        "file": "models/cells_11x19_exact_107.cnf",
+        "forbidden_submatrix_clauses": 159885,
+        "rows": 11,
+        "sha256": "6011af5166d0a82feba3f28e68abc07a45c75b78465535081ea0ceeae3981dbf",
+        "target_ones": 107,
+        "variables_total": 33277
+      },
+      "column_lp": {
+        "columns": 19,
+        "file": "models/column_types_11x19_exact_107.lp",
+        "row_triple_constraints": 165,
+        "rows": 11,
+        "sha256": "d712e0c3f35bca1ad0f27ee4862cdafe79d959cdfbde49bfdbcb08ea76589aa7",
+        "structural_constraints": 167,
+        "support_variables": 2048,
+        "target_ones": 107
+      },
+      "columns": 19,
+      "excluded_target": 107,
+      "monotonicity_note": "Testing exactly 107 ones suffices because deleting ones preserves K_3,3-freeness.",
+      "rows": 11,
+      "slug": "z11_19_106"
+    },
     "z11_20_111": {
       "cell_cnf": {
         "base_cell_variables": 220,
@@ -83,6 +111,34 @@
       "monotonicity_note": "Testing exactly 112 ones suffices because deleting ones preserves K_3,3-freeness.",
       "rows": 11,
       "slug": "z11_20_111"
+    },
+    "z12_23_134": {
+      "cell_cnf": {
+        "base_cell_variables": 276,
+        "clauses_total": 618940,
+        "columns": 23,
+        "file": "models/cells_12x23_exact_135.cnf",
+        "forbidden_submatrix_clauses": 389620,
+        "rows": 12,
+        "sha256": "112acc23f9f40067055646543c146937459ba81109fc2ef26b3d6afcf1e5164f",
+        "target_ones": 135,
+        "variables_total": 57813
+      },
+      "column_lp": {
+        "columns": 23,
+        "file": "models/column_types_12x23_exact_135.lp",
+        "row_triple_constraints": 220,
+        "rows": 12,
+        "sha256": "d639a25ae62d6056dc1e730da1f883a3b8325fd857ab08ff1e38814967fb4a75",
+        "structural_constraints": 222,
+        "support_variables": 4096,
+        "target_ones": 135
+      },
+      "columns": 23,
+      "excluded_target": 135,
+      "monotonicity_note": "Testing exactly 135 ones suffices because deleting ones preserves K_3,3-freeness.",
+      "rows": 12,
+      "slug": "z12_23_134"
     },
     "z9_23_103": {
       "cell_cnf": {

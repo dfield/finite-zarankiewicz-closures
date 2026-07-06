@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Standalone exhaustive checker for the three additional matrix witnesses."""
+"""Standalone exhaustive checker for the five additional matrix witnesses."""
 
 from __future__ import annotations
 
@@ -13,7 +13,9 @@ ROOT = Path(__file__).resolve().parents[1]
 SPECS = (
     ("z10_21_106_matrix.csv", 10, 21, 106),
     ("z10_22_110_matrix.csv", 10, 22, 110),
+    ("z11_19_106_matrix.csv", 11, 19, 106),
     ("z11_20_111_matrix.csv", 11, 20, 111),
+    ("z12_23_134_matrix.csv", 12, 23, 134),
 )
 
 
