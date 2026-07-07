@@ -146,7 +146,23 @@ python3 scripts/replay_certificates.py
 python3 scripts/replay_z10_23_certificates.py --output audit/z10_23_sat_replay.json
 ```
 
-The first command regenerates temporary small CNFs and uses seed `20260704`. The second should report 86 rows, 512 columns, 6,399 matrix nonzeros, and 512 integer variables. The third requires all six small terminal trace checks to report true. The fourth expands all thirteen profile DRAT cores, converts them to LRAT, checks both stages, and can take substantially longer.
+The first command regenerates temporary small CNFs and uses seed `20260704`. The second should report 86 rows, 512 columns, 6,399 matrix nonzeros, and 512 integer variables. The third requires all six small terminal trace checks to report true. The fourth expands ten direct profile cores and every leaf core in three complete-cover archives, converts them to LRAT, checks both stages, and can take substantially longer. Pass `--workers N` to parallelize leaf replay.
+
+To regenerate one of the three cover families from scratch after installing
+`python-sat`, CaDiCaL, `drat-trim`, and `lrat-check`:
+
+```sh
+python3 search/z10_23_certify.py cubes '3x1,4x2,5x18,6x2' \
+  --output build/z10_23 --conflicts 200000 --maximum-depth 10
+python3 search/z10_23_cube_certify.py '3x1,4x2,5x18,6x2' \
+  --catalog build/z10_23/3d1_4d2_5d18_6d2.cubes.jsonl \
+  --output build/z10_23 --workers 4
+```
+
+The first command discovers a deterministic adaptive cover. The second does
+not trust its search outcomes: it recomputes trie completeness, independently
+proves every leaf, performs both replay stages, and writes the deterministic
+archive and proof index.
 
 External output is summarized in [`audit/model_validation.json`](../audit/model_validation.json), [`audit/certificate_replay.json`](../audit/certificate_replay.json), and [`audit/z10_23_sat_replay.json`](../audit/z10_23_sat_replay.json). Temporary paths and timing noise are intentionally not stored.
 
@@ -170,7 +186,7 @@ The following outputs are byte-deterministic:
 - exact DGH boundary report;
 - local-kernel catalog;
 - extended finite-table report;
-- profile CNFs and direct compressed DRAT cores for $Z(10,23)$, with oversized compressed streams stored as hash-bound sub-100 MB byte chunks; and
+- profile CNFs, ten direct compressed DRAT cores, and three complete cube-cover proof archives for $Z(10,23)$, with oversized compressed streams stored as hash-bound sub-100 MB byte chunks; and
 - artifact checksum file.
 
 Reports from external tools retain semantic outcomes and tool versions while omitting elapsed time, temporary directories, and machine identifiers.

@@ -19,7 +19,7 @@ The principal failure modes considered were:
 7. generated evidence depends on a local path, timestamp, random seed, or unavailable private source; or
 8. documentation silently upgrades corroborating computation into a theorem's logical basis; or
 9. the extended table is mistranscribed, a deletion bound is rounded incorrectly, or a finite profile/orbit is omitted from the $(10,22)$, $(10,23)$, or $(12,23)$ certificate; or
-10. a $(10,23)$ CNF omits a legal matrix, or a stored DRAT core fails the advertised DRAT-to-LRAT replay against the unsplit formula.
+10. a $(10,23)$ CNF omits a legal matrix, a cover omits a canonical branch, or a stored direct or leaf DRAT core fails its advertised DRAT-to-LRAT replay.
 
 ## 1. Original human-proof audit
 
@@ -102,7 +102,9 @@ All sixteen generic target models regenerate byte-for-byte. The repository audit
 
 The audit found no basis for describing these traces as a proof of the raw cell CNF, so the documentation does not do so. They replay only the terminal aggregate contradictions. The JSON certificate and its checker are the bridge from the mathematical problem to those endpoints.
 
-Separately, `drat-trim` accepts all thirteen compressed DRAT cores used for $Z(10,23)$ and converts each to an LRAT refutation accepted by `lrat-check`. Every proof is produced directly from, and checked against, the exact unsplit profile CNF listed in [`certificates/z10_23_sat.json`](../certificates/z10_23_sat.json). For compressed streams stored in multiple byte chunks, the integrity gate checks the ordered part hashes and each reconstructed-stream hash before replay. The recorded semantic replay is [`audit/z10_23_sat_replay.json`](../audit/z10_23_sat_replay.json). Optional row-stabilizer cube searches are not part of this trust boundary.
+Separately, `drat-trim` accepts the ten direct compressed DRAT cores and every leaf core in the three complete $Z(10,23)$ cover archives, converting each to an LRAT refutation accepted by `lrat-check`. Direct proofs are checked against the exact unsplit profile CNF. Cover leaves are checked against that same base formula with precisely their indexed cell literals appended as unit clauses. The standard-library trie audit recomputes all permitted child supports and rejects missing, duplicate, overlapping, wrong-degree, or noncanonical leaves. Thus neither an incremental solver status nor the catalog generator is trusted for completeness.
+
+For compressed streams stored in multiple byte chunks, the integrity gate checks the ordered part hashes and each reconstructed-stream hash before replay. It also binds every cover catalog and per-leaf proof index. The recorded semantic replay is [`audit/z10_23_sat_replay.json`](../audit/z10_23_sat_replay.json).
 
 ## 6. Lean audit
 

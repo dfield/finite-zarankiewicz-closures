@@ -3,15 +3,19 @@
 
 The standard-library arithmetic checker reduces the 25 capacity-feasible
 degree profiles at 113 ones to thirteen SAT cases.  This optional tool builds
-one deterministic CNF per surviving profile, can decompose it into canonical
-row-stabilizer cubes for exploratory search, and can ask CaDiCaL plus
-DRAT/LRAT checkers for a replayable *direct* proof of the unsplit formula.  It
-requires ``python-sat``; the checked-in formulas and traces do not.
+one deterministic CNF per surviving profile, can decompose it into a complete
+canonical row-stabilizer cube catalog, and can ask CaDiCaL plus DRAT/LRAT
+checkers for a replayable *direct* proof of the unsplit formula.  A catalog is
+not itself a proof; ``z10_23_cube_certify.py`` independently proves and checks
+every leaf.  Formula and catalog generation require ``python-sat``; the
+checked-in formulas and traces do not.
 
 Typical use for one profile::
 
     python3 search/z10_23_certify.py cubes '4x2,5x21' --output build/z10_23
     python3 search/z10_23_certify.py direct '4x2,5x21' --output build/z10_23
+    python3 search/z10_23_cube_certify.py '4x2,5x21' \
+      --catalog build/z10_23/4d2_5d21.cubes.jsonl --output build/z10_23
 
 The cube run is deterministic.  Equal-degree columns stay contiguous, rare
 degree blocks come first, rows and equal-degree columns obey double-lex order,

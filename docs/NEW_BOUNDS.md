@@ -22,7 +22,7 @@ For $(11,19)$, the upper bound is the deletion bound already derived in [`EXTEND
 
 For $(12,23)$, Section 3 proves $Z(12,23,3,3)\le134$ by a two-step deficit argument (their reported interval was $125$--$136$), and the matching lower bound is a new explicit 134-one matrix, [`data/z12_23_134_matrix.csv`](../data/z12_23_134_matrix.csv).
 
-For $(10,23)$, [`PROOF_Z10_23.md`](PROOF_Z10_23.md) reduces 113 ones to twelve arithmetic contradictions and thirteen deterministic CNFs, each carrying a DRAT core replayed through independent LRAT checking. The explicit 112-one matrix matches the upper bound. Vertex deletion then gives $Z(11,23)\le123$, and [`data/z11_23_123_matrix.csv`](../data/z11_23_123_matrix.csv) matches it; see [`PROOF_Z11_23.md`](PROOF_Z11_23.md).
+For $(10,23)$, [`PROOF_Z10_23.md`](PROOF_Z10_23.md) reduces 113 ones to twelve arithmetic contradictions and thirteen deterministic CNFs. Ten carry direct DRAT cores; the remaining three carry complete canonical-prefix covers with a checked core at every leaf. Every core is replayed through independent LRAT checking. The explicit 112-one matrix matches the upper bound. Vertex deletion then gives $Z(11,23)\le123$, and [`data/z11_23_123_matrix.csv`](../data/z11_23_123_matrix.csv) matches it; see [`PROOF_Z11_23.md`](PROOF_Z11_23.md).
 
 With these closures, eleven of the paper's 44 open cells are settled and **33 remain open**.
 
@@ -278,7 +278,7 @@ Cells not listed are unchanged. Note that $(12,19)$, $(12,20)$, and $(12,21)$ in
 
 - The $Z(11,19)$ **upper** bound and every deletion-propagated bound depend on the correctness of the established values in [BNL26] Figure 2 / Tan's Table 3 — the same dependency already accepted by [`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) for $Z(10,21)$ and $Z(11,20)$. The witness and both deficit theorems are self-contained.
 - The theorems of Sections 3 and 4 are fully elementary; [`scripts/check_new_bounds.py`](../scripts/check_new_bounds.py) re-derives the profile classifications by exhaustive enumeration and re-checks every displayed number, in the standard library only.
-- The original 2026-07-05 per-profile SAT sweep retained no proof traces and remains non-load-bearing historical evidence. It has now been superseded: the completed proof enumerates all 25 capacity-feasible profiles at 113 ones, eliminates twelve arithmetically, and stores deterministic formulas plus independently replayed DRAT/LRAT certificates for the remaining thirteen. [`analysis/sat_cross_check.json`](../analysis/sat_cross_check.json) records that transition, [`certificates/z10_23_sat.json`](../certificates/z10_23_sat.json) binds the artifacts, and [`SAT_Z10_23_STATUS.md`](SAT_Z10_23_STATUS.md) documents the completed promotion criteria.
+- The original 2026-07-05 per-profile SAT sweep retained no proof traces and remains non-load-bearing historical evidence. It has now been superseded: the completed proof enumerates all 25 capacity-feasible profiles at 113 ones, eliminates twelve arithmetically, and stores deterministic formulas plus independently replayed direct or complete-cover DRAT/LRAT certificates for the remaining thirteen. [`analysis/sat_cross_check.json`](../analysis/sat_cross_check.json) records that transition, [`certificates/z10_23_sat.json`](../certificates/z10_23_sat.json) binds the artifacts, and [`SAT_Z10_23_STATUS.md`](SAT_Z10_23_STATUS.md) documents the completed promotion criteria.
 - The figure-2 transcription used here was re-read from the arXiv HTML of [BNL26] v2 during the session and matches [`analysis/extended_results.json`](../analysis/extended_results.json); the upper bounds equal $\min(\text{[Tan22] Table 3},\ \text{[DGH26] Table 2})$ cell-by-cell, and an exact-rational re-computation of the [DGH26] linear program reproduced their published values for every open cell.
 
 ## 7. Reproduction
@@ -287,8 +287,8 @@ Cells not listed are unchanged. Note that $(12,19)$, $(12,20)$, and $(12,21)$ in
 # everything claimed above (witness scan, both theorems, the propagated table)
 python3 scripts/check_new_bounds.py --check
 
-# optional, heavyweight semantic replay of all thirteen Z(10,23) proofs
-python3 scripts/replay_z10_23_certificates.py
+# optional, heavyweight semantic replay of all direct and cover-leaf proofs
+python3 scripts/replay_z10_23_certificates.py --workers 4
 
 # regenerate the machine-readable table after an intentional change
 python3 scripts/check_new_bounds.py --write

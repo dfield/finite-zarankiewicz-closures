@@ -117,7 +117,7 @@ $$
 Z(12,23,3,3)=134.
 $$
 
-Four values use the classical minimum-degree deletion bound. Two extended closures combine explicit constructions with finite degree-profile and deficit arguments. The $(10,23)$ closure combines an arithmetic profile reduction with thirteen checked propositional refutations; it then supplies the neighboring $(11,23)$ deletion bound. These additions leave 33 of the paper's original 44 open cells unresolved. No exact value is asserted for those cases.
+Four values use the classical minimum-degree deletion bound. Two extended closures combine explicit constructions with finite degree-profile and deficit arguments. The $(10,23)$ closure combines an arithmetic profile reduction with ten direct propositional refutations and three complete, leaf-refuted canonical covers; it then supplies the neighboring $(11,23)$ deletion bound. These additions leave 33 of the paper's original 44 open cells unresolved. No exact value is asserted for those cases.
 
 The original four-result status was checked against the paper's rendered Figure 2 with a cutoff of **2026-07-04**; the four later parameters were checked again on **2026-07-06**. The searches located no later arXiv source containing those closures, but this negative literature finding remains provisional.
 

@@ -104,16 +104,91 @@ def _proof_metadata(slug: str) -> dict[str, object]:
     }
 
 
+def _jsonl_metadata(path: Path) -> dict[str, object]:
+    return {
+        "file": str(path.relative_to(ROOT)),
+        "sha256": _sha256(path),
+        "bytes": path.stat().st_size,
+        "count": sum(1 for line in path.read_text(encoding="ascii").splitlines() if line),
+    }
+
+
+def _cube_archive_metadata(slug: str) -> dict[str, object]:
+    directory = ROOT / "certificates" / "z10_23"
+    archive = directory / f"{slug}.cube-proofs.tar.xz"
+    parts = sorted(directory.glob(f"{slug}.cube-proofs.tar.xz.part-*"))
+    if archive.is_file() == bool(parts):
+        raise ValueError(f"expected exactly one cube-proof archive representation for {slug}")
+    if archive.is_file():
+        if archive.stat().st_size >= 100_000_000:
+            raise ValueError(f"cube-proof archive exceeds GitHub's single-file limit: {archive}")
+        return {
+            "file": str(archive.relative_to(ROOT)),
+            "sha256": _sha256(archive),
+            "bytes": archive.stat().st_size,
+            "format": "TAR+DRAT+xz",
+        }
+
+    digest = hashlib.sha256()
+    total_bytes = 0
+    part_metadata = []
+    for part in parts:
+        size = part.stat().st_size
+        if size >= 100_000_000:
+            raise ValueError(f"cube-proof archive part exceeds GitHub's limit: {part}")
+        part_digest = hashlib.sha256()
+        with part.open("rb") as handle:
+            for block in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(block)
+                part_digest.update(block)
+        total_bytes += size
+        part_metadata.append(
+            {
+                "file": str(part.relative_to(ROOT)),
+                "sha256": part_digest.hexdigest(),
+                "bytes": size,
+            }
+        )
+    return {
+        "parts": part_metadata,
+        "sha256": digest.hexdigest(),
+        "bytes": total_bytes,
+        "format": "TAR+DRAT+xz+split",
+    }
+
+
+def _cube_proof_metadata(slug: str) -> dict[str, object]:
+    directory = ROOT / "certificates" / "z10_23"
+    catalog = directory / f"{slug}.cubes.jsonl"
+    index = directory / f"{slug}.cube-proof-index.jsonl"
+    if not catalog.is_file() or not index.is_file():
+        raise ValueError(f"missing cube-cover catalog or proof index for {slug}")
+    return {
+        "format": "row-stabilizer-cube-cover",
+        "catalog": _jsonl_metadata(catalog),
+        "proof_index": _jsonl_metadata(index),
+        "archive": _cube_archive_metadata(slug),
+    }
+
+
 def render() -> str:
     cases = []
     for profile in PROFILES:
         slug = _slug(profile)
         formula = ROOT / "models" / "z10_23" / f"{slug}.cnf"
+        proof_directory = ROOT / "certificates" / "z10_23"
+        direct_exists = (proof_directory / f"{slug}.drat.xz").is_file() or bool(
+            list(proof_directory.glob(f"{slug}.drat.xz.part-*"))
+        )
+        cube_exists = (proof_directory / f"{slug}.cubes.jsonl").is_file()
+        if direct_exists == cube_exists:
+            raise ValueError(f"expected exactly one proof strategy for {slug}")
+        strategy = "direct_cadical" if direct_exists else "row_stabilizer_cube_cover"
         case: dict[str, object] = {
             "profile": profile,
-            "strategy": "direct_cadical",
+            "strategy": strategy,
             "formula": _formula_metadata(formula),
-            "proof": _proof_metadata(slug),
+            "proof": _proof_metadata(slug) if direct_exists else _cube_proof_metadata(slug),
             "replay": {
                 "checker": "drat-trim -> LRAT -> lrat-check",
                 "status": "VERIFIED",

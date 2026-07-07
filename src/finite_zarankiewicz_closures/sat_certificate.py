@@ -13,8 +13,10 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+import re
 from typing import Any, Mapping
 
+from .cube_cover import CubeCoverError, verify_cube_catalog
 from .extended import z10_23_profile_report
 
 
@@ -144,6 +146,108 @@ def _check_proof_artifact(root: Path, payload: Mapping[str, Any]) -> int:
     return total_bytes
 
 
+def _check_cube_archive(root: Path, payload: Mapping[str, Any]) -> int:
+    """Check one direct or byte-split tar/xz archive of cube-leaf proofs."""
+
+    proof_format = payload.get("format")
+    if proof_format == "TAR+DRAT+xz":
+        path = _check_hashed_file(root, payload)
+        if not path.name.endswith(".cube-proofs.tar.xz") or path.stat().st_size >= 100_000_000:
+            raise SatCertificateError(f"unexpected cube-proof archive: {path}")
+        return path.stat().st_size
+    if proof_format != "TAR+DRAT+xz+split":
+        raise SatCertificateError("unexpected cube-proof archive format")
+
+    parts = payload.get("parts")
+    if not isinstance(parts, list) or len(parts) < 2:
+        raise SatCertificateError("split cube-proof archive must contain at least two parts")
+    names = [part.get("file") for part in parts if isinstance(part, dict)]
+    if (
+        len(names) != len(parts)
+        or not all(isinstance(name, str) for name in names)
+        or names != sorted(names)
+    ):
+        raise SatCertificateError("cube-proof archive parts are not in canonical order")
+    digest = hashlib.sha256()
+    total_bytes = 0
+    for part in parts:
+        path, expected_hash = _resolve_artifact(root, part)
+        if ".cube-proofs.tar.xz.part-" not in path.name or path.stat().st_size >= 100_000_000:
+            raise SatCertificateError(f"unexpected cube-proof archive part: {path}")
+        part_digest = hashlib.sha256()
+        with path.open("rb") as handle:
+            for block in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(block)
+                part_digest.update(block)
+        if part_digest.hexdigest() != expected_hash:
+            raise SatCertificateError(f"SAT artifact hash mismatch: {part['file']}")
+        total_bytes += path.stat().st_size
+    if digest.hexdigest() != payload.get("sha256"):
+        raise SatCertificateError("reassembled cube-proof archive hash mismatch")
+    if total_bytes != payload.get("bytes"):
+        raise SatCertificateError("reassembled cube-proof archive size mismatch")
+    return total_bytes
+
+
+def _load_jsonl(root: Path, payload: Mapping[str, Any], label: str) -> list[Mapping[str, Any]]:
+    path = _check_hashed_file(root, payload)
+    records: list[Mapping[str, Any]] = []
+    try:
+        for line_number, line in enumerate(path.read_text(encoding="ascii").splitlines(), start=1):
+            record = json.loads(line)
+            if not isinstance(record, dict):
+                raise SatCertificateError(f"{label} record is not an object: {path}:{line_number}")
+            records.append(record)
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise SatCertificateError(f"malformed {label}: {path}") from error
+    if payload.get("count") != len(records):
+        raise SatCertificateError(f"{label} count mismatch: {path}")
+    return records
+
+
+def _check_cube_proof(
+    root: Path,
+    profile: str,
+    payload: Mapping[str, Any],
+) -> tuple[int, dict[str, Any]]:
+    """Check a complete canonical cover and its hash-bound leaf proof index."""
+
+    if payload.get("format") != "row-stabilizer-cube-cover":
+        raise SatCertificateError(f"unexpected cube-cover format for {profile}")
+    catalog_payload = payload.get("catalog")
+    index_payload = payload.get("proof_index")
+    archive_payload = payload.get("archive")
+    if not all(isinstance(item, dict) for item in (catalog_payload, index_payload, archive_payload)):
+        raise SatCertificateError(f"incomplete cube-cover metadata for {profile}")
+    catalog = _load_jsonl(root, catalog_payload, "cube catalog")
+    try:
+        cover_report = verify_cube_catalog(profile, catalog)
+    except CubeCoverError as error:
+        raise SatCertificateError(f"invalid cube cover for {profile}: {error}") from error
+    index = _load_jsonl(root, index_payload, "cube proof index")
+    if len(index) != len(catalog):
+        raise SatCertificateError(f"cube proof count differs from catalog for {profile}")
+    hex_digest = re.compile(r"[0-9a-f]{64}")
+    for position, (leaf, proof) in enumerate(zip(catalog, index)):
+        expected_file = f"proofs/leaf-{position:08d}.drat"
+        if proof.get("index") != position or proof.get("masks") != leaf.get("masks"):
+            raise SatCertificateError(f"cube proof index mismatch for {profile} leaf {position}")
+        if proof.get("file") != expected_file:
+            raise SatCertificateError(f"noncanonical cube proof name for {profile} leaf {position}")
+        if (
+            not isinstance(proof.get("bytes"), int)
+            or proof["bytes"] <= 0
+            or not isinstance(proof.get("sha256"), str)
+            or hex_digest.fullmatch(proof["sha256"]) is None
+            or proof.get("status") != "VERIFIED"
+            or proof.get("replay")
+            != "drat-trim -> LRAT -> lrat-check; projected DRAT -> drat-trim"
+        ):
+            raise SatCertificateError(f"invalid cube proof record for {profile} leaf {position}")
+    archive_bytes = _check_cube_archive(root, archive_payload)
+    return archive_bytes, cover_report
+
+
 def verify_z10_23_sat_manifest(manifest: Mapping[str, Any], root: Path) -> dict[str, Any]:
     """Check an untrusted manifest against arithmetic scope and file contents."""
 
@@ -178,18 +282,27 @@ def verify_z10_23_sat_manifest(manifest: Mapping[str, Any], root: Path) -> dict[
         raise SatCertificateError("SAT manifest profile scope differs from arithmetic reduction")
 
     total_compressed_bytes = 0
+    direct_profiles = 0
+    cube_profiles = 0
+    cube_leaves = 0
     for case in cases:
         profile = case["profile"]
-        if case.get("strategy") != "direct_cadical":
-            raise SatCertificateError(f"non-direct SAT strategy for {profile}")
-
         formula_payload = case.get("formula")
         proof_payload = case.get("proof")
         if not isinstance(formula_payload, dict) or not isinstance(proof_payload, dict):
             raise SatCertificateError(f"incomplete SAT artifact metadata: {profile}")
         formula_path = _check_hashed_file(root, formula_payload)
         _check_dimacs(formula_path, formula_payload)
-        proof_bytes = _check_proof_artifact(root, proof_payload)
+        strategy = case.get("strategy")
+        if strategy == "direct_cadical":
+            proof_bytes = _check_proof_artifact(root, proof_payload)
+            direct_profiles += 1
+        elif strategy == "row_stabilizer_cube_cover":
+            proof_bytes, cover_report = _check_cube_proof(root, profile, proof_payload)
+            cube_profiles += 1
+            cube_leaves += cover_report["leaf_count"]
+        else:
+            raise SatCertificateError(f"unexpected SAT strategy for {profile}")
         if case.get("replay") != {
             "checker": "drat-trim -> LRAT -> lrat-check",
             "status": "VERIFIED",
@@ -203,7 +316,9 @@ def verify_z10_23_sat_manifest(manifest: Mapping[str, Any], root: Path) -> dict[
         "arithmetic_profiles": arithmetic["profile_count"],
         "arithmetic_eliminations": arithmetic["profile_count"] - len(cases),
         "sat_profiles": len(cases),
-        "direct_profiles": len(cases),
+        "direct_profiles": direct_profiles,
+        "cube_cover_profiles": cube_profiles,
+        "cube_leaves": cube_leaves,
         "compressed_proof_bytes": total_compressed_bytes,
     }
 

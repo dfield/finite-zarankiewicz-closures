@@ -15,17 +15,18 @@ The original sweep retained no DIMACS files or proof traces and was correctly tr
 1. a standard-library enumeration of all 25 capacity-feasible degree profiles at 113 ones;
 2. transparent deletion or deficit contradictions for twelve profiles;
 3. one deterministic CNF for each of the remaining thirteen profiles;
-4. a compressed DRAT core for every CNF; and
-5. a recorded successful `drat-trim` replay and independent `lrat-check` replay for every core.
+4. direct compressed DRAT cores for ten CNFs and complete canonical-prefix covers for the other three; and
+5. a recorded successful `drat-trim` replay and independent `lrat-check` replay for every direct core and every cover leaf.
 
-Every stored trace comes from a direct run on its unsplit base CNF and is then checked against that same file. Deterministic row-stabilizer cubes remain available as a non-load-bearing search aid; an incremental cube `UNSAT` line or raw trace is not accepted as a theorem certificate.
+Every direct trace is checked against its unsplit base CNF. For each cover leaf, the checker appends exactly the catalogued cell literals as unit clauses to that same base file, checks the leaf's DRAT core, derives LRAT, and checks the LRAT independently. A standard-library trie verifier recomputes every canonical child at every split, proving that the leaves are prefix-free and exhaustive. An incremental cube `UNSAT` line or untraced search state is not accepted as a theorem certificate.
 
 ## Review paths
 
 - [`PROOF_Z10_23.md`](PROOF_Z10_23.md) gives the complete mathematical reduction and formula semantics.
 - [`z10_23_sat.json`](../certificates/z10_23_sat.json) binds every formula and compressed proof by SHA-256.
 - [`z10_23_certify.py`](../search/z10_23_certify.py) regenerates the formulas and proof-production workflow.
-- [`replay_z10_23_certificates.py`](../scripts/replay_z10_23_certificates.py) decompresses all thirteen DRAT cores, converts them to LRAT, and semantically checks both stages.
+- [`z10_23_cube_certify.py`](../search/z10_23_cube_certify.py) rechecks a cover and independently produces and replays every leaf core.
+- [`replay_z10_23_certificates.py`](../scripts/replay_z10_23_certificates.py) decompresses the ten direct cores and three cover archives, converts every core to LRAT, and semantically checks both stages.
 - [`sat_cross_check.json`](../analysis/sat_cross_check.json) preserves the status of the original untraced session as historical corroboration and points to its certified replacement.
 
 The completed value also gives

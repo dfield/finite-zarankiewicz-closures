@@ -10,7 +10,7 @@
     "traced_profiles": 13,
     "witness": "data/z10_23_112_matrix.csv"
   },
-  "description": "The unlogged 2026-07-05 SAT sweep was a useful discovery record but was not proof. It has been superseded by deterministic profile CNFs and compressed DRAT cores replayed through independent LRAT checking for every surviving 113-one profile.",
+  "description": "The unlogged 2026-07-05 SAT sweep was a useful discovery record but was not proof. It has been superseded by deterministic profile CNFs and compressed direct or complete-cover DRAT cores replayed through independent LRAT checking for every surviving 113-one profile.",
   "evidence_status": "SUPERSEDED_BY_REPLAYABLE_CERTIFICATE",
   "historical_untraced_session": {
     "date": "2026-07-05",

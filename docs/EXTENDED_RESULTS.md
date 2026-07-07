@@ -152,7 +152,7 @@ All four profiles are impossible. Therefore 111 ones cannot occur, and the 110-o
 
 ## 4. The traced value $Z(10,23,3,3)=112$
 
-At 113 ones, row-triple capacity leaves exactly 25 column-degree profiles. Low-degree deletion eliminates nine, and row/pair-deficit residues eliminate three more. The remaining thirteen profiles are translated to deterministic CNFs. Every CNF has a direct, checked, compressed DRAT core of the unsplit base formula, and every core is converted to independently checked LRAT. Optional row-stabilizer cube searches are non-load-bearing. The explicit matrix [`z10_23_112_matrix.csv`](../data/z10_23_112_matrix.csv) supplies the lower bound.
+At 113 ones, row-triple capacity leaves exactly 25 column-degree profiles. Low-degree deletion eliminates nine, and row/pair-deficit residues eliminate three more. The remaining thirteen profiles are translated to deterministic CNFs. Ten have direct checked DRAT cores of the unsplit base formula. The three hardest have complete canonical-prefix covers: a pure-Python trie checker proves coverage, and every leaf has a DRAT core converted to independently checked LRAT. The explicit matrix [`z10_23_112_matrix.csv`](../data/z10_23_112_matrix.csv) supplies the lower bound.
 
 The complete reduction, formula semantics, symmetry argument, and trust boundary are in [`PROOF_Z10_23.md`](PROOF_Z10_23.md). [`z10_23_sat.json`](../certificates/z10_23_sat.json) binds all formula and proof hashes, and `scripts/replay_z10_23_certificates.py` independently replays every DRAT core through LRAT checking.
 

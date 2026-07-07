@@ -15,7 +15,7 @@ $$
 
 Here $Z(m,n,3,3)$ is the largest number of ones in an $m\times n$ zero-one matrix with no all-one $3\times3$ submatrix. Each equality comes with an explicit extremal matrix and a reproducible upper-bound certificate.
 
-The eight upper bounds use complementary mechanisms: a marked-row deficit argument for $(9,23)$; vertex-deletion bounds for $(10,21)$, $(11,19)$, $(11,20)$, and $(11,23)$; an exhaustive pair-deficit certificate for $(10,22)$; a profile reduction plus thirteen independently replayed SAT proof cores for $(10,23)$; and a two-stage row/pair-deficit certificate for $(12,23)$. No claimed equality rests on an opaque solver verdict.
+The eight upper bounds use complementary mechanisms: a marked-row deficit argument for $(9,23)$; vertex-deletion bounds for $(10,21)$, $(11,19)$, $(11,20)$, and $(11,23)$; an exhaustive pair-deficit certificate for $(10,22)$; a profile reduction plus ten direct proof cores and three complete proof-backed cube covers for $(10,23)$; and a two-stage row/pair-deficit certificate for $(12,23)$. Every SAT leaf is independently replayed through DRAT and LRAT checking; no claimed equality rests on an opaque solver verdict.
 
 ## Why these cases mattered
 
@@ -28,7 +28,7 @@ The 2026 table of Jay Bhan, Nicole Nobili, and Patrick Langer left these eight c
 | $Z(9,23,3,3)$ | $103\text{--}104$ | marked-row deficits exclude 104 |
 | $Z(10,21,3,3)$ | $106\text{--}108$ | deletion from $Z(9,21,3,3)=96$ gives the matching upper bound |
 | $Z(10,22,3,3)$ | $110\text{--}111$ | pair-deficit enumeration excludes 111 |
-| $Z(10,23,3,3)$ | $112\text{--}115$ | arithmetic reduction plus replay-verified DRAT/LRAT certificates excludes 113 |
+| $Z(10,23,3,3)$ | $112\text{--}115$ | arithmetic reduction plus direct and complete-cover DRAT/LRAT certificates excludes 113 |
 | $Z(11,19,3,3)$ | $102\text{--}108$ | deletion from $Z(11,18,3,3)=101$ plus a new 106-one witness |
 | $Z(11,20,3,3)$ | $111\text{--}112$ | two deletion steps from $Z(11,18,3,3)=101$ give the matching upper bound |
 | $Z(11,23,3,3)$ | $118\text{--}125$ | deletion from $Z(10,23,3,3)=112$ plus an explicit 123-one witness |
@@ -97,7 +97,7 @@ The logical role of computation differs across the eight results:
 | Human upper-bound proof | Excludes 104 ones for $(9,23)$ | [`docs/PROOF.md`](docs/PROOF.md) |
 | Deletion arguments | Give matching upper bounds for $(10,21)$, $(11,19)$, $(11,20)$, and $(11,23)$ | [`docs/PROOF_Z10_21.md`](docs/PROOF_Z10_21.md), [`docs/PROOF_Z11_19.md`](docs/PROOF_Z11_19.md), [`docs/PROOF_Z11_20.md`](docs/PROOF_Z11_20.md), [`docs/PROOF_Z11_23.md`](docs/PROOF_Z11_23.md) |
 | Computer-assisted finite proof | Exhaustively excludes the four possible 111-one degree profiles for $(10,22)$ | [`docs/PROOF_Z10_22.md`](docs/PROOF_Z10_22.md), [`src/finite_zarankiewicz_closures/extended.py`](src/finite_zarankiewicz_closures/extended.py) |
-| Traced SAT proof | Reduces 113 ones for $(10,23)$ to thirteen deterministic CNFs and replays every DRAT core through independent LRAT checking | [`docs/PROOF_Z10_23.md`](docs/PROOF_Z10_23.md), [`certificates/z10_23_sat.json`](certificates/z10_23_sat.json) |
+| Traced SAT proof | Reduces 113 ones for $(10,23)$ to thirteen deterministic CNFs; checks ten directly and three by complete canonical cube covers, replaying every DRAT core through independent LRAT checking | [`docs/PROOF_Z10_23.md`](docs/PROOF_Z10_23.md), [`certificates/z10_23_sat.json`](certificates/z10_23_sat.json) |
 | Two-stage deficit proof | Excludes 136 and all five 135-one profiles for $(12,23)$ | [`docs/PROOF_Z12_23.md`](docs/PROOF_Z12_23.md), [`src/finite_zarankiewicz_closures/extended.py`](src/finite_zarankiewicz_closures/extended.py) |
 | Further frontier bound | Proves $Z(13,23,3,3)\le144$ without claiming equality | [`docs/BOUND_Z13_23.md`](docs/BOUND_Z13_23.md) |
 | Explicit constructions | Supply all eight matching lower bounds | [`data/`](data/) |
@@ -112,7 +112,7 @@ Four boundaries are important:
 
 - The $(9,23)$ upper bound is entirely human-readable; its computation is corroborating rather than logically necessary.
 - The $(10,22)$ and $(12,23)$ upper bounds are computer-assisted: their finite standard-library enumerations are proof components. Lean checks the resulting classifications and numerical minima but does not rerun those enumerations.
-- The $(10,23)$ upper bound is computer-assisted and proof-producing. The checked-in DRAT cores certify the thirteen stored CNFs and are converted to LRAT for independent checking; the human proof and standard-library checker establish the exhaustive arithmetic split and the meaning of those formulas.
+- The $(10,23)$ upper bound is computer-assisted and proof-producing. Ten checked-in DRAT cores certify unsplit CNFs; three complete prefix-cover archives certify the remaining CNFs leaf by leaf. Every core is converted to LRAT for independent checking, while the human proof and standard-library checker establish the arithmetic split, formula semantics, and cover completeness.
 - The Lean development formalizes arithmetic kernels, not the Boolean-matrix reductions, witness CSVs, deletion lemma, combinatorial double counts, or SAT proof checkers.
 
 ## Quick verification
@@ -164,7 +164,7 @@ python3 scripts/replay_certificates.py
 python3 scripts/replay_z10_23_certificates.py
 ```
 
-The last command expands all thirteen $Z(10,23)$ DRAT cores, converts each to LRAT, and independently checks the derived LRAT. It is intentionally much heavier than the core gate. The versions used for the recorded audit were CaDiCaL 3.0.0 and GLPK 5.0. Because the DRAT and LRAT binaries do not expose stable semantic version strings, the certificate manifest pins their source commit as well as the CaDiCaL source commit.
+The last command expands the ten direct $Z(10,23)$ cores and every leaf core in the three complete cube-cover archives, converts each to LRAT, and independently checks the derived LRAT. It is intentionally much heavier than the core gate; `--workers N` parallelizes leaf replay. The versions used for the recorded audit were CaDiCaL 3.0.0 and GLPK 5.0. Because the DRAT and LRAT binaries do not expose stable semantic version strings, the certificate manifest pins their source commit as well as the CaDiCaL source commit.
 
 ## What each computational artifact means
 

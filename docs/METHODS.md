@@ -7,7 +7,7 @@ The repository contains five kinds of upper-bound argument, with different trust
 - the $(9,23)$ marked-row proof in [`PROOF.md`](PROOF.md) is human-readable and does not logically require computation;
 - the $(10,21)$, $(11,19)$, $(11,20)$, and $(11,23)$ proofs are elementary applications of vertex deletion;
 - the $(10,22)$ proof includes an exhaustive standard-library enumeration of two finite residue cases; and
-- the $(10,23)$ proof combines an arithmetic profile reduction with thirteen DRAT cores replayed through independent LRAT checking; and
+- the $(10,23)$ proof combines an arithmetic profile reduction with ten direct DRAT cores and three complete leaf-proof families replayed through independent LRAT checking; and
 - the $(12,23)$ proof combines a forced-profile pair count with a five-profile row/pair-deficit certificate. The same machinery gives $Z(13,23)\le144$.
 
 The remaining computational methods have narrower corroborating or reproducibility roles:
@@ -147,7 +147,9 @@ Both DRAT and LRAT traces are stored for each CNF. `drat-trim` and `lrat-check` 
 
 The $(10,23)$ proof uses a separate, profile-specific encoding at 113 ones. Column degrees are fixed by profile. For every row triple and column, an auxiliary variable is forced true when that column contains the triple; a sequential counter allows at most two such columns. Rows and equal-degree columns are put in double-lex order, and every row has degree at least ten because deleting a row and retaining 104 ones would contradict $Z(9,23)=103$.
 
-The arithmetic front end leaves thirteen formulas. Each is refuted by a direct CaDiCaL run on the unsplit base CNF. `drat-trim` converts that solver proof to LRAT, `lrat-check` checks the LRAT against the same stored CNF and projects it to a compact DRAT core, and `drat-trim` verifies the stored core. The repository replay converts the core back to LRAT and runs `lrat-check` again. Deterministic canonical-prefix cubes are available only as an exploratory search aid and are not accepted by the certificate manifest.
+The arithmetic front end leaves thirteen formulas. Ten are refuted by a direct CaDiCaL run on the unsplit base CNF. The other three use a canonical row-stabilizer prefix trie: the standard-library checker recomputes every allowed child support at every nonleaf, while every leaf is the base CNF plus its fixed cell literals and has its own checked refutation. This makes the cover an exhaustive partition rather than a search heuristic.
+
+For every direct or leaf trace, `drat-trim` converts the solver proof to LRAT, `lrat-check` checks the LRAT against the exact formula and projects it to a compact DRAT core, and `drat-trim` verifies the stored core. The repository replay converts each stored core back to LRAT and runs `lrat-check` again. The certificate manifest accepts a cover only when its catalog is prefix-free and complete, its proof index matches every leaf exactly, and its archive is hash-bound.
 
 [`certificates/z10_23_sat.json`](../certificates/z10_23_sat.json) records formula and proof hashes. [`scripts/replay_z10_23_certificates.py`](../scripts/replay_z10_23_certificates.py) performs the heavyweight semantic replay. The ordinary case-certificate gate checks the complete profile scope and artifact integrity without requiring an external checker.
 
@@ -188,7 +190,7 @@ Those layers are human-readable and independently executable, but they remain ou
 |---|---|---|
 | $Z(10,21,3,3)=106$ | One row-deletion step from $Z(9,21,3,3)=96$ | Arithmetic replay only |
 | $Z(10,22,3,3)=110$ | Four-profile pair-deficit elimination | Exhaustive finite enumeration is required |
-| $Z(10,23,3,3)=112$ | Twelve arithmetic eliminations plus thirteen profile CNFs | Independent DRAT-to-LRAT replay is required |
+| $Z(10,23,3,3)=112$ | Twelve arithmetic eliminations plus thirteen profile CNFs: ten direct, three complete covers | Independent DRAT-to-LRAT replay is required for every core |
 | $Z(11,19,3,3)=106$ | One column-deletion step from $Z(11,18,3,3)=101$ | Arithmetic replay only |
 | $Z(11,20,3,3)=111$ | Two column-deletion steps from $Z(11,18,3,3)=101$ | Arithmetic replay only |
 | $Z(11,23,3,3)=123$ | One row-deletion step from $Z(10,23,3,3)=112$ | Arithmetic replay only |

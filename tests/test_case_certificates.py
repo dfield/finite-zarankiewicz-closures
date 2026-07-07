@@ -36,7 +36,7 @@ class CaseCertificateTests(unittest.TestCase):
         with self.assertRaises(SatCertificateError):
             verify_z10_23_sat_manifest(commit_mutation, ROOT)
         strategy_mutation = copy.deepcopy(manifest)
-        strategy_mutation["profiles"][0]["strategy"] = "row_stabilizer_cubes"
+        strategy_mutation["profiles"][0]["strategy"] = "unrecorded"
         with self.assertRaises(SatCertificateError):
             verify_z10_23_sat_manifest(strategy_mutation, ROOT)
         chunk_mutation = copy.deepcopy(manifest)
@@ -53,6 +53,24 @@ class CaseCertificateTests(unittest.TestCase):
         split_case["proof"]["parts"][0]["sha256"] = "0" * 64
         with self.assertRaises(SatCertificateError):
             verify_z10_23_sat_manifest(chunk_hash_mutation, ROOT)
+        cube_count_mutation = copy.deepcopy(manifest)
+        cube_case = next(
+            case
+            for case in cube_count_mutation["profiles"]
+            if case["strategy"] == "row_stabilizer_cube_cover"
+        )
+        cube_case["proof"]["catalog"]["count"] -= 1
+        with self.assertRaises(SatCertificateError):
+            verify_z10_23_sat_manifest(cube_count_mutation, ROOT)
+        cube_index_mutation = copy.deepcopy(manifest)
+        cube_case = next(
+            case
+            for case in cube_index_mutation["profiles"]
+            if case["strategy"] == "row_stabilizer_cube_cover"
+        )
+        cube_case["proof"]["proof_index"]["sha256"] = "0" * 64
+        with self.assertRaises(SatCertificateError):
+            verify_z10_23_sat_manifest(cube_index_mutation, ROOT)
 
     def test_all_stored_certificates_pass(self) -> None:
         for case in CASE_SPECS:
