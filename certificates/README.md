@@ -39,6 +39,11 @@ python3 scripts/replay_certificates.py
 
 [`z10_23_sat.json`](z10_23_sat.json) binds the thirteen profile CNFs and every compressed DRAT core. These proofs certify the stored profile formulas, not the generic cell CNF. The replay script checks each core with `drat-trim`, converts it to LRAT, and checks the derived trace with `lrat-check`.
 
+Ten formulas are refuted directly. The other three use complete fixed
+depth-four row-stabilizer frontiers of 1,479, 773, and 773 leaves. Catalog
+generation performs no SAT search; every leaf has its own independently
+checked proof core.
+
 Compressed traces larger than GitHub's 100 MB single-file limit are stored as
 ordered 95,000,000-byte parts. The manifest binds every part and the SHA-256
 and byte length of each exact concatenation. The replay script reassembles each

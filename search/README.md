@@ -15,7 +15,7 @@ witness matrix is checked by exhaustive scan.
 | `filters.py` | the general row/pair deficit profile filter behind the two new upper-bound theorems | Python 3.9+ |
 | `sat_tool.py` | per-profile SAT feasibility (sequential-counter cardinalities, double-lex symmetry breaking) | `pip install python-sat` |
 | `tier2.py` | configuration-level residue filter (found the five profile kills behind the $Z(12,23,3,3)\le134$ theorem) | Python 3.9+ |
-| `z10_23_certify.py` | deterministic profile CNFs, optional row-stabilizer search cubes, and direct checked compressed DRAT cores for $Z(10,23,3,3)=112$ | `python-sat`, CaDiCaL, `drat-trim`, `lrat-check` |
+| `z10_23_certify.py` | deterministic profile CNFs, complete fixed row-stabilizer frontiers, optional adaptive search cubes, and direct checked compressed DRAT cores for $Z(10,23,3,3)=112$ | `python-sat`, CaDiCaL, `drat-trim`, `lrat-check` |
 | `lp_dgh.py` | exact-rational Davies--Gill--Horsley LP, reproduces their published table | Python 3.9+ |
 
 Build the annealers with:
@@ -50,13 +50,20 @@ drat-trim profile.cnf profile.drat
 ```
 
 For the completed case, list the exact SAT scope, regenerate a direct proof,
-or generate an optional deterministic cube partition for search experiments:
+write a fixed proof frontier, or generate an adaptive cube partition for
+search experiments:
 
 ```sh
 python3 z10_23_certify.py list
 python3 z10_23_certify.py direct '4x4,5x18,7x1' --output build/z10_23
+python3 z10_23_certify.py frontier '3x1,4x2,5x18,6x2' \
+  --depth 4 --output build/z10_23
 python3 z10_23_certify.py cubes '4x2,5x21' --output build/z10_23
 ```
+
+The fixed frontier command performs no SAT search. Its catalog becomes proof
+only when `z10_23_cube_certify.py` independently refutes every leaf and the
+standard-library trie checker confirms completeness.
 
 Proof conversion, hashing, and compression stream their large intermediate
 files. Compressed streams at or above GitHub's 100 MB single-file limit are

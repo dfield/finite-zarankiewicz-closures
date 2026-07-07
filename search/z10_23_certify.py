@@ -12,6 +12,8 @@ checked-in formulas and traces do not.
 
 Typical use for one profile::
 
+    python3 search/z10_23_certify.py frontier '3x1,4x2,5x18,6x2' \
+      --depth 4 --output build/z10_23
     python3 search/z10_23_certify.py cubes '4x2,5x21' --output build/z10_23
     python3 search/z10_23_certify.py direct '4x2,5x21' --output build/z10_23
     python3 search/z10_23_cube_certify.py '4x2,5x21' \
@@ -188,6 +190,90 @@ def _sha256(path: Path) -> str:
         for block in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(block)
     return digest.hexdigest()
+
+
+def generate_frontier(
+    profile: str,
+    output: Path,
+    depth: int = 4,
+) -> dict[str, object]:
+    """Generate a complete fixed-depth canonical prefix cover.
+
+    The catalog deliberately makes no SAT claim.  Every nonterminal prefix is
+    marked ``proof_required`` and becomes a theorem certificate only after
+    ``z10_23_cube_certify.py`` independently refutes it.  Prefixes with no
+    canonical child are retained as earlier terminal leaves and are refuted by
+    the same proof-producing path.
+    """
+
+    canonical = canonical_profile(profile)
+    if canonical not in SAT_PROFILES:
+        raise ValueError(f"profile is not in the thirteen-case SAT scope: {canonical}")
+    if not 1 <= depth <= COLUMNS:
+        raise ValueError("frontier depth must lie between one and 23")
+    output.mkdir(parents=True, exist_ok=True)
+    slug = profile_slug(canonical)
+    formula_path = output / f"{slug}.cnf"
+    cubes_path = output / f"{slug}.cubes.jsonl"
+    metadata_path = output / f"{slug}.json"
+
+    cnf, _, degrees = build_profile_formula(canonical)
+    cnf.to_file(str(formula_path))
+    frontier: list[tuple[list[set[int]], Optional[str]]] = [
+        ([{row for row in range(degrees[0])}], None)
+    ]
+    while any(reason is None and len(prefix) < depth for prefix, reason in frontier):
+        expanded: list[tuple[list[set[int]], Optional[str]]] = []
+        for prefix, reason in frontier:
+            if reason is not None or len(prefix) >= depth:
+                expanded.append((prefix, reason))
+                continue
+            children = child_supports(prefix, degrees)
+            if children:
+                expanded.extend((prefix + [support], None) for support in children)
+            else:
+                expanded.append((prefix, "no_canonical_child"))
+        frontier = expanded
+
+    depth_counts: collections.Counter[int] = collections.Counter()
+    with cubes_path.open("w", encoding="ascii") as cube_file:
+        for prefix, reason in frontier:
+            depth_counts[len(prefix)] += 1
+            cube_file.write(
+                json.dumps(
+                    {
+                        "masks": _support_masks(prefix),
+                        "reason": reason or "proof_required",
+                    },
+                    separators=(",", ":"),
+                    sort_keys=True,
+                )
+                + "\n"
+            )
+
+    metadata = {
+        "schema_version": 1,
+        "profile": canonical,
+        "column_order": degrees,
+        "formula": {
+            "file": formula_path.name,
+            "sha256": _sha256(formula_path),
+            "variables": cnf.nv,
+            "clauses": len(cnf.clauses),
+        },
+        "strategy": "fixed_row_stabilizer_frontier",
+        "cubes": {
+            "file": cubes_path.name,
+            "sha256": _sha256(cubes_path),
+            "count": len(frontier),
+            "requested_depth": depth,
+            "depth_counts": {
+                str(level): depth_counts[level] for level in sorted(depth_counts)
+            },
+        },
+    }
+    metadata_path.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n")
+    return metadata
 
 
 def generate_cubes(
@@ -483,11 +569,13 @@ def main(argv: Optional[list[str]] = None) -> int:
     subparsers = parser.add_subparsers(dest="command", required=True)
     list_parser = subparsers.add_parser("list", help="list the thirteen SAT profiles")
     list_parser.set_defaults(profile=None, output=None)
-    for name in ("cubes", "direct"):
+    for name in ("frontier", "cubes", "direct"):
         command = subparsers.add_parser(name)
         command.add_argument("profile")
         command.add_argument("--output", type=Path, required=True)
-        if name == "cubes":
+        if name == "frontier":
+            command.add_argument("--depth", type=int, default=4)
+        elif name == "cubes":
             command.add_argument("--conflicts", type=int, default=20_000)
             command.add_argument("--maximum-depth", type=int, default=10)
             command.add_argument("--depth-factor", type=int, default=1)
@@ -500,7 +588,9 @@ def main(argv: Optional[list[str]] = None) -> int:
         print("\n".join(SAT_PROFILES))
         return 0
     args.output = args.output.resolve()
-    if args.command == "cubes":
+    if args.command == "frontier":
+        result = generate_frontier(args.profile, args.output, args.depth)
+    elif args.command == "cubes":
         result = generate_cubes(
             args.profile,
             args.output,

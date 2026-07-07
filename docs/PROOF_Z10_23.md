@@ -174,7 +174,12 @@ $$
 3^1 4^4 5^{14}6^4
 $$
 
-use complete row-stabilizer covers. Once a prefix of columns is fixed, rows
+use complete row-stabilizer covers. Each stored cover is the fixed canonical
+depth-four frontier: it has 1,479 leaves for $3^1 4^2 5^{18}6^2$ and 773
+leaves for each of the other two profiles. Catalog generation performs no SAT
+search; every leaf is independently refuted by the proof-producing step.
+
+Once a prefix of columns is fixed, rows
 with the same prefix form a stabilizer cell; row lex order forces the next
 support to be an initial segment of every cell. Equal-degree column lex order
 fixes the order of consecutive supports, and supports that would place one
@@ -187,7 +192,8 @@ nonleaf prefix it recomputes the complete permitted child set and requires an
 exact match; it also rejects duplicate, overlapping, wrong-degree, and
 noncanonical leaves. Thus the leaves are a prefix-free partition of every
 possible satisfying cell assignment, not a collection of sampled search
-states. For each leaf, its cell literals are appended to the unchanged base
+states. The stored `proof_required` label makes explicit that the catalog
+alone asserts no solver result. For each leaf, its cell literals are appended to the unchanged base
 CNF as unit clauses and CaDiCaL produces a DRAT refutation.
 
 For both strategies, `drat-trim` converts the solver trace to LRAT,

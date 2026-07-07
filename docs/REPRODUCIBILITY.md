@@ -152,24 +152,20 @@ To regenerate one of the three cover families from scratch after installing
 `python-sat`, CaDiCaL, `drat-trim`, and `lrat-check`:
 
 ```sh
-python3 search/z10_23_certify.py cubes '3x1,4x2,5x18,6x2' \
-  --output build/z10_23 --conflicts 200000 --maximum-depth 10 \
-  --depth-factor 5 --escalate-after 3 --maximum-conflicts 5000000
+python3 search/z10_23_certify.py frontier '3x1,4x2,5x18,6x2' \
+  --output build/z10_23 --depth 4
 python3 search/z10_23_cube_certify.py '3x1,4x2,5x18,6x2' \
   --catalog build/z10_23/3d1_4d2_5d18_6d2.cubes.jsonl \
   --output build/z10_23 --workers 4
 ```
 
-The first command discovers a deterministic adaptive cover. The second does
-not trust its search outcomes: it recomputes trie completeness, independently
-proves every leaf, performs both replay stages, and writes the deterministic
-archive and proof index.
-
-The recorded catalogs use 200,000 conflicts at the depth-three frontier, then
-grow the budget by a factor of five and cap it at 5,000,000 conflicts. This
-closes hard internal nodes before their canonical child sets become large.
-The policy changes only cover granularity: completeness and every final leaf
-are checked independently of the exploratory budget.
+The first command performs no SAT search. It writes the complete canonical
+depth-four frontier: 1,479 prefixes for $3^1 4^2 5^{18}6^2$ and 773 prefixes
+for each of the other two cover profiles. The second command does not trust
+the catalog's leaf labels: it recomputes trie completeness, independently
+proves every prefix formula, performs both replay stages, and writes the
+deterministic archive and proof index. Thus no conflict budget, timeout, or
+incremental solver verdict is part of the certificate.
 
 External output is summarized in [`audit/model_validation.json`](../audit/model_validation.json), [`audit/certificate_replay.json`](../audit/certificate_replay.json), and [`audit/z10_23_sat_replay.json`](../audit/z10_23_sat_replay.json). Temporary paths and timing noise are intentionally not stored.
 

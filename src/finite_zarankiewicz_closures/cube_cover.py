@@ -118,7 +118,7 @@ def verify_cube_catalog(
             raise CubeCoverError(f"cube record {index} is not an object")
         masks = record.get("masks")
         reason = record.get("reason")
-        if reason not in {"solver_unsat", "no_canonical_child"}:
+        if reason not in {"proof_required", "solver_unsat", "no_canonical_child"}:
             raise CubeCoverError(f"cube record {index} has an invalid reason")
         if (
             not isinstance(masks, list)

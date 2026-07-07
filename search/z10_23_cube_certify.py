@@ -154,7 +154,9 @@ def _prove_leaf(task: tuple[int, list[int]]) -> dict[str, Any]:
         core_output = _run([_TOOLS["drat-trim"], str(formula), str(core)])
         if "VERIFIED" not in core_output:
             raise RuntimeError(f"projected DRAT did not verify leaf {index}")
-        os.replace(core, destination)
+        staged_proof = destination.with_suffix(".tmp")
+        shutil.copyfile(core, staged_proof)
+        os.replace(staged_proof, destination)
 
     record: dict[str, Any] = {
         "index": index,
@@ -241,6 +243,12 @@ def certify(profile: str, catalog_path: Path, output: Path, workers: int) -> dic
     catalog = [json.loads(line) for line in catalog_path.read_text(encoding="ascii").splitlines()]
     cover_report = verify_cube_catalog(canonical, catalog)
     tasks = [(index, leaf["masks"]) for index, leaf in enumerate(catalog)]
+    scheduled_tasks = []
+    for offset in range((len(tasks) + 1) // 2):
+        scheduled_tasks.append(tasks[offset])
+        opposite = len(tasks) - 1 - offset
+        if opposite != offset:
+            scheduled_tasks.append(tasks[opposite])
     tools = _proof_tools()
     records: dict[int, dict[str, Any]] = {}
     started = time.monotonic()
@@ -249,7 +257,7 @@ def certify(profile: str, catalog_path: Path, output: Path, workers: int) -> dic
         initializer=_initialize,
         initargs=(str(formula), str(work), tools),
     ) as pool:
-        for record in pool.imap_unordered(_prove_leaf, tasks):
+        for record in pool.imap_unordered(_prove_leaf, scheduled_tasks):
             records[int(record["index"])] = record
             if len(records) % 100 == 0 or len(records) == len(tasks):
                 print(

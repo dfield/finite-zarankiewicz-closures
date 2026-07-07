@@ -30,6 +30,18 @@ def depth_three_catalog(profile: str) -> list[dict[str, object]]:
     return [{"masks": prefix, "reason": "solver_unsat"} for prefix in prefixes]
 
 
+def fixed_frontier_catalog(profile: str, depth: int) -> list[dict[str, object]]:
+    degrees = ordered_degrees(profile)
+    prefixes = [[(1 << degrees[0]) - 1]]
+    while len(prefixes[0]) < depth:
+        prefixes = [
+            prefix + [mask]
+            for prefix in prefixes
+            for mask in child_masks(prefix, degrees)
+        ]
+    return [{"masks": prefix, "reason": "proof_required"} for prefix in prefixes]
+
+
 class CubeCoverTests(unittest.TestCase):
     def test_depth_three_frontier_is_complete(self) -> None:
         for profile in PROFILES:
@@ -45,6 +57,17 @@ class CubeCoverTests(unittest.TestCase):
         catalog = depth_three_catalog(PROFILES[0])
         with self.assertRaises(CubeCoverError):
             verify_cube_catalog(PROFILES[0], catalog[:-1])
+
+    def test_fixed_depth_four_frontiers_are_complete(self) -> None:
+        expected = (1479, 773, 773)
+        for profile, count in zip(PROFILES, expected):
+            with self.subTest(profile=profile):
+                catalog = fixed_frontier_catalog(profile, 4)
+                self.assertEqual(len(catalog), count)
+                report = verify_cube_catalog(profile, catalog)
+                self.assertEqual(report["status"], "COMPLETE")
+                self.assertEqual(report["leaf_count"], count)
+                self.assertEqual(report["depth_counts"], {"4": count})
 
     def test_wrong_degree_and_prefix_overlap_are_rejected(self) -> None:
         catalog = depth_three_catalog(PROFILES[0])
