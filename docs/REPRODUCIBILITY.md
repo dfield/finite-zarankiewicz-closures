@@ -143,10 +143,19 @@ Run:
 python3 scripts/validate_models.py
 glpsol --lp models/column_types_9x23_exact_104.lp --check
 python3 scripts/replay_certificates.py
-python3 scripts/replay_z10_23_certificates.py --output audit/z10_23_sat_replay.json
+python3 scripts/fetch_z10_23_release_assets.py --output build/z10_23_assets
+Z10_23_ASSET_DIR=build/z10_23_assets \
+  python3 scripts/replay_z10_23_certificates.py \
+    --output audit/z10_23_sat_replay.json
 ```
 
-The first command regenerates temporary small CNFs and uses seed `20260704`. The second should report 86 rows, 512 columns, 6,399 matrix nonzeros, and 512 integer variables. The third requires all six small terminal trace checks to report true. The fourth expands ten direct profile cores and every leaf core in three complete-cover archives, converts them to LRAT, checks both stages, and can take substantially longer. Pass `--workers N` to parallelize leaf replay.
+The first command regenerates temporary small CNFs and uses seed `20260704`.
+The second should report 86 rows, 512 columns, 6,399 matrix nonzeros, and 512
+integer variables. The third requires all six small terminal trace checks to
+report true. The fourth fetches and hash-checks the release assets. The fifth
+expands ten direct profile cores and every leaf core in three complete-cover
+archives, converts them to LRAT, checks both stages, and can take substantially
+longer. Pass `--workers N` to parallelize leaf replay.
 
 To regenerate one of the three cover families from scratch after installing
 `python-sat`, CaDiCaL, `drat-trim`, and `lrat-check`:
@@ -160,12 +169,15 @@ python3 search/z10_23_cube_certify.py '3x1,4x2,5x18,6x2' \
 ```
 
 The first command performs no SAT search. It writes the complete canonical
-depth-four frontier: 1,479 prefixes for $3^1 4^2 5^{18}6^2$ and 773 prefixes
-for each of the other two cover profiles. The second command does not trust
-the catalog's leaf labels: it recomputes trie completeness, independently
-proves every prefix formula, performs both replay stages, and writes the
-deterministic archive and proof index. Thus no conflict budget, timeout, or
-incremental solver verdict is part of the certificate.
+depth-four starting frontier: 1,479 prefixes for $3^1 4^2 5^{18}6^2$ and 773
+prefixes for each of the other two cover profiles. Proof production may keep
+a refuted starting prefix or replace a difficult one by a complete partition
+using selected cells of its immediate next column. The second command does
+not trust leaf labels: it expands partial leaves over all matching canonical
+supports, recomputes exact trie completeness, independently proves every
+stored leaf formula, performs both replay stages, and writes the archive and
+proof index. Thus no conflict budget, timeout, or incremental solver verdict
+is part of the certificate.
 Leaf refutations use CaDiCaL's recorded `--unsat -q -P2` options; `-P2`
 requests two initial preprocessing rounds and has no logical role because each
 resulting trace is checked independently.
@@ -192,7 +204,7 @@ The following outputs are byte-deterministic:
 - exact DGH boundary report;
 - local-kernel catalog;
 - extended finite-table report;
-- profile CNFs, ten direct compressed DRAT cores, and three complete cube-cover proof archives for $Z(10,23)$, with oversized compressed streams stored as hash-bound sub-100 MB byte chunks; and
+- profile CNFs, ten direct compressed DRAT cores, three complete cube-cover catalogs and indexes, and the hash-bound metadata for their deterministic release archives; and
 - artifact checksum file.
 
 Reports from external tools retain semantic outcomes and tool versions while omitting elapsed time, temporary directories, and machine identifiers.
@@ -208,4 +220,7 @@ make verify
 cd lean && lake build && lake env lean AxiomAudit.lean
 ```
 
-Then, if the optional tools are installed, run the four external commands above. No command requires a file outside the cloned repository.
+Then, if the optional tools are installed, run the external commands above.
+The core gate is self-contained in the clone. The heavyweight $Z(10,23)$
+semantic replay additionally downloads the release assets whose names, sizes,
+and SHA-256 digests are fixed by the checked-in sidecars and manifest.
