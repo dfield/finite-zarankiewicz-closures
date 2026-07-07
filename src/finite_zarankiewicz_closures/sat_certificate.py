@@ -24,6 +24,10 @@ class SatCertificateError(ValueError):
     """Raised when the stored SAT manifest or an artifact fails integrity checks."""
 
 
+_CUBE_RELEASE_REPOSITORY = "dfield/finite-zarankiewicz-closures"
+_CUBE_RELEASE_TAG = "z10-23-certificate-v1"
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -150,6 +154,47 @@ def _check_cube_archive(root: Path, payload: Mapping[str, Any]) -> int:
     """Check one direct or byte-split tar/xz archive of cube-leaf proofs."""
 
     proof_format = payload.get("format")
+    if proof_format == "TAR+DRAT+xz+github-release-parts":
+        release = payload.get("release")
+        parts = payload.get("parts")
+        if release != {
+            "repository": _CUBE_RELEASE_REPOSITORY,
+            "tag": _CUBE_RELEASE_TAG,
+        }:
+            raise SatCertificateError("unexpected cube-proof release location")
+        if not isinstance(parts, list) or not parts:
+            raise SatCertificateError("release-backed cube proof has no parts")
+        names = [part.get("name") for part in parts if isinstance(part, dict)]
+        if (
+            len(names) != len(parts)
+            or not all(isinstance(name, str) for name in names)
+            or names != sorted(names)
+            or any(
+                ".cube-proofs.tar.xz.part-" not in name or "/" in name or "\\" in name
+                for name in names
+            )
+        ):
+            raise SatCertificateError("release-backed cube-proof parts are not canonical")
+        hex_digest = re.compile(r"[0-9a-f]{64}")
+        total_bytes = 0
+        for part in parts:
+            size = part.get("bytes")
+            digest = part.get("sha256")
+            if (
+                not isinstance(size, int)
+                or not 0 < size < 2_000_000_000
+                or not isinstance(digest, str)
+                or hex_digest.fullmatch(digest) is None
+            ):
+                raise SatCertificateError("invalid release-backed cube-proof part")
+            total_bytes += size
+        if (
+            payload.get("bytes") != total_bytes
+            or not isinstance(payload.get("sha256"), str)
+            or hex_digest.fullmatch(payload["sha256"]) is None
+        ):
+            raise SatCertificateError("invalid release-backed cube-proof stream metadata")
+        return total_bytes
     if proof_format == "TAR+DRAT+xz":
         path = _check_hashed_file(root, payload)
         if not path.name.endswith(".cube-proofs.tar.xz") or path.stat().st_size >= 100_000_000:

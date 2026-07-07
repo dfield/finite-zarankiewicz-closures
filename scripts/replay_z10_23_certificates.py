@@ -9,6 +9,7 @@ from contextlib import contextmanager
 import hashlib
 import json
 import lzma
+import os
 import shutil
 import subprocess
 import sys
@@ -50,6 +51,61 @@ def _cube_archive(case: Mapping[str, Any]) -> Iterator[Path]:
     """Yield a direct or reassembled cube-proof tar/xz archive path."""
 
     archive = case["proof"]["archive"]
+    if archive.get("format") == "TAR+DRAT+xz+github-release-parts":
+        release = archive["release"]
+        asset_directory = os.environ.get("Z10_23_ASSET_DIR")
+        with tempfile.TemporaryDirectory(prefix="z10_23_release_assets_") as directory:
+            temporary = Path(directory)
+            combined = temporary / "cube-proofs.tar.xz"
+            digest = hashlib.sha256()
+            total_bytes = 0
+            with combined.open("wb") as output:
+                for part in archive["parts"]:
+                    if asset_directory:
+                        source = Path(asset_directory) / part["name"]
+                    else:
+                        gh = shutil.which("gh")
+                        if gh is None:
+                            raise RuntimeError(
+                                "gh is required to fetch release-backed proof archives"
+                            )
+                        completed = subprocess.run(
+                            [
+                                gh,
+                                "release",
+                                "download",
+                                release["tag"],
+                                "--repo",
+                                release["repository"],
+                                "--pattern",
+                                part["name"],
+                                "--dir",
+                                str(temporary),
+                                "--clobber",
+                            ],
+                            check=False,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT,
+                            text=True,
+                        )
+                        if completed.returncode != 0:
+                            raise RuntimeError(completed.stdout[-2000:])
+                        source = temporary / part["name"]
+                    if (
+                        not source.is_file()
+                        or source.stat().st_size != part["bytes"]
+                        or _sha256(source) != part["sha256"]
+                    ):
+                        raise ValueError(f"release asset integrity failure: {part['name']}")
+                    with source.open("rb") as handle:
+                        for block in iter(lambda: handle.read(1024 * 1024), b""):
+                            digest.update(block)
+                            output.write(block)
+                            total_bytes += len(block)
+            if total_bytes != archive["bytes"] or digest.hexdigest() != archive["sha256"]:
+                raise ValueError("reassembled release archive integrity failure")
+            yield combined
+        return
     if "file" in archive:
         yield ROOT / archive["file"]
         return

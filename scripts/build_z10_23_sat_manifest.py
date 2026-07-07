@@ -115,6 +115,12 @@ def _jsonl_metadata(path: Path) -> dict[str, object]:
 
 def _cube_archive_metadata(slug: str) -> dict[str, object]:
     directory = ROOT / "certificates" / "z10_23"
+    release_metadata = directory / f"{slug}.cube-proofs.release.json"
+    if release_metadata.is_file():
+        payload = json.loads(release_metadata.read_text(encoding="utf-8"))
+        if payload.get("format") != "TAR+DRAT+xz+github-release-parts":
+            raise ValueError(f"unexpected release archive format: {release_metadata}")
+        return payload
     archive = directory / f"{slug}.cube-proofs.tar.xz"
     parts = sorted(directory.glob(f"{slug}.cube-proofs.tar.xz.part-*"))
     if archive.is_file() == bool(parts):
