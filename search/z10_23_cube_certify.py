@@ -243,12 +243,12 @@ def certify(profile: str, catalog_path: Path, output: Path, workers: int) -> dic
     catalog = [json.loads(line) for line in catalog_path.read_text(encoding="ascii").splitlines()]
     cover_report = verify_cube_catalog(canonical, catalog)
     tasks = [(index, leaf["masks"]) for index, leaf in enumerate(catalog)]
-    scheduled_tasks = []
-    for offset in range((len(tasks) + 1) // 2):
-        scheduled_tasks.append(tasks[offset])
-        opposite = len(tasks) - 1 - offset
-        if opposite != offset:
-            scheduled_tasks.append(tasks[opposite])
+    scheduled_tasks = sorted(
+        tasks,
+        key=lambda task: hashlib.sha256(
+            ",".join(str(mask) for mask in task[1]).encode("ascii")
+        ).digest(),
+    )
     tools = _proof_tools()
     records: dict[int, dict[str, Any]] = {}
     started = time.monotonic()
