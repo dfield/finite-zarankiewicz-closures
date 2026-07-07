@@ -166,6 +166,9 @@ the catalog's leaf labels: it recomputes trie completeness, independently
 proves every prefix formula, performs both replay stages, and writes the
 deterministic archive and proof index. Thus no conflict budget, timeout, or
 incremental solver verdict is part of the certificate.
+Leaf refutations use CaDiCaL's recorded `--unsat -q -P2` options; `-P2`
+requests two initial preprocessing rounds and has no logical role because each
+resulting trace is checked independently.
 
 External output is summarized in [`audit/model_validation.json`](../audit/model_validation.json), [`audit/certificate_replay.json`](../audit/certificate_replay.json), and [`audit/z10_23_sat_replay.json`](../audit/z10_23_sat_replay.json). Temporary paths and timing noise are intentionally not stored.
 

@@ -202,6 +202,9 @@ and `drat-trim` independently verifies the projected core. The compact cores
 are the checked-in artifacts. Consequently, the three cover proofs rely on
 both independently checked leaf refutations and the deterministic trie
 completeness check; no incremental solver status is accepted as evidence.
+The leaf producer records CaDiCaL options `--unsat -q -P2`; the preprocessing
+choice affects runtime only, since the resulting proof is replayed from the
+stored leaf formula.
 
 The certificate manifest records each formula hash, profile order, compressed
 proof hash, solver version, and successful DRAT-to-LRAT replay. For a cover it

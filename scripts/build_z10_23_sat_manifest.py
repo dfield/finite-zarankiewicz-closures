@@ -206,6 +206,7 @@ def render() -> str:
             "cnf_generator": "python-sat 1.9.dev2",
             "solver": "CaDiCaL 3.0.0",
             "solver_commit": "7b99c07f0bcab5824a5a3ce62c7066554017f641",
+            "cube_solver_options": ["--unsat", "-q", "-P2"],
             "proof_converter": "drat-trim",
             "proof_projection": "lrat-check DRAT output",
             "proof_checker": "drat-trim + lrat-check",

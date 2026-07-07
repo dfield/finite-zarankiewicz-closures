@@ -140,7 +140,10 @@ def _prove_leaf(task: tuple[int, list[int]]) -> dict[str, Any]:
             handle.write(_BASE_BODY)
             for literal in units:
                 handle.write(f"{literal} 0\n".encode())
-        _run([_TOOLS["cadical"], "--unsat", "-q", str(formula), str(raw)], (0, 20))
+        _run(
+            [_TOOLS["cadical"], "--unsat", "-q", "-P2", str(formula), str(raw)],
+            (0, 20),
+        )
         drat_output = _run(
             [_TOOLS["drat-trim"], str(formula), str(raw), "-L", str(lrat)]
         )
@@ -309,6 +312,7 @@ def certify(profile: str, catalog_path: Path, output: Path, workers: int) -> dic
         },
         "toolchain": {
             "cadical_version": _run([tools["cadical"], "--version"]).strip(),
+            "cadical_options": ["--unsat", "-q", "-P2"],
             "proof_converter": "drat-trim",
             "proof_checker": "lrat-check + drat-trim",
         },
