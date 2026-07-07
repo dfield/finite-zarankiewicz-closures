@@ -16,6 +16,8 @@ witness matrix is checked by exhaustive scan.
 | `sat_tool.py` | per-profile SAT feasibility (sequential-counter cardinalities, double-lex symmetry breaking) | `pip install python-sat` |
 | `tier2.py` | configuration-level residue filter (found the five profile kills behind the $Z(12,23,3,3)\le134$ theorem) | Python 3.9+ |
 | `z10_23_certify.py` | deterministic profile CNFs, complete fixed row-stabilizer frontiers, optional adaptive search cubes, and direct checked compressed DRAT cores for $Z(10,23,3,3)=112$ | `python-sat`, CaDiCaL, `drat-trim`, `lrat-check` |
+| `z10_23_cube_certify.py` | completeness checking plus proof production and independent replay for full or partially fixed canonical cube leaves | CaDiCaL, `drat-trim`, `lrat-check` |
+| `z10_23_cube_finalize.py` | deterministic validation and indexing of a proof family produced in distributed shards | CaDiCaL |
 | `lp_dgh.py` | exact-rational Davies--Gill--Horsley LP, reproduces their published table | Python 3.9+ |
 
 Build the annealers with:
@@ -62,13 +64,19 @@ python3 z10_23_certify.py cubes '4x2,5x21' --output build/z10_23
 ```
 
 The fixed frontier command performs no SAT search. Its catalog becomes proof
-only when `z10_23_cube_certify.py` independently refutes every leaf and the
-standard-library trie checker confirms completeness.
+only when `z10_23_cube_certify.py` independently refutes every retained leaf
+and the standard-library trie checker confirms completeness. A difficult
+frontier leaf may be replaced by partial assignments in its immediate next
+column. The checker expands each such partial leaf over every matching
+canonical support and still requires an exact, prefix-free partition, so this
+adaptive refinement changes proof granularity without trusting a solver
+verdict for coverage.
 
 Proof conversion, hashing, and compression stream their large intermediate
-files. Compressed streams at or above GitHub's 100 MB single-file limit are
-automatically written as ordered 95,000,000-byte parts; concatenating the parts
-recovers the exact XZ stream recorded by the metadata hash. If a completed
+files. Direct traces at or above GitHub's 100 MB repository-file limit are
+written as ordered 95,000,000-byte parts. The much larger cube-proof archives
+are stored as release assets; small checked-in sidecars bind every asset part,
+its exact concatenation, and the deterministic PAX-tar/XZ settings. If a completed
 CaDiCaL run left a raw trace after an interrupted parent process, pass
 `--reuse-raw` to `direct` to validate and convert that trace without solving
 the profile again. Incremental assumption runs over a cube catalog are useful

@@ -169,7 +169,7 @@ Ten profiles have a direct CaDiCaL refutation of the unsplit base CNF. The
 three profiles
 
 $$
-3^1 4^2 5^{18}6^2,qquad
+3^1 4^2 5^{18}6^2,\qquad
 3^1 4^3 5^{16}6^3,qquad
 3^1 4^4 5^{14}6^4
 $$

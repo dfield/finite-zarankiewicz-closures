@@ -161,10 +161,19 @@ If CaDiCaL, GLPK, `drat-trim`, and `lrat-check` are installed:
 python3 scripts/validate_models.py
 glpsol --lp models/column_types_9x23_exact_104.lp --check
 python3 scripts/replay_certificates.py
-python3 scripts/replay_z10_23_certificates.py
+python3 scripts/fetch_z10_23_release_assets.py --output build/z10_23_assets
+Z10_23_ASSET_DIR=build/z10_23_assets \
+  python3 scripts/replay_z10_23_certificates.py
 ```
 
-The last command expands the ten direct $Z(10,23)$ cores and every leaf core in the three complete cube-cover archives, converts each to LRAT, and independently checks the derived LRAT. It is intentionally much heavier than the core gate; `--workers N` parallelizes leaf replay. The versions used for the recorded audit were CaDiCaL 3.0.0 and GLPK 5.0. Because the DRAT and LRAT binaries do not expose stable semantic version strings, the certificate manifest pins their source commit as well as the CaDiCaL source commit.
+The fetch command downloads and hash-checks the release-backed cube archives.
+The last command expands the ten direct $Z(10,23)$ cores and every leaf core
+in the three complete cube-cover archives, converts each to LRAT, and
+independently checks the derived LRAT. It is intentionally much heavier than
+the core gate; `--workers N` parallelizes leaf replay. The versions used for
+the recorded audit were CaDiCaL 3.0.0 and GLPK 5.0. Because the DRAT and LRAT
+binaries do not expose stable semantic version strings, the certificate
+manifest pins their source commit as well as the CaDiCaL source commit.
 
 ## What each computational artifact means
 
