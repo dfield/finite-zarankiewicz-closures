@@ -153,7 +153,8 @@ To regenerate one of the three cover families from scratch after installing
 
 ```sh
 python3 search/z10_23_certify.py cubes '3x1,4x2,5x18,6x2' \
-  --output build/z10_23 --conflicts 200000 --maximum-depth 10
+  --output build/z10_23 --conflicts 200000 --maximum-depth 10 \
+  --depth-factor 5 --escalate-after 3 --maximum-conflicts 5000000
 python3 search/z10_23_cube_certify.py '3x1,4x2,5x18,6x2' \
   --catalog build/z10_23/3d1_4d2_5d18_6d2.cubes.jsonl \
   --output build/z10_23 --workers 4
@@ -164,11 +165,11 @@ not trust its search outcomes: it recomputes trie completeness, independently
 proves every leaf, performs both replay stages, and writes the deterministic
 archive and proof index.
 
-For the two profiles with three or four degree-four columns, the recorded
-catalog generation additionally used `--depth-factor 5 --escalate-after 5`:
-the budget is 200,000 conflicts through depth five, then grows by a factor of
-five at each deeper split. This changes only cover granularity. Completeness
-and every final leaf are checked independently of the exploratory budget.
+The recorded catalogs use 200,000 conflicts at the depth-three frontier, then
+grow the budget by a factor of five and cap it at 5,000,000 conflicts. This
+closes hard internal nodes before their canonical child sets become large.
+The policy changes only cover granularity: completeness and every final leaf
+are checked independently of the exploratory budget.
 
 External output is summarized in [`audit/model_validation.json`](../audit/model_validation.json), [`audit/certificate_replay.json`](../audit/certificate_replay.json), and [`audit/z10_23_sat_replay.json`](../audit/z10_23_sat_replay.json). Temporary paths and timing noise are intentionally not stored.
 
