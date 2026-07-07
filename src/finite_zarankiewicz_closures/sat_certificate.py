@@ -157,6 +157,11 @@ def _check_cube_archive(root: Path, payload: Mapping[str, Any]) -> int:
     if proof_format == "TAR+DRAT+xz+github-release-parts":
         release = payload.get("release")
         parts = payload.get("parts")
+        if payload.get("compression") != {
+            "archive": "deterministic PAX tar",
+            "xz_options": ["-T8", "-3"],
+        }:
+            raise SatCertificateError("unexpected cube-proof release compression")
         if release != {
             "repository": _CUBE_RELEASE_REPOSITORY,
             "tag": _CUBE_RELEASE_TAG,

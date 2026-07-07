@@ -30,7 +30,7 @@ def pack(
     slug: str,
     work: Path,
     threads: int = 8,
-    preset: str = "-6e",
+    preset: str = "-3",
     part_bytes: int = PART_BYTES,
 ) -> dict[str, object]:
     metadata = json.loads((work / "metadata.json").read_text(encoding="ascii"))
@@ -102,6 +102,10 @@ def pack(
 
     release_metadata = {
         "format": "TAR+DRAT+xz+github-release-parts",
+        "compression": {
+            "archive": "deterministic PAX tar",
+            "xz_options": [f"-T{threads}", preset],
+        },
         "release": RELEASE,
         "parts": parts,
         "bytes": total_bytes,
@@ -120,7 +124,7 @@ def main() -> int:
     parser.add_argument("slug")
     parser.add_argument("--work", type=Path, required=True)
     parser.add_argument("--threads", type=int, default=8)
-    parser.add_argument("--preset", default="-6e")
+    parser.add_argument("--preset", default="-3")
     parser.add_argument("--part-bytes", type=int, default=PART_BYTES)
     args = parser.parse_args()
     result = pack(

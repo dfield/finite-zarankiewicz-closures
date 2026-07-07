@@ -24,6 +24,10 @@ class CaseCertificateTests(unittest.TestCase):
     def test_release_backed_cube_archive_metadata_is_strict(self) -> None:
         payload = {
             "format": "TAR+DRAT+xz+github-release-parts",
+            "compression": {
+                "archive": "deterministic PAX tar",
+                "xz_options": ["-T8", "-3"],
+            },
             "release": {
                 "repository": "dfield/finite-zarankiewicz-closures",
                 "tag": "z10-23-certificate-v1",
@@ -46,6 +50,7 @@ class CaseCertificateTests(unittest.TestCase):
         self.assertEqual(_check_cube_archive(ROOT, payload), 24)
         for mutate in (
             lambda value: value["release"].__setitem__("tag", "unrecorded"),
+            lambda value: value["compression"]["xz_options"].append("unrecorded"),
             lambda value: value["parts"].reverse(),
             lambda value: value["parts"][0].__setitem__("sha256", "bad"),
             lambda value: value.__setitem__("bytes", 25),
