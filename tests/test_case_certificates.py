@@ -27,6 +27,7 @@ class CaseCertificateTests(unittest.TestCase):
             "compression": {
                 "archive": "deterministic PAX tar",
                 "xz_options": ["-T8", "-3"],
+                "xz_version": "xz (XZ Utils) 5.4.1",
             },
             "release": {
                 "repository": "dfield/finite-zarankiewicz-closures",

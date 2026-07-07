@@ -105,6 +105,13 @@ def pack(
         "compression": {
             "archive": "deterministic PAX tar",
             "xz_options": [f"-T{threads}", preset],
+            "xz_version": subprocess.run(
+                ["xz", "--version"],
+                check=True,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                text=True,
+            ).stdout.splitlines()[0],
         },
         "release": RELEASE,
         "parts": parts,

@@ -160,6 +160,7 @@ def _check_cube_archive(root: Path, payload: Mapping[str, Any]) -> int:
         if payload.get("compression") != {
             "archive": "deterministic PAX tar",
             "xz_options": ["-T8", "-3"],
+            "xz_version": "xz (XZ Utils) 5.4.1",
         }:
             raise SatCertificateError("unexpected cube-proof release compression")
         if release != {
