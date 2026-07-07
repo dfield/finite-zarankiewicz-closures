@@ -230,7 +230,11 @@ def _check_cube_proof(
     hex_digest = re.compile(r"[0-9a-f]{64}")
     for position, (leaf, proof) in enumerate(zip(catalog, index)):
         expected_file = f"proofs/leaf-{position:08d}.drat"
-        if proof.get("index") != position or proof.get("masks") != leaf.get("masks"):
+        if (
+            proof.get("index") != position
+            or proof.get("masks") != leaf.get("masks")
+            or proof.get("literals", []) != leaf.get("literals", [])
+        ):
             raise SatCertificateError(f"cube proof index mismatch for {profile} leaf {position}")
         if proof.get("file") != expected_file:
             raise SatCertificateError(f"noncanonical cube proof name for {profile} leaf {position}")

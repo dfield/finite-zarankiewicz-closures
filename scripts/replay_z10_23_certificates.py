@@ -69,7 +69,12 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _leaf_formula(base: Path, masks: list[int], destination: Path) -> None:
+def _leaf_formula(
+    base: Path,
+    masks: list[int],
+    literals: list[int],
+    destination: Path,
+) -> None:
     """Append one cube's cell literals as unit clauses to the base formula."""
 
     raw = base.read_bytes()
@@ -84,7 +89,7 @@ def _leaf_formula(base: Path, masks: list[int], destination: Path) -> None:
         else -(row * 23 + column + 1)
         for column, mask in enumerate(masks)
         for row in range(10)
-    ]
+    ] + literals
     with destination.open("wb") as handle:
         handle.write(f"p cnf {variables} {clauses + len(units)}\n".encode())
         handle.write(body)
@@ -96,13 +101,14 @@ def _replay_cube_leaf(
     formula: Path,
     proof: Path,
     masks: list[int],
+    literals: list[int],
     drat_trim: str,
     lrat_check: str,
 ) -> tuple[bool, str]:
     with tempfile.TemporaryDirectory(prefix="z10_23_cube_leaf_") as directory:
         leaf_formula = Path(directory) / "leaf.cnf"
         derived_lrat = Path(directory) / "leaf.lrat"
-        _leaf_formula(formula, masks, leaf_formula)
+        _leaf_formula(formula, masks, literals, leaf_formula)
         drat_completed = subprocess.run(
             [drat_trim, str(leaf_formula), str(proof), "-L", str(derived_lrat)],
             cwd=ROOT,
@@ -176,6 +182,7 @@ def _replay_cube_case(
                     formula,
                     extracted / record["file"],
                     catalog[position]["masks"],
+                    catalog[position].get("literals", []),
                     drat_trim,
                     lrat_check,
                 ): position

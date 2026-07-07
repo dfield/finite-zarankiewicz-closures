@@ -42,6 +42,32 @@ def fixed_frontier_catalog(profile: str, depth: int) -> list[dict[str, object]]:
     return [{"masks": prefix, "reason": "proof_required"} for prefix in prefixes]
 
 
+def split_leaf_by_next_cell(
+    profile: str,
+    leaf: dict[str, object],
+    row: int,
+) -> list[dict[str, object]]:
+    masks = leaf["masks"]
+    assert isinstance(masks, list)
+    column = len(masks)
+    variable = row * 23 + column + 1
+    degrees = ordered_degrees(profile)
+    children = child_masks(masks, degrees)
+    signs = [
+        sign
+        for sign in (1, -1)
+        if any(bool(mask & (1 << row)) == (sign > 0) for mask in children)
+    ]
+    return [
+        {
+            "masks": masks,
+            "literals": [sign * variable],
+            "reason": "proof_required",
+        }
+        for sign in signs
+    ]
+
+
 class CubeCoverTests(unittest.TestCase):
     def test_depth_three_frontier_is_complete(self) -> None:
         for profile in PROFILES:
@@ -82,6 +108,40 @@ class CubeCoverTests(unittest.TestCase):
         )
         with self.assertRaises(CubeCoverError):
             verify_cube_catalog(PROFILES[0], prefix_overlap)
+
+    def test_partial_next_column_split_is_complete(self) -> None:
+        catalog = depth_three_catalog(PROFILES[0])
+        replacement = split_leaf_by_next_cell(PROFILES[0], catalog[0], row=0)
+        mixed = replacement + catalog[1:]
+        report = verify_cube_catalog(PROFILES[0], mixed)
+        self.assertEqual(report["status"], "COMPLETE")
+        self.assertEqual(report["leaf_count"], len(mixed))
+        self.assertEqual(report["partial_leaf_count"], len(replacement))
+        self.assertGreaterEqual(report["canonical_leaf_count"], report["leaf_count"])
+
+    def test_missing_and_overlapping_partial_branches_are_rejected(self) -> None:
+        catalog = depth_three_catalog(PROFILES[0])
+        replacement = split_leaf_by_next_cell(PROFILES[0], catalog[0], row=0)
+        self.assertEqual(len(replacement), 2)
+        with self.assertRaises(CubeCoverError):
+            verify_cube_catalog(PROFILES[0], replacement[:1] + catalog[1:])
+        with self.assertRaises(CubeCoverError):
+            verify_cube_catalog(PROFILES[0], replacement + replacement[:1] + catalog[1:])
+
+    def test_partial_literals_must_fix_distinct_immediate_cells(self) -> None:
+        catalog = depth_three_catalog(PROFILES[0])
+        masks = catalog[0]["masks"]
+        assert isinstance(masks, list)
+        current_column = len(masks)
+        valid = current_column + 1
+        malformed = copy.deepcopy(catalog)
+        malformed[0]["literals"] = [valid, valid]
+        with self.assertRaises(CubeCoverError):
+            verify_cube_catalog(PROFILES[0], malformed)
+        malformed = copy.deepcopy(catalog)
+        malformed[0]["literals"] = [current_column]
+        with self.assertRaises(CubeCoverError):
+            verify_cube_catalog(PROFILES[0], malformed)
 
 
 if __name__ == "__main__":

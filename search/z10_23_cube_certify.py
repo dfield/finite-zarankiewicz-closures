@@ -100,20 +100,21 @@ def _run(command: list[str], accepted: tuple[int, ...] = (0,)) -> str:
     return completed.stdout
 
 
-def _units(masks: list[int]) -> list[int]:
-    return [
+def _units(masks: list[int], literals: list[int]) -> list[int]:
+    fixed_columns = [
         row * COLUMNS + column + 1
         if mask & (1 << row)
         else -(row * COLUMNS + column + 1)
         for column, mask in enumerate(masks)
         for row in range(ROWS)
     ]
+    return fixed_columns + literals
 
 
-def _prove_leaf(task: tuple[int, list[int]]) -> dict[str, Any]:
+def _prove_leaf(task: tuple[int, list[int], list[int]]) -> dict[str, Any]:
     if _BASE_HEADER is None or _PROOFS is None or _CHECKPOINTS is None:
         raise RuntimeError("proof worker was not initialized")
-    index, masks = task
+    index, masks, literals = task
     name = f"leaf-{index:08d}.drat"
     destination = _PROOFS / name
     checkpoint = _CHECKPOINTS / f"leaf-{index:08d}.json"
@@ -122,13 +123,18 @@ def _prove_leaf(task: tuple[int, list[int]]) -> dict[str, Any]:
         if (
             record.get("index") == index
             and record.get("masks") == masks
+            and record.get("literals", []) == literals
             and record.get("bytes") == destination.stat().st_size
             and record.get("sha256") == _sha256(destination)
+            and record.get("status") == "VERIFIED"
+            and record.get("solver_options") == ["--unsat", "-q", "-P2"]
+            and record.get("replay")
+            == "drat-trim -> LRAT -> lrat-check; projected DRAT -> drat-trim"
         ):
             return record
 
     variables, clauses = _BASE_HEADER
-    units = _units(masks)
+    units = _units(masks, literals)
     with tempfile.TemporaryDirectory(prefix=f"z10_23_leaf_{index:08d}_") as directory:
         temporary = Path(directory)
         formula = temporary / "leaf.cnf"
@@ -164,6 +170,7 @@ def _prove_leaf(task: tuple[int, list[int]]) -> dict[str, Any]:
     record: dict[str, Any] = {
         "index": index,
         "masks": masks,
+        "literals": literals,
         "file": f"proofs/{name}",
         "bytes": destination.stat().st_size,
         "sha256": _sha256(destination),
@@ -246,11 +253,18 @@ def certify(profile: str, catalog_path: Path, output: Path, workers: int) -> dic
     cnf.to_file(str(formula))
     catalog = [json.loads(line) for line in catalog_path.read_text(encoding="ascii").splitlines()]
     cover_report = verify_cube_catalog(canonical, catalog)
-    tasks = [(index, leaf["masks"]) for index, leaf in enumerate(catalog)]
+    tasks = [
+        (index, leaf["masks"], leaf.get("literals", []))
+        for index, leaf in enumerate(catalog)
+    ]
     scheduled_tasks = sorted(
         tasks,
         key=lambda task: hashlib.sha256(
-            ",".join(str(mask) for mask in task[1]).encode("ascii")
+            (
+                ",".join(str(mask) for mask in task[1])
+                + ";"
+                + ",".join(str(literal) for literal in task[2])
+            ).encode("ascii")
         ).digest(),
     )
     tools = _proof_tools()
