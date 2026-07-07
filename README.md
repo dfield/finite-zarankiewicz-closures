@@ -112,7 +112,7 @@ Four boundaries are important:
 
 - The $(9,23)$ upper bound is entirely human-readable; its computation is corroborating rather than logically necessary.
 - The $(10,22)$ and $(12,23)$ upper bounds are computer-assisted: their finite standard-library enumerations are proof components. Lean checks the resulting classifications and numerical minima but does not rerun those enumerations.
-- The $(10,23)$ upper bound is computer-assisted and proof-producing. Ten checked-in DRAT cores certify unsplit CNFs; three complete prefix-cover archives certify the remaining CNFs leaf by leaf. Every core is converted to LRAT for independent checking, while the human proof and standard-library checker establish the arithmetic split, formula semantics, and cover completeness.
+- The $(10,23)$ upper bound is computer-assisted and proof-producing. Ten checked-in DRAT cores certify unsplit CNFs; three complete adaptive canonical-cover archives certify the remaining CNFs leaf by leaf. Every core is converted to LRAT for independent checking, while the human proof and standard-library checker establish the arithmetic split, formula semantics, and cover completeness. The large cover archives are GitHub release assets whose names, sizes, and SHA-256 digests are fixed by checked-in metadata.
 - The Lean development formalizes arithmetic kernels, not the Boolean-matrix reductions, witness CSVs, deletion lemma, combinatorial double counts, or SAT proof checkers.
 
 ## Quick verification

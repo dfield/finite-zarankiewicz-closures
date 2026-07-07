@@ -15,10 +15,10 @@ The original sweep retained no DIMACS files or proof traces and was correctly tr
 1. a standard-library enumeration of all 25 capacity-feasible degree profiles at 113 ones;
 2. transparent deletion or deficit contradictions for twelve profiles;
 3. one deterministic CNF for each of the remaining thirteen profiles;
-4. direct compressed DRAT cores for ten CNFs and complete canonical-prefix covers for the other three; and
+4. direct compressed DRAT cores for ten CNFs and complete adaptive canonical-prefix covers for the other three; and
 5. a recorded successful `drat-trim` replay and independent `lrat-check` replay for every direct core and every cover leaf.
 
-Every direct trace is checked against its unsplit base CNF. The three covers are fixed canonical depth-four frontiers, with 1,479, 773, and 773 leaves; generating them requires no SAT verdict. For each cover leaf, the checker appends exactly the catalogued cell literals as unit clauses to that same base file, checks the leaf's DRAT core, derives LRAT, and checks the LRAT independently. A standard-library trie verifier recomputes every canonical child at every split, proving that the leaves are prefix-free and exhaustive. An incremental cube `UNSAT` line or untraced search state is not accepted as a theorem certificate.
+Every direct trace is checked against its unsplit base CNF. The three covers begin with deterministic canonical depth-four frontiers of 1,479, 773, and 773 prefixes and adaptively partition difficult prefixes using literals from the immediate next column. Generating and refining a catalog requires no SAT verdict. For each retained cover leaf, the checker appends exactly the catalogued cell literals as unit clauses to that same base file, checks the leaf's DRAT core, derives LRAT, and checks the LRAT independently. A standard-library trie verifier expands partial leaves over every matching canonical support and recomputes every canonical child at every split, proving that the retained leaves are prefix-free and exhaustive. An incremental cube `UNSAT` line or untraced search state is not accepted as a theorem certificate.
 
 ## Review paths
 

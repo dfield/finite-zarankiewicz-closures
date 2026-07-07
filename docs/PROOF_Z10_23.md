@@ -174,10 +174,13 @@ $$
 3^1 4^4 5^{14}6^4
 $$
 
-use complete row-stabilizer covers. Each stored cover is the fixed canonical
-depth-four frontier: it has 1,479 leaves for $3^1 4^2 5^{18}6^2$ and 773
-leaves for each of the other two profiles. Catalog generation performs no SAT
-search; every leaf is independently refuted by the proof-producing step.
+use complete adaptive row-stabilizer covers. Their deterministic starting
+frontiers have depth four: 1,479 prefixes for $3^1 4^2 5^{18}6^2$ and 773
+prefixes for each of the other two profiles. A prefix that is difficult to
+refute directly may be replaced by a complete partition using selected cells
+of its immediate next column, and refinement may continue recursively.
+Catalog generation and refinement make no SAT claim; every retained leaf is
+independently refuted by the proof-producing step.
 
 Once a prefix of columns is fixed, rows
 with the same prefix form a stabilizer cell; row lex order forces the next
@@ -187,21 +190,25 @@ row triple in three columns are impossible. Starting with the initial segment
 forced for the first column, these rules enumerate every possible next
 support of a satisfying assignment.
 
-The standard-library checker builds a trie from the stored leaves. At every
-nonleaf prefix it recomputes the complete permitted child set and requires an
-exact match; it also rejects duplicate, overlapping, wrong-degree, and
-noncanonical leaves. Thus the leaves are a prefix-free partition of every
-possible satisfying cell assignment, not a collection of sampled search
-states. The stored `proof_required` label makes explicit that the catalog
-alone asserts no solver result. For each leaf, its cell literals are appended to the unchanged base
-CNF as unit clauses and CaDiCaL produces a DRAT refutation.
+The standard-library checker expands every partial next-column assignment over
+the canonical supports that match it, then builds a trie from the resulting
+virtual leaves. At every nonleaf prefix it recomputes the complete permitted
+child set and requires an exact match; it also rejects duplicate, overlapping,
+wrong-degree, wrong-literal, and noncanonical leaves. Thus the retained leaves
+are a prefix-free partition of every possible satisfying cell assignment, not
+a collection of sampled search states. The stored `proof_required` label makes
+explicit that the catalog alone asserts no solver result. For each retained
+leaf, its cell literals are appended to the unchanged base CNF as unit clauses
+and CaDiCaL produces a DRAT refutation.
 
 For both strategies, `drat-trim` converts the solver trace to LRAT,
 `lrat-check` checks that LRAT and projects it to a compact standard DRAT core,
-and `drat-trim` independently verifies the projected core. The compact cores
-are the checked-in artifacts. Consequently, the three cover proofs rely on
-both independently checked leaf refutations and the deterministic trie
-completeness check; no incremental solver status is accepted as evidence.
+and `drat-trim` independently verifies the projected core. The compact direct
+cores are checked in; the much larger deterministic leaf-core archives are
+GitHub release assets bound by checked-in names, sizes, and SHA-256 digests.
+Consequently, the three cover proofs rely on both independently checked leaf
+refutations and the deterministic trie completeness check; no incremental
+solver status is accepted as evidence.
 The leaf producer records CaDiCaL options `--unsat -q -P2`; the preprocessing
 choice affects runtime only, since the resulting proof is replayed from the
 stored leaf formula.
