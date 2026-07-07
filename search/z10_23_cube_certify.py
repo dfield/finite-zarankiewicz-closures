@@ -168,6 +168,7 @@ def _prove_leaf(task: tuple[int, list[int]]) -> dict[str, Any]:
         "bytes": destination.stat().st_size,
         "sha256": _sha256(destination),
         "replay": "drat-trim -> LRAT -> lrat-check; projected DRAT -> drat-trim",
+        "solver_options": ["--unsat", "-q", "-P2"],
         "status": "VERIFIED",
     }
     staged = checkpoint.with_suffix(".tmp")

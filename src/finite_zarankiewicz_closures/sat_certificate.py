@@ -240,6 +240,7 @@ def _check_cube_proof(
             or not isinstance(proof.get("sha256"), str)
             or hex_digest.fullmatch(proof["sha256"]) is None
             or proof.get("status") != "VERIFIED"
+            or proof.get("solver_options") != ["--unsat", "-q", "-P2"]
             or proof.get("replay")
             != "drat-trim -> LRAT -> lrat-check; projected DRAT -> drat-trim"
         ):
