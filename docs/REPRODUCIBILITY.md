@@ -10,7 +10,7 @@ The core verification requires:
 
 Lean is optional for checking the mathematical result but required to rebuild the formal arithmetic layer. The subproject pins Lean 4.29.0 and uses only `Std`.
 
-External SAT, MIP, DRAT, and LRAT tools are optional corroborating checks.
+External SAT, MIP, DRAT, and LRAT tools are optional for the core integrity gate. Semantic replay of the $Z(10,23)$ proof requires `drat-trim` and `lrat-check` and is the strongest review path for that computer-assisted result.
 
 Python 3.9 is retained deliberately as an archival compatibility floor even though upstream support ended in October 2025. Continuous integration checks both Python 3.9 and current stable Python 3.14; the core has no third-party Python dependencies.
 
@@ -22,7 +22,7 @@ From the repository root:
 make verify
 ```
 
-This runs tests, all six witness checks, all six case-certificate paths, deterministic model regeneration, and the repository audit. It does not invoke external solvers or Lean.
+This runs tests, all eight witness checks, all eight case-certificate paths, deterministic model regeneration, and the repository audit. It does not invoke external solvers or Lean.
 
 ## Continuous integration
 
@@ -36,7 +36,7 @@ The GitHub Actions workflow runs `make verify` on Python 3.9 and 3.14 and builds
 make test
 ```
 
-Expected: 33 tests and `OK`. The test count is secondary; the named cases in [`tests/`](../tests/) define the coverage.
+Expected: `OK`. The named cases in [`tests/`](../tests/) define the coverage; the precise count is secondary.
 
 ### Witness
 
@@ -64,7 +64,7 @@ Both reports must show the same SHA-256 digest.
 make certificate
 ```
 
-Expected: the detailed marked-row checker reports `VERIFIED` with three profiles, followed by six `VERIFIED` case certificates. The latter bind every witness hash to its case-specific upper-bound mechanism.
+Expected: the detailed marked-row checker reports `VERIFIED` with three profiles, followed by eight `VERIFIED` case certificates. The latter bind every witness hash to its case-specific upper-bound mechanism.
 
 ### Additional exact values
 
@@ -76,10 +76,10 @@ Expected from the primary checker:
 
 - `status: IDENTICAL`;
 - `source_open_cases: 44`;
-- `remaining_open_cases: 35`; and
-- five verified additional witnesses.
+- `remaining_open_cases: 33`; and
+- seven verified additional witnesses.
 
-The independent checker must inspect the complete candidate sets for all five additional matrices, including 159,885 for $11\times19$ and 389,620 for $12\times23$. The standard-library upper-bound certificates must reproduce the four $(10,22)$ profiles, five $(12,23)$ profiles at 135, and three $(13,23)$ profiles at 145.
+The independent checker must inspect the complete candidate sets for all seven additional matrices, including 212,520 for $10\times23$, 292,215 for $11\times23$, and 389,620 for $12\times23$. The standard-library upper-bound certificates must reproduce 25 $(10,23)$ profiles at 113, the four $(10,22)$ profiles, five $(12,23)$ profiles at 135, and three $(13,23)$ profiles at 145.
 
 ### Decision models
 
@@ -87,15 +87,17 @@ The independent checker must inspect the complete candidate sets for all five ad
 make models
 ```
 
-Expected: `status: IDENTICAL` for all twelve files. The schema-v2 manifest covers six cell CNFs and six column-support LPs:
+Expected: `status: IDENTICAL` for all sixteen files. The schema-v2 manifest covers eight cell CNFs and eight column-support LPs:
 
 | Case | Cell variables | Cell clauses | Support variables | Triple constraints |
 |---|---:|---:|---:|---:|
 | $(9,23)$ at 104 | 32,654 | 277,931 | 512 | 84 |
 | $(10,21)$ at 107 | 33,596 | 292,514 | 1,024 | 120 |
 | $(10,22)$ at 111 | 36,849 | 330,656 | 1,024 | 120 |
+| $(10,23)$ at 113 | 40,246 | 371,894 | 1,024 | 120 |
 | $(11,19)$ at 107 | 33,277 | 291,530 | 2,048 | 165 |
 | $(11,20)$ at 112 | 36,846 | 333,944 | 2,048 | 165 |
+| $(11,23)$ at 124 | 48,633 | 484,976 | 2,048 | 165 |
 | $(12,23)$ at 135 | 57,813 | 618,940 | 4,096 | 220 |
 
 To rewrite the artifacts intentionally:
@@ -120,7 +122,7 @@ lake build
 lake env lean AxiomAudit.lean
 ```
 
-Expected: both Lean libraries build and the axiom audit prints the arithmetic theorems for all six exact results and the additional frontier bound. The exact boundary is listed in [`ADVERSARIAL_AUDIT.md`](ADVERSARIAL_AUDIT.md).
+Expected: both Lean libraries build and the axiom audit prints the arithmetic theorems for all eight exact results and the additional frontier bound. The exact boundary is listed in [`ADVERSARIAL_AUDIT.md`](ADVERSARIAL_AUDIT.md).
 
 ## Optional independent tools
 
@@ -130,10 +132,10 @@ The audit machine used:
 |---|---|---|
 | Python | 3.9.6 | Core checks and generators |
 | Lean | 4.29.0 | Formal arithmetic |
-| CaDiCaL | 3.0.0 | Small-instance CNF validation |
+| CaDiCaL | 3.0.0, commit `7b99c07f0bcab5824a5a3ce62c7066554017f641` | Small-instance validation and profile proof production |
 | GLPK / `glpsol` | 5.0 | Independent LP/MIP parser |
-| `drat-trim` | command-line checker | DRAT replay |
-| `lrat-check` | command-line checker | LRAT replay |
+| `drat-trim` | commit `2e3b2dc0ecf938addbd779d42877b6ed69d9a985` | DRAT-to-LRAT conversion and DRAT replay |
+| `lrat-check` | commit `2e3b2dc0ecf938addbd779d42877b6ed69d9a985` | LRAT replay |
 
 Run:
 
@@ -141,11 +143,12 @@ Run:
 python3 scripts/validate_models.py
 glpsol --lp models/column_types_9x23_exact_104.lp --check
 python3 scripts/replay_certificates.py
+python3 scripts/replay_z10_23_certificates.py --output audit/z10_23_sat_replay.json
 ```
 
-The first command regenerates temporary small CNFs and uses seed `20260704`. The second should report 86 rows, 512 columns, 6,399 matrix nonzeros, and 512 integer variables. The third requires all six trace checks to report true.
+The first command regenerates temporary small CNFs and uses seed `20260704`. The second should report 86 rows, 512 columns, 6,399 matrix nonzeros, and 512 integer variables. The third requires all six small terminal trace checks to report true. The fourth expands all thirteen profile DRAT cores, converts them to LRAT, checks both stages, and can take substantially longer.
 
-External output is summarized in [`audit/model_validation.json`](../audit/model_validation.json) and [`audit/certificate_replay.json`](../audit/certificate_replay.json). Temporary paths and timing noise are intentionally not stored.
+External output is summarized in [`audit/model_validation.json`](../audit/model_validation.json), [`audit/certificate_replay.json`](../audit/certificate_replay.json), and [`audit/z10_23_sat_replay.json`](../audit/z10_23_sat_replay.json). Temporary paths and timing noise are intentionally not stored.
 
 ## Artifact integrity
 
@@ -166,7 +169,8 @@ The following outputs are byte-deterministic:
 - model metadata;
 - exact DGH boundary report;
 - local-kernel catalog;
-- extended finite-table report; and
+- extended finite-table report;
+- profile CNFs and direct compressed DRAT cores for $Z(10,23)$, with oversized compressed streams stored as hash-bound sub-100 MB byte chunks; and
 - artifact checksum file.
 
 Reports from external tools retain semantic outcomes and tool versions while omitting elapsed time, temporary directories, and machine identifiers.
@@ -182,4 +186,4 @@ make verify
 cd lean && lake build && lake env lean AxiomAudit.lean
 ```
 
-Then, if the optional tools are installed, run the three external commands above. No command requires a file outside the cloned repository.
+Then, if the optional tools are installed, run the four external commands above. No command requires a file outside the cloned repository.

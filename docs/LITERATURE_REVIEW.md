@@ -2,25 +2,26 @@
 
 ## Scope and search date
 
-This review records the literature relevant to the six exact finite values established in this repository:
+This review records the literature relevant to the eight exact finite values established in this repository:
 
 $$
 \begin{aligned}
 Z(9,23,3,3)&=103, & Z(10,21,3,3)&=106,\\
-Z(10,22,3,3)&=110, & Z(11,19,3,3)&=106,\\
-Z(11,20,3,3)&=111, & Z(12,23,3,3)&=134.
+Z(10,22,3,3)&=110, & Z(10,23,3,3)&=112,\\
+Z(11,19,3,3)&=106, & Z(11,20,3,3)&=111,\\
+Z(11,23,3,3)&=123, & Z(12,23,3,3)&=134.
 \end{aligned}
 $$
 
-The original four-result search cutoff was **2026-07-04**; a targeted follow-up search for the two later closures and the $Z(13,23)$ bound was performed on **2026-07-06**. The review treats in greatest depth the chain of published and publicly posted results leading to the original one-edge interval
+The original four-result search cutoff was **2026-07-04**; targeted follow-up searches for the four later closures and the $Z(13,23)$ bound were performed on **2026-07-06**. The review treats in greatest depth the chain of published and publicly posted results leading to the original one-edge interval
 
 $$
 103\le Z(9,23,3,3)\le104,
 $$
 
-and separately records the source intervals and neighboring exact values used to close the other five cells. The Zarankiewicz literature is much larger than these six finite problems, so the discussion of general asymptotic theory and geometric variants is necessarily selective. Füredi and Simonovits's historical survey is a suitable entry point for that broader literature [FS13].
+and separately records the source intervals and neighboring exact values used to close the other seven cells. The Zarankiewicz literature is much larger than these eight finite problems, so the discussion of general asymptotic theory and geometric variants is necessarily selective. Füredi and Simonovits's historical survey is a suitable entry point for that broader literature [FS13].
 
-The search covered exact-title, exact-parameter, author, DOI, arXiv, and citation-forward queries. Variants of all six parameter pairs were checked, as were later references to Tan [Tan22], Davies--Gill--Horsley [DGH26], and Bhan--Nobili--Langer [BNL26]. No public source located by those searches identified the six values as exact before the corresponding repository work. That statement is deliberately dated: it cannot rule out unpublished work, an unindexed source, or a later revision.
+The search covered exact-title, exact-parameter, author, DOI, arXiv, and citation-forward queries. Variants of all eight parameter pairs were checked, as were later references to Tan [Tan22], Davies--Gill--Horsley [DGH26], and Bhan--Nobili--Langer [BNL26]. No public source located by those searches identified the eight values as exact before the corresponding repository work. That statement is deliberately dated: it cannot rule out unpublished work, an unindexed source, or a later revision.
 
 ## 1. The problem in context
 
@@ -41,7 +42,7 @@ The general theory has several strands:
 - **Asymptotic estimates.** The orders of magnitude and leading constants remain subtle even when one or both part sizes grow. Nikiforov [Nik10], Conlon [Con21], and the survey of Füredi--Simonovits [FS13] place the finite questions within this wider program.
 - **Exact finite computation.** Integer programming, canonical generation, and SAT can close small cases that are beyond a single coarse counting inequality. Irving [Irv78], Goddard--Henning--Oellermann [GHO00], Collins--Riasanovsky--Wallace--Radziszowski [CRWR16], and Tan [Tan22] are important points in this line.
 
-The marked-row proof in this repository belongs to the first and fourth strands: a computation-discovered degree pattern is distilled into an elementary counting and congruence argument, while independent programs check the construction and the finite arithmetic. The other closures use vertex deletion and a finite computer-assisted pair-deficit enumeration.
+The marked-row proof in this repository belongs to the first and fourth strands: a computation-discovered degree pattern is distilled into an elementary counting and congruence argument, while independent programs check the construction and the finite arithmetic. The other closures use vertex deletion, finite computer-assisted deficit enumerations, and—in the $(10,23)$ case—proof-producing SAT with independently replayed DRAT/LRAT certificates.
 
 ## 2. Roman's degree bound and why 104 appeared
 
@@ -98,22 +99,27 @@ The construction in this repository independently certifies the same lower bound
 
 ## 6. Review of the other closures and remaining finite table
 
-Figure 2 of Bhan--Nobili--Langer contains 44 cells that were open at the paper's stated literature boundary. The paper closes three of those cells. This repository closes six more: the marked-row argument handles $(9,23)$, while the extended proof documents handle the other five:
+Figure 2 of Bhan--Nobili--Langer contains 44 cells that were open at the paper's stated literature boundary. The paper closes three of those cells. This repository closes eight more: the marked-row argument handles $(9,23)$, while the extended proof documents handle the other seven:
 
 $$
 Z(10,21,3,3)=106,
 \qquad Z(10,22,3,3)=110,
-\qquad Z(11,19,3,3)=106,
+\qquad Z(10,23,3,3)=112,
 $$
 
 $$
-Z(11,20,3,3)=111,
-\qquad Z(12,23,3,3)=134.
+Z(11,19,3,3)=106,
+\qquad Z(11,20,3,3)=111,
+\qquad Z(11,23,3,3)=123,
 $$
 
-Three values use the classical minimum-degree deletion bound. The other two extended closures combine explicit constructions with finite degree-profile and deficit arguments. These additions leave 35 of the paper's original 44 open cells unresolved. No exact value is asserted for those cases.
+$$
+Z(12,23,3,3)=134.
+$$
 
-The original four-result status was checked against the paper's rendered Figure 2 with a cutoff of **2026-07-04**; the two later parameters were checked again on **2026-07-06**. The searches located no later arXiv source containing those closures, but this negative literature finding remains provisional.
+Four values use the classical minimum-degree deletion bound. Two extended closures combine explicit constructions with finite degree-profile and deficit arguments. The $(10,23)$ closure combines an arithmetic profile reduction with thirteen checked propositional refutations; it then supplies the neighboring $(11,23)$ deletion bound. These additions leave 33 of the paper's original 44 open cells unresolved. No exact value is asserted for those cases.
+
+The original four-result status was checked against the paper's rendered Figure 2 with a cutoff of **2026-07-04**; the four later parameters were checked again on **2026-07-06**. The searches located no later arXiv source containing those closures, but this negative literature finding remains provisional.
 
 ## 7. Relation of the marked-row proof to prior methods
 
@@ -145,15 +151,17 @@ The detailed history of the original marked-row case is:
 | 2026 | Bhan--Nobili--Langer [BNL26] | New 103-one construction | Establishes $103\le Z\le104$ |
 | This repository | Elementary proof and checked witness | Excludes 104 and verifies 103 | $Z(9,23,3,3)=103$ |
 
-The six source intervals and present exact values are:
+The eight source intervals and present exact values are:
 
 | Cell | Bhan--Nobili--Langer v2 interval | Closure supplied here | Exact value |
 |---|---:|---|---:|
 | $Z(9,23,3,3)$ | $103\text{--}104$ | Marked-row deficit argument | 103 |
 | $Z(10,21,3,3)$ | $106\text{--}108$ | Vertex deletion from $Z(9,21,3,3)=96$ | 106 |
 | $Z(10,22,3,3)$ | $110\text{--}111$ | Computer-assisted pair-deficit enumeration | 110 |
+| $Z(10,23,3,3)$ | $112\text{--}115$ | Profile reduction plus independently replayed DRAT/LRAT certificates | 112 |
 | $Z(11,19,3,3)$ | $102\text{--}108$ | Vertex deletion plus a new checked witness | 106 |
 | $Z(11,20,3,3)$ | $111\text{--}112$ | Two vertex-deletion steps from $Z(11,18,3,3)=101$ | 111 |
+| $Z(11,23,3,3)$ | $118\text{--}125$ | Vertex deletion from $Z(10,23,3,3)=112$ plus a checked witness | 123 |
 | $Z(12,23,3,3)$ | $125\text{--}136$ | Two-stage row/pair-deficit certificate | 134 |
 
 ## 9. Reproducibility of the literature claims

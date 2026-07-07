@@ -3,11 +3,12 @@ import Lean.Elab.Tactic.Omega
 /-!
 # Arithmetic kernels for additional finite closures and frontier bounds
 
-This file checks the arithmetic endpoints for five closures beyond
+This file checks the arithmetic endpoints for seven closures beyond
 `Z(9,23,3,3) = 103` and for the bound `Z(13,23,3,3) ≤ 144`. As with the
 original `ZarankiewiczZ923` module, the combinatorial reductions remain in the
 proof documents and Python certificates. In particular, Lean checks reported
-finite minima but does not re-run row-symmetry or row-type enumeration.
+finite minima but does not re-run row-symmetry or row-type enumeration or
+replay the `Z(10,23)` propositional certificates.
 -/
 
 namespace ZarankiewiczFiniteClosures
@@ -21,6 +22,8 @@ theorem z10_21_deletion_bound : (10 * 96) / 9 = 106 := by decide
 theorem z11_19_deletion_bound : (19 * 101) / 18 = 106 := by decide
 
 theorem z11_20_deletion_bound : (20 * 106) / 19 = 111 := by decide
+
+theorem z11_23_deletion_bound : (11 * 112) / 10 = 123 := by decide
 
 theorem z10_21_excluded_target
     (deletedDegree : Nat)
@@ -38,6 +41,12 @@ theorem z11_20_excluded_target
     (deletedDegree : Nat)
     (hdegree : deletedDegree ≤ 5)
     (hremaining : 112 ≤ 106 + deletedDegree) : False := by
+  omega
+
+theorem z11_23_excluded_target
+    (deletedDegree : Nat)
+    (hdegree : deletedDegree ≤ 11)
+    (hremaining : 124 ≤ 112 + deletedDegree) : False := by
   omega
 
 /-! ## The `Z(10,22)` degree-profile boundary -/
@@ -64,6 +73,39 @@ theorem z10_penalty_table :
     List.ofFn (fun d : Fin 11 => z10Penalty d.val) =
       [40, 30, 20, 11, 4, 0, 0, 5, 16, 34, 60] := by
   decide
+
+/-! ## The `Z(10,23)` arithmetic front end -/
+
+theorem z10_23_affine_base : 10 * 113 - 40 * 23 = 210 := by decide
+
+theorem z10_23_penalty_budget : 240 - 210 = 30 := by decide
+
+theorem z10_23_low_column_impossible
+    (columnDegree : Nat)
+    (hdegree : columnDegree ≤ 2)
+    (hremaining : 113 ≤ 110 + columnDegree) : False := by
+  omega
+
+theorem z10_23_two_degree_three_impossible
+    (firstDegree secondDegree : Nat)
+    (hfirst : firstDegree ≤ 3)
+    (hsecond : secondDegree ≤ 3)
+    (hremaining : 113 ≤ 106 + firstDegree + secondDegree) : False := by
+  omega
+
+theorem z10_23_two_six_residue_minima :
+    List.all [18, 15, 12, 9, 6] (fun minimum => 3 < minimum) = true := by
+  decide
+
+theorem z10_23_three_six_residue_minima :
+    List.all [18, 15, 12, 9] (fun minimum => 6 < minimum) = true := by
+  decide
+
+theorem z10_23_exceptional_profile_impossible
+    (pairResidue : Nat)
+    (hbudget : pairResidue ≤ 18)
+    (henumeratedMinimum : 39 ≤ pairResidue) : False := by
+  omega
 
 theorem z10_22_affine_base : 10 * 111 - 40 * 22 = 230 := by decide
 

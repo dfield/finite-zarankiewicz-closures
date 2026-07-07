@@ -10,12 +10,50 @@ from finite_zarankiewicz_closures.case_certificates import (
     CaseCertificateError,
     verify_case_certificate,
 )
+from finite_zarankiewicz_closures.sat_certificate import (
+    SatCertificateError,
+    verify_z10_23_sat_manifest,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
 class CaseCertificateTests(unittest.TestCase):
+    def test_z10_23_sat_manifest_rejects_scope_and_toolchain_mutations(self) -> None:
+        path = ROOT / "certificates" / "z10_23_sat.json"
+        manifest = json.loads(path.read_text(encoding="utf-8"))
+        scope_mutation = copy.deepcopy(manifest)
+        scope_mutation["profiles"][0]["profile"] = "4x1,5x22"
+        with self.assertRaises(SatCertificateError):
+            verify_z10_23_sat_manifest(scope_mutation, ROOT)
+        toolchain_mutation = copy.deepcopy(manifest)
+        toolchain_mutation["toolchain"]["solver"] = "unrecorded"
+        with self.assertRaises(SatCertificateError):
+            verify_z10_23_sat_manifest(toolchain_mutation, ROOT)
+        commit_mutation = copy.deepcopy(manifest)
+        commit_mutation["toolchain"]["proof_tools_commit"] = "unrecorded"
+        with self.assertRaises(SatCertificateError):
+            verify_z10_23_sat_manifest(commit_mutation, ROOT)
+        strategy_mutation = copy.deepcopy(manifest)
+        strategy_mutation["profiles"][0]["strategy"] = "row_stabilizer_cubes"
+        with self.assertRaises(SatCertificateError):
+            verify_z10_23_sat_manifest(strategy_mutation, ROOT)
+        chunk_mutation = copy.deepcopy(manifest)
+        split_case = next(
+            case for case in chunk_mutation["profiles"] if "parts" in case["proof"]
+        )
+        split_case["proof"]["parts"].reverse()
+        with self.assertRaises(SatCertificateError):
+            verify_z10_23_sat_manifest(chunk_mutation, ROOT)
+        chunk_hash_mutation = copy.deepcopy(manifest)
+        split_case = next(
+            case for case in chunk_hash_mutation["profiles"] if "parts" in case["proof"]
+        )
+        split_case["proof"]["parts"][0]["sha256"] = "0" * 64
+        with self.assertRaises(SatCertificateError):
+            verify_z10_23_sat_manifest(chunk_hash_mutation, ROOT)
+
     def test_all_stored_certificates_pass(self) -> None:
         for case in CASE_SPECS:
             with self.subTest(case=case.slug):
@@ -43,11 +81,17 @@ class CaseCertificateTests(unittest.TestCase):
             "z10_22_110": lambda c: c["upper_bound"]["detailed_report"]["case_c"].__setitem__(
                 "minimum_pair_residue_sum", 11
             ),
+            "z10_23_112": lambda c: c["upper_bound"]["sat_integrity_report"].__setitem__(
+                "sat_profiles", 12
+            ),
             "z11_19_106": lambda c: c["upper_bound"]["steps"][0].__setitem__(
                 "source_upper_bound", 102
             ),
             "z11_20_111": lambda c: c["upper_bound"]["steps"][1].__setitem__(
                 "recomputed_upper_bound", 112
+            ),
+            "z11_23_123": lambda c: c["upper_bound"]["steps"][0].__setitem__(
+                "recomputed_upper_bound", 124
             ),
             "z12_23_134": lambda c: c["upper_bound"]["detailed_report"]["at_135"][
                 "cases"

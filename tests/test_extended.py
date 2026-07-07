@@ -8,6 +8,7 @@ from finite_zarankiewicz_closures.extended import (
     deletion_upper,
     extended_frontier_report,
     z10_22_certificate_report,
+    z10_23_profile_report,
     z12_23_certificate_report,
     z13_23_upper_report,
     z13_23_upper_certificate,
@@ -29,7 +30,7 @@ class ExtendedResultTests(unittest.TestCase):
         report = extended_frontier_report()
         self.assertEqual(len(PAPER_OPEN_BOUNDS), 44)
         self.assertEqual(report["source_open_cases"], 44)
-        self.assertEqual(report["remaining_open_cases"], 35)
+        self.assertEqual(report["remaining_open_cases"], 33)
 
     def test_z10_22_upper_certificate_is_recomputed(self) -> None:
         report = z10_22_certificate_report()
@@ -37,6 +38,16 @@ class ExtendedResultTests(unittest.TestCase):
         self.assertEqual(report["excluded_target"], 111)
         self.assertEqual(len(report["degree_profiles"]), 4)
         self.assertEqual(report["case_c"]["minimum_pair_residue_sum"], 12)
+
+    def test_z10_23_arithmetic_front_end_is_recomputed(self) -> None:
+        report = z10_23_profile_report()
+        self.assertEqual(report["status"], "ARITHMETIC_FRONT_END_VERIFIED")
+        self.assertEqual(report["profile_count"], 25)
+        self.assertEqual(len(report["sat_profiles"]), 13)
+        self.assertEqual(
+            report["exceptional_pair_residue"]["minimum_pair_residue_sum"],
+            39,
+        )
 
     def test_z12_23_upper_certificate_is_recomputed(self) -> None:
         report = z12_23_certificate_report()
@@ -65,8 +76,10 @@ class ExtendedResultTests(unittest.TestCase):
         for filename, rows, columns, ones in (
             ("z10_21_106_matrix.csv", 10, 21, 106),
             ("z10_22_110_matrix.csv", 10, 22, 110),
+            ("z10_23_112_matrix.csv", 10, 23, 112),
             ("z11_19_106_matrix.csv", 11, 19, 106),
             ("z11_20_111_matrix.csv", 11, 20, 111),
+            ("z11_23_123_matrix.csv", 11, 23, 123),
             ("z12_23_134_matrix.csv", 12, 23, 134),
         ):
             path = ROOT / "data" / filename

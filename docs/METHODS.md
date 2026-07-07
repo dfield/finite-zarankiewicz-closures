@@ -2,11 +2,12 @@
 
 ## 1. Separation of roles
 
-The repository contains four kinds of upper-bound argument, with different trust boundaries:
+The repository contains five kinds of upper-bound argument, with different trust boundaries:
 
 - the $(9,23)$ marked-row proof in [`PROOF.md`](PROOF.md) is human-readable and does not logically require computation;
-- the $(10,21)$, $(11,19)$, and $(11,20)$ proofs are elementary applications of vertex deletion;
+- the $(10,21)$, $(11,19)$, $(11,20)$, and $(11,23)$ proofs are elementary applications of vertex deletion;
 - the $(10,22)$ proof includes an exhaustive standard-library enumeration of two finite residue cases; and
+- the $(10,23)$ proof combines an arithmetic profile reduction with thirteen DRAT cores replayed through independent LRAT checking; and
 - the $(12,23)$ proof combines a forced-profile pair count with a five-profile row/pair-deficit certificate. The same machinery gives $Z(13,23)\le144$.
 
 The remaining computational methods have narrower corroborating or reproducibility roles:
@@ -17,7 +18,7 @@ The remaining computational methods have narrower corroborating or reproducibili
 - diagnose why a published degree-only LP stops at 104; and
 - expose mistakes through implementation diversity and mutation tests.
 
-This separation matters. No claimed value relies on an opaque `UNSAT` line, but the $(10,22)$ and $(12,23)$ finite enumerations are genuine computer-assisted proof components and are labeled as such.
+This separation matters. No claimed value relies on an opaque `UNSAT` line. The $(10,22)$ and $(12,23)$ finite enumerations and the $(10,23)$ DRAT/LRAT refutations are genuine computer-assisted proof components and are labeled as such.
 
 ## 2. The $(9,23)$ proof-to-code map
 
@@ -55,7 +56,7 @@ row-triple/column-triple choices. Agreement between these algorithms reduces the
 
 ## 4. Case-specific JSON certificates
 
-[`scripts/check_case_certificates.py`](../scripts/check_case_certificates.py) regenerates one standalone certificate for each of the six exact values. Each certificate binds the complete witness report and SHA-256 digest to the case's own upper-bound mechanism: marked-row deficits, deletion, pair-deficit enumeration, or the two-stage $(12,23)$ deficit proof. Stored fields are compared with recomputation, and mutation tests require every schema to reject altered values.
+[`scripts/check_case_certificates.py`](../scripts/check_case_certificates.py) regenerates one standalone certificate for each of the eight exact values. Each certificate binds the complete witness report and SHA-256 digest to the case's own upper-bound mechanism: marked-row deficits, deletion, pair-deficit enumeration, traced SAT, or the two-stage $(12,23)$ deficit proof. Stored fields are compared with recomputation, and mutation tests require every schema to reject altered values.
 
 The original detailed subcertificate, [`certificates/degree_deficit.json`](../certificates/degree_deficit.json), remains the arithmetic payload for the $(9,23)$ case.
 
@@ -76,11 +77,11 @@ $$
 
 Only after comparing the enumerated set with the JSON does it check each case. Consequently, deleting a difficult case from the certificate cannot make the checker pass.
 
-This exact-integer subcertificate is the replayable nonexistence certificate for the marked-row reduction. The other five case certificates contain their corresponding deletion arithmetic, four-profile report, or two-stage deficit report. All use only the Python standard library.
+This exact-integer subcertificate is the replayable nonexistence certificate for the marked-row reduction. The other seven case certificates contain their corresponding deletion arithmetic, finite profile report, traced-SAT manifest, or two-stage deficit report. The integrity checkers use only the Python standard library; semantic DRAT-to-LRAT replay is an explicit optional external step.
 
 ## 5. Cell-level SAT models
 
-Each exact-value theorem has a direct cell CNF at its first excluded weight: 104, 107, 111, 107, 112, and 135 for $(9,23)$, $(10,21)$, $(10,22)$, $(11,19)$, $(11,20)$, and $(12,23)$ respectively. The $(9,23)$ model in [`models/cells_9x23_exact_104.cnf`](../models/cells_9x23_exact_104.cnf) illustrates the encoding and uses the base variable
+Each exact-value theorem has a direct cell CNF at its first excluded weight: 104, 107, 111, 113, 107, 112, 124, and 135 for $(9,23)$, $(10,21)$, $(10,22)$, $(10,23)$, $(11,19)$, $(11,20)$, $(11,23)$, and $(12,23)$ respectively. The $(9,23)$ model in [`models/cells_9x23_exact_104.cnf`](../models/cells_9x23_exact_104.cnf) illustrates the encoding and uses the base variable
 
 $$
 x_{r,c}=23r+c+1
@@ -98,7 +99,7 @@ There are 148,764 such clauses. They occur first in lexicographic combination or
 
 Exactly 104 cells are true. The generator encodes both an at-most-104 bound on the positive literals and an at-most-103 bound on their negations. Each bound uses a sequential threshold circuit in which every auxiliary variable is defined by an equivalence, not merely constrained by a one-way implication. This slightly larger encoding is easier to audit because a base assignment has a unique threshold extension.
 
-That model has 32,654 variables and 277,931 clauses. [`scripts/generate_models.py`](../scripts/generate_models.py) regenerates all six cell CNFs deterministically; [`models/manifest.json`](../models/manifest.json) records every dimension and hash.
+That model has 32,654 variables and 277,931 clauses. [`scripts/generate_models.py`](../scripts/generate_models.py) regenerates all eight cell CNFs deterministically; [`models/manifest.json`](../models/manifest.json) records every dimension and hash.
 
 ## 6. Column-type integer models
 
@@ -113,7 +114,7 @@ $$
 \quad(T\in\tbinom{[9]}3),
 $$
 
-with $0\le x_S\le23$ integral. The six stored LPs use 512, 1,024, 1,024, 2,048, 2,048, and 4,096 support variables according to their row counts. Each has two structural equalities and one inequality per row triple.
+with $0\le x_S\le23$ integral. The eight stored LPs use 512 support variables at nine rows, 1,024 for each ten-row case, 2,048 for each eleven-row case, and 4,096 at twelve rows. Each has two structural equalities and one inequality per row triple.
 
 The cell and column models use different base objects: individual entries versus exact column supports. Their shared semantic core is only the definition of a forbidden row triple. None is presented as an UNSAT certificate for the claimed upper bound.
 
@@ -142,7 +143,15 @@ The three degree cases also have tiny propositional encodings of their final agg
 
 Both DRAT and LRAT traces are stored for each CNF. `drat-trim` and `lrat-check` replay all six traces. These files certify only the terminal aggregation; the JSON checker establishes why the matrix problem reduces to those aggregations.
 
-## 9. Davies--Gill--Horsley boundary
+## 9. Profile SAT proofs for $(10,23)$
+
+The $(10,23)$ proof uses a separate, profile-specific encoding at 113 ones. Column degrees are fixed by profile. For every row triple and column, an auxiliary variable is forced true when that column contains the triple; a sequential counter allows at most two such columns. Rows and equal-degree columns are put in double-lex order, and every row has degree at least ten because deleting a row and retaining 104 ones would contradict $Z(9,23)=103$.
+
+The arithmetic front end leaves thirteen formulas. Each is refuted by a direct CaDiCaL run on the unsplit base CNF. `drat-trim` converts that solver proof to LRAT, `lrat-check` checks the LRAT against the same stored CNF and projects it to a compact DRAT core, and `drat-trim` verifies the stored core. The repository replay converts the core back to LRAT and runs `lrat-check` again. Deterministic canonical-prefix cubes are available only as an exploratory search aid and are not accepted by the certificate manifest.
+
+[`certificates/z10_23_sat.json`](../certificates/z10_23_sat.json) records formula and proof hashes. [`scripts/replay_z10_23_certificates.py`](../scripts/replay_z10_23_certificates.py) performs the heavyweight semantic replay. The ordinary case-certificate gate checks the complete profile scope and artifact integrity without requiring an external checker.
+
+## 10. Davies--Gill--Horsley boundary
 
 [`analysis/dgh_boundary.json`](../analysis/dgh_boundary.json) evaluates the full degree-count constraints of Davies--Gill--Horsley using exact rational arithmetic. The fractional profile
 
@@ -156,9 +165,9 @@ All three integral 104-one profiles also satisfy every DGH inequality. This iden
 
 [`analysis/local_kernel_catalog.csv`](../analysis/local_kernel_catalog.csv) records the complete row-symmetry quotient of the one-column kernels used during extraction: restrictions to three through five rows, all ambient degrees, and marked-row membership for degrees three through six. It is not described as an exhaustive catalog of arbitrary multi-column submatrices.
 
-## 10. Lean boundary
+## 11. Lean boundary
 
-The Lean subproject checks arithmetic endpoints for all six exact values and the $(13,23)$ bound using Lean 4.29.0 and `Std` only. The original library checks the $(9,23)$ penalty table, profile classification, and residue contradictions. The additional library checks the deletion chains, the $(10,22)$ certificate endpoints, both stages of the $(12,23)$ profile argument, and the $(13,23)$ profile/residue arithmetic. Kernel `decide` handles executable finite identities; `omega` checks the Presburger consequences.
+The Lean subproject checks arithmetic endpoints for all eight exact values and the $(13,23)$ bound using Lean 4.29.0 and `Std` only. The original library checks the $(9,23)$ penalty table, profile classification, and residue contradictions. The additional library checks the deletion chains, the $(10,22)$ and $(10,23)$ arithmetic certificate endpoints, both stages of the $(12,23)$ profile argument, and the $(13,23)$ profile/residue arithmetic. Kernel `decide` handles executable finite identities; `omega` checks the Presburger consequences.
 
 The following are not formalized in Lean:
 
@@ -166,20 +175,23 @@ The following are not formalized in Lean:
 - the equivalence between $K_{3,3}$-freeness and row-triple capacity;
 - the combinatorial double counts and deletion lemma;
 - the $Z(10,22)$ row-symmetry orbit enumeration; and
-- the six CSV witnesses.
+- the SAT-to-matrix reduction and DRAT-to-LRAT replay for $Z(10,23)$; and
+- the eight CSV witnesses.
 
-Those layers are human-readable and independently executable, but they remain outside the proof assistant. [`lean/README.md`](../lean/README.md) and [`lean/AxiomAudit.lean`](../lean/AxiomAudit.lean) make the six-case boundary testable.
+Those layers are human-readable and independently executable, but they remain outside the proof assistant. [`lean/README.md`](../lean/README.md) and [`lean/AxiomAudit.lean`](../lean/AxiomAudit.lean) make the eight-case boundary testable.
 
-## 11. Additional finite-table certificate
+## 12. Additional finite-table certificate
 
-[`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) and [`NEW_BOUNDS.md`](NEW_BOUNDS.md) close five additional cells from the 2026 table. Three closures use vertex deletion. The $Z(10,22,3,3)=110$ and $Z(12,23,3,3)=134$ bounds use finite degree-profile and deficit certificates.
+[`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) and [`NEW_BOUNDS.md`](NEW_BOUNDS.md) close seven additional cells from the 2026 table. Four closures use vertex deletion. The $Z(10,22,3,3)=110$ and $Z(12,23,3,3)=134$ bounds use finite degree-profile and deficit certificates, while $Z(10,23,3,3)=112$ uses arithmetic reduction plus replayable SAT proof cores.
 
 | Result | Upper-bound mechanism | Computational role |
 |---|---|---|
 | $Z(10,21,3,3)=106$ | One row-deletion step from $Z(9,21,3,3)=96$ | Arithmetic replay only |
 | $Z(10,22,3,3)=110$ | Four-profile pair-deficit elimination | Exhaustive finite enumeration is required |
+| $Z(10,23,3,3)=112$ | Twelve arithmetic eliminations plus thirteen profile CNFs | Independent DRAT-to-LRAT replay is required |
 | $Z(11,19,3,3)=106$ | One column-deletion step from $Z(11,18,3,3)=101$ | Arithmetic replay only |
 | $Z(11,20,3,3)=111$ | Two column-deletion steps from $Z(11,18,3,3)=101$ | Arithmetic replay only |
+| $Z(11,23,3,3)=123$ | One row-deletion step from $Z(10,23,3,3)=112$ | Arithmetic replay only |
 | $Z(12,23,3,3)=134$ | Forced profile at 136 plus five-profile deficit elimination at 135 | One finite row-type enumeration is required |
 | $Z(13,23,3,3)\le144$ | Three-profile marked-row residue argument | Finite profile classification only |
 

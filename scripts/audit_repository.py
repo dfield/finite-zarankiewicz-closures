@@ -46,8 +46,10 @@ EXPECTED_FILES = (
     "docs/PROOF.md",
     "docs/PROOF_Z10_21.md",
     "docs/PROOF_Z10_22.md",
+    "docs/PROOF_Z10_23.md",
     "docs/PROOF_Z11_19.md",
     "docs/PROOF_Z11_20.md",
+    "docs/PROOF_Z11_23.md",
     "docs/PROOF_Z12_23.md",
     "docs/BOUND_Z13_23.md",
     "docs/NEW_BOUNDS.md",
@@ -60,15 +62,20 @@ EXPECTED_FILES = (
     "data/z9_23_103_matrix.csv",
     "data/z10_21_106_matrix.csv",
     "data/z10_22_110_matrix.csv",
+    "data/z10_23_112_matrix.csv",
     "data/z11_19_106_matrix.csv",
     "data/z11_20_111_matrix.csv",
+    "data/z11_23_123_matrix.csv",
     "data/z12_23_134_matrix.csv",
     "certificates/degree_deficit.json",
     "certificates/z9_23_103.json",
     "certificates/z10_21_106.json",
     "certificates/z10_22_110.json",
+    "certificates/z10_23_112.json",
+    "certificates/z10_23_sat.json",
     "certificates/z11_19_106.json",
     "certificates/z11_20_111.json",
+    "certificates/z11_23_123.json",
     "certificates/z12_23_134.json",
     "certificates/z13_23_upper_144.json",
     "models/cells_9x23_exact_104.cnf",
@@ -77,10 +84,14 @@ EXPECTED_FILES = (
     "models/column_types_10x21_exact_107.lp",
     "models/cells_10x22_exact_111.cnf",
     "models/column_types_10x22_exact_111.lp",
+    "models/cells_10x23_exact_113.cnf",
+    "models/column_types_10x23_exact_113.lp",
     "models/cells_11x19_exact_107.cnf",
     "models/column_types_11x19_exact_107.lp",
     "models/cells_11x20_exact_112.cnf",
     "models/column_types_11x20_exact_112.lp",
+    "models/cells_11x23_exact_124.cnf",
+    "models/column_types_11x23_exact_124.lp",
     "models/cells_12x23_exact_135.cnf",
     "models/column_types_12x23_exact_135.lp",
     "analysis/dgh_boundary.json",
@@ -88,6 +99,7 @@ EXPECTED_FILES = (
     "analysis/extended_results.json",
     "analysis/new_bounds.json",
     "analysis/sat_cross_check.json",
+    "audit/z10_23_sat_replay.json",
     "lean/ZarankiewiczZ923/ArithmeticKernel.lean",
     "lean/ZarankiewiczFiniteClosures/ArithmeticKernels.lean",
     "artifacts.sha256",
@@ -105,6 +117,16 @@ def repository_files() -> Iterator[Path]:
             yield path
 
 
+def sha256(path: Path) -> str:
+    """Hash one file incrementally so large compressed proofs remain safe."""
+
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
 def check_required_files() -> dict[str, object]:
     """Require the reviewer-facing and mathematical deliverables."""
 
@@ -120,6 +142,13 @@ def check_no_path_leaks_or_symlinks() -> dict[str, object]:
     symlinks = [path.relative_to(ROOT).as_posix() for path in ROOT.rglob("*") if path.is_symlink()]
     if symlinks:
         raise AssertionError(f"symlinks are not permitted: {symlinks}")
+    oversized = [
+        (path.relative_to(ROOT).as_posix(), path.stat().st_size)
+        for path in repository_files()
+        if path.stat().st_size >= 100_000_000
+    ]
+    if oversized:
+        raise AssertionError(f"files exceed the GitHub 100 MB limit: {oversized}")
     # Construct the markers so the scanner does not contain the strings it rejects.
     markers = {
         "private workspace marker": ("r" + "55").encode("ascii"),
@@ -129,15 +158,45 @@ def check_no_path_leaks_or_symlinks() -> dict[str, object]:
     }
     findings: list[tuple[str, str]] = []
     scanned = 0
+    maximum_marker_length = max(map(len, markers.values()))
+    text_suffixes = {
+        ".bib",
+        ".c",
+        ".cff",
+        ".cnf",
+        ".csv",
+        ".drat",
+        ".h",
+        ".json",
+        ".lean",
+        ".lp",
+        ".lrat",
+        ".md",
+        ".py",
+        ".sha256",
+        ".toml",
+        ".txt",
+        ".yaml",
+        ".yml",
+    }
+    text_names = {"Makefile", ".gitignore", "LICENSE"}
     for path in repository_files():
+        if path.suffix.lower() not in text_suffixes and path.name not in text_names:
+            continue
         scanned += 1
-        lowered = path.read_bytes().lower()
-        for label, marker in markers.items():
-            if marker.lower() in lowered:
-                findings.append((path.relative_to(ROOT).as_posix(), label))
+        tail = b""
+        found: set[str] = set()
+        with path.open("rb") as handle:
+            for block in iter(lambda: handle.read(1024 * 1024), b""):
+                lowered = (tail + block).lower()
+                for label, marker in markers.items():
+                    if label not in found and marker.lower() in lowered:
+                        findings.append((path.relative_to(ROOT).as_posix(), label))
+                        found.add(label)
+                tail = lowered[-maximum_marker_length:]
     if findings:
         raise AssertionError(f"path/provenance leakage: {findings}")
-    return {"files_scanned": scanned, "symlinks": 0, "leaks": 0}
+    return {"files_scanned": scanned, "symlinks": 0, "oversized_files": 0, "leaks": 0}
 
 
 def check_markdown_links() -> dict[str, object]:
@@ -289,7 +348,7 @@ def check_models() -> dict[str, object]:
             case.rows, 3
         ) * math.comb(case.columns, 3):
             raise AssertionError(f"wrong forbidden-clause count: {case.slug}")
-        if hashlib.sha256(cell.read_bytes()).hexdigest() != cell_metadata["sha256"]:
+        if sha256(cell) != cell_metadata["sha256"]:
             raise AssertionError(f"cell model hash mismatch: {case.slug}")
         lp_path = ROOT / column_metadata["file"]
         lp = lp_path.read_text(encoding="ascii")
@@ -299,7 +358,7 @@ def check_models() -> dict[str, object]:
             lp.count("\n triple_") != expected_triples
             or lp.count("\n x_") != expected_supports
             or not lp.endswith("End\n")
-            or hashlib.sha256(lp_path.read_bytes()).hexdigest() != column_metadata["sha256"]
+            or sha256(lp_path) != column_metadata["sha256"]
         ):
             raise AssertionError(f"column LP has unexpected structure: {case.slug}")
         case_reports[case.slug] = {
@@ -326,11 +385,15 @@ def check_json_and_recorded_reports() -> dict[str, object]:
         if path.suffix == ".json":
             json.loads(path.read_text(encoding="utf-8"))
             parsed += 1
-    for relative in ("audit/model_validation.json", "audit/certificate_replay.json"):
+    for relative in (
+        "audit/model_validation.json",
+        "audit/certificate_replay.json",
+        "audit/z10_23_sat_replay.json",
+    ):
         report = json.loads((ROOT / relative).read_text(encoding="utf-8"))
         if report.get("status") != "VERIFIED":
             raise AssertionError(f"recorded audit report is not verified: {relative}")
-    return {"json_files_parsed": parsed, "verified_recorded_reports": 2}
+    return {"json_files_parsed": parsed, "verified_recorded_reports": 3}
 
 
 def check_mathematical_artifacts() -> dict[str, object]:
@@ -351,8 +414,10 @@ def check_mathematical_artifacts() -> dict[str, object]:
     for filename, rows, columns, ones in (
         ("z10_21_106_matrix.csv", 10, 21, 106),
         ("z10_22_110_matrix.csv", 10, 22, 110),
+        ("z10_23_112_matrix.csv", 10, 23, 112),
         ("z11_19_106_matrix.csv", 11, 19, 106),
         ("z11_20_111_matrix.csv", 11, 20, 111),
+        ("z11_23_123_matrix.csv", 11, 23, 123),
         ("z12_23_134_matrix.csv", 12, 23, 134),
     ):
         path = ROOT / "data" / filename
@@ -380,7 +445,7 @@ def check_mathematical_artifacts() -> dict[str, object]:
     )
     verify_z13_23_upper_certificate(stored_z13_certificate)
     frontier = extended_frontier_report()
-    if frontier["source_open_cases"] != 44 or frontier["remaining_open_cases"] != 35:
+    if frontier["source_open_cases"] != 44 or frontier["remaining_open_cases"] != 33:
         raise AssertionError("extended frontier count mismatch")
     case_certificate_reports = []
     for case in CASE_SPECS:
@@ -474,7 +539,7 @@ def check_readme_attribution_and_checksums() -> dict[str, object]:
     for line in lines:
         digest, relative = line.split("  ", 1)
         path = ROOT / relative
-        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+        if not path.is_file() or sha256(path) != digest:
             raise AssertionError(f"artifact checksum mismatch: {relative}")
         checked += 1
     return {"readme_attribution": True, "artifact_hashes_checked": checked}

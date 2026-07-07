@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""Verify the 2026-07-05 frontier extension: Z(11,19,3,3)=106,
-Z(12,23,3,3)=134, the upper bound Z(13,23,3,3)<=144, and the propagated
-bound table in analysis/new_bounds.json.
+"""Verify the frontier extension, including the eight repository closures,
+the upper bound Z(13,23,3,3)<=144, and the propagated bound table in
+analysis/new_bounds.json.
 
 Standard library only.  Usage:
     python3 scripts/check_new_bounds.py --check    # verify everything
@@ -55,29 +55,39 @@ def _check_one_witness(name: str, m: int, n: int, target: int) -> dict:
 
 def check_witness() -> dict:
     return {
+        "z10_23": _check_one_witness("z10_23_112_matrix.csv", 10, 23, 112),
         "z11_19": _check_one_witness("z11_19_106_matrix.csv", 11, 19, 106),
+        "z11_23": _check_one_witness("z11_23_123_matrix.csv", 11, 23, 123),
         "z12_23": _check_one_witness("z12_23_134_matrix.csv", 12, 23, 134),
     }
 
 
 def check_sat_record_catalog() -> dict[str, object]:
-    """Check profile completeness while keeping unlogged verdicts non-load-bearing."""
+    """Check that the historical lead points to its certified replacement."""
 
     record = json.loads(SAT_RECORD.read_text(encoding="utf-8"))
-    assert record["evidence_status"] == "UNVERIFIED_SESSION_RECORD"
-    observations = record["frontier_observations"]
-    counts = {}
-    for total, expected_count in ((113, 25), (114, 11)):
-        generated = {
-            ",".join(f"{degree}x{count}" for degree, count in sorted(profile.items()))
-            for profile in degree_profiles(10, 23, total)
-        }
-        recorded = set(observations[f"10,23 at {total}"])
-        assert generated == recorded
-        assert len(generated) == expected_count
-        counts[str(total)] = expected_count
-    assert observations["10,23 at 113"]["1x1,5x20,6x2"] == "FILTER-KILLED"
-    return {"evidence_status": record["evidence_status"], "profile_counts": counts}
+    assert record["schema_version"] == 2
+    assert record["evidence_status"] == "SUPERSEDED_BY_REPLAYABLE_CERTIFICATE"
+    certified = record["certified_result"]
+    assert certified["theorem"] == "Z(10,23,3,3)=112"
+    assert certified["arithmetic_profiles"] == 25
+    assert certified["arithmetic_eliminations"] == 12
+    assert certified["traced_profiles"] == 13
+    manifest_path = ROOT / certified["sat_manifest"]
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    assert manifest["theorem"] == certified["theorem"]
+    assert manifest["excluded_target"] == 113
+    assert len(manifest["profiles"]) == certified["traced_profiles"]
+    generated_counts = {
+        str(total): len(degree_profiles(10, 23, total)) for total in (113, 114)
+    }
+    assert generated_counts == {"113": 25, "114": 11}
+    assert record["historical_untraced_session"]["profile_counts"] == generated_counts
+    return {
+        "evidence_status": record["evidence_status"],
+        "profile_counts": generated_counts,
+        "traced_profiles": len(manifest["profiles"]),
+    }
 
 
 # ------------------------------------------------- upper bound Z(11,19) ------
@@ -348,7 +358,8 @@ ESTABLISHED = {
 }
 CLOSED = {
     # this repository (docs/PROOF.md, docs/EXTENDED_RESULTS.md)
-    (9, 23): 103, (10, 21): 106, (10, 22): 110, (11, 20): 111,
+    (9, 23): 103, (10, 21): 106, (10, 22): 110, (10, 23): 112,
+    (11, 20): 111, (11, 23): 123,
     # Bhan--Nobili--Langer
     (11, 21): 116, (11, 22): 121, (12, 22): 132,
     # this extension (docs/NEW_BOUNDS.md)
@@ -426,7 +437,9 @@ def build_table() -> dict:
             "creates K33).",
             "Every upper bound is the literature value, the deficit theorems of "
             "docs/NEW_BOUNDS.md, or a floor(k/(k-1) * bound) deletion propagation.",
-            "Solver verdicts are intentionally excluded from this table.",
+            "The Z(10,23) seed is supported by an arithmetic reduction and "
+            "DRAT cores independently replayed through LRAT checking; no unlogged "
+            "solver verdict is used.",
         ],
         "cells": table,
     }
@@ -445,6 +458,10 @@ def run(check_only: bool) -> int:
     # closure consistency: the new exact values must agree with the table
     cell = table["cells"]["11,19"]
     assert cell["lower"] == cell["upper"] == 106, cell
+    cell = table["cells"]["10,23"]
+    assert cell["lower"] == cell["upper"] == 112, cell
+    cell = table["cells"]["11,23"]
+    assert cell["lower"] == cell["upper"] == 123, cell
     cell = table["cells"]["12,23"]
     assert cell["lower"] == cell["upper"] == 134, cell
     if check_only:

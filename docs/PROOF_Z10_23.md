@@ -1,0 +1,213 @@
+# Proof dossier for $Z(10,23,3,3)=112$
+
+## 1. Statement and evidence boundary
+
+This case is computer-assisted:
+
+$$
+\boxed{Z(10,23,3,3)=112}.
+$$
+
+The lower bound is an explicit Boolean matrix checked by two exhaustive
+verifiers. The upper bound has a standard-library arithmetic front end and a
+SAT back end. Each SAT case has a deterministic CNF and a compressed DRAT
+core. `drat-trim` verifies each core and converts it to LRAT, which the
+independent `lrat-check` program accepts. The Lean development checks the
+arithmetic endpoints; it does not replay SAT proofs or formalize the
+Boolean-matrix reduction.
+
+## 2. Translate columns into row sets
+
+Suppose for a contradiction that a $10\times23$ $K_{3,3}$-free Boolean matrix
+has 113 ones. For column $j$, let $E_j\subseteq[10]$ be its support and put
+$d_j=|E_j|$. If $\lambda_T$ is the number of columns containing a row triple
+$T$, then $K_{3,3}$-freeness is equivalent to $\lambda_T\le2$. Hence
+
+$$
+\sum_{j=1}^{23}\binom{d_j}{3}
+=\sum_{T\in\binom{[10]}3}\lambda_T
+\le2\binom{10}{3}=240. \tag{1}
+$$
+
+For $0\le d\le10$, define
+
+$$
+p(d)=\binom d3-10d+40.
+$$
+
+Its values are
+
+$$
+(p(0),\ldots,p(10))=(40,30,20,11,4,0,0,5,16,34,60).
+$$
+
+Therefore
+
+$$
+\sum_j p(d_j)
+=\sum_j\binom{d_j}{3}-10\cdot113+40\cdot23
+\le240-210=30. \tag{2}
+$$
+
+Exhausting the nonnegative integer solutions to the column count, degree sum,
+and (1) gives exactly 25 profiles. The standard-library function
+`z10_23_profile_report()` regenerates the list rather than trusting it.
+
+## 3. Twelve profiles are arithmetic
+
+### 3.1 Low-degree deletions
+
+Five profiles have a column of degree at most two:
+
+$$
+2^1 5^{21}6^1,\quad
+2^1 4^1 5^{19}6^2,\quad
+2^1 4^2 5^{17}6^3,\quad
+2^1 4^1 5^{20}7^1,\quad
+1^1 5^{20}6^2.
+$$
+
+Deleting that column leaves at least 111 ones in a $10\times22$ matrix,
+contradicting $Z(10,22,3,3)=110$.
+
+Four more profiles have two degree-three columns:
+
+$$
+3^2 5^{19}6^2,\quad
+3^2 4^1 5^{17}6^3,\quad
+3^2 4^2 5^{15}6^4,\quad
+3^2 5^{20}7^1.
+$$
+
+Deleting both leaves 107 ones in a $10\times21$ matrix, contradicting
+$Z(10,21,3,3)=106$.
+
+### 3.2 Two short row-residue contradictions
+
+For a row $r$, define its row-triple deficit by
+
+$$
+D_r=72-\sum_{j:r\in E_j}\binom{d_j-1}{2}\ge0.
+$$
+
+If
+
+$$
+s=240-\sum_j\binom{d_j}{3},
+$$
+
+then double counting gives $\sum_rD_r=3s$.
+
+For profile $4^6 5^{14}6^2 7^1$, one has $s=1$. Modulo three, only the two
+degree-six columns contribute. If they meet in $t$ rows, where $2\le t\le6$,
+then rows in exactly one of them have least residue two and rows in both have
+least residue one. Thus
+
+$$
+\sum_rD_r\ge2(12-2t)+t=24-3t\ge6>3=3s.
+$$
+
+For profile $3^1 4^3 5^{17}6^1 7^1$, one has $s=2$. Modulo three, only the
+degree-three and degree-six columns contribute. If their intersection has size
+$t\le3$, the same calculation gives
+
+$$
+\sum_rD_r\ge2(9-2t)+t=18-3t\ge9>6=3s.
+$$
+
+### 3.3 One finite pair-residue contradiction
+
+It remains to eliminate $3^1 4^2 5^{19}7^1$, whose slack is $s=6$. For a row
+pair $P$, put
+
+$$
+D_P=16-\sum_{j:P\subseteq E_j}(d_j-2)\ge0,
+\qquad
+\sum_PD_P=3s=18. \tag{3}
+$$
+
+Degree-five columns vanish modulo three. A row is represented by its membership
+pattern in the four exceptional columns of degrees $3,7,4,4$. Enumerating
+unlabelled multiplicities of the 16 patterns gives 1,577 configurations; 1,380
+obey the requirement that every triple of exceptional columns share at most
+two rows. Across those legal configurations, the minimum sum of the least
+nonnegative pair residues in (3) is 39. Since $39>18$, the profile is
+impossible. The checker recomputes all three numbers.
+
+## 4. The thirteen traced SAT cases
+
+The remaining profiles are
+
+$$
+\begin{aligned}
+&4^2 5^{21},\quad 4^3 5^{19}6^1,\quad 4^4 5^{17}6^2,
+  \quad 4^4 5^{18}7^1,\\
+&4^5 5^{15}6^3,\quad 4^5 5^{16}6^1 7^1,
+  \quad 4^6 5^{13}6^4,\quad 4^7 5^{11}6^5,\\
+&3^1 5^{22},\quad 3^1 4^1 5^{20}6^1,
+  \quad 3^1 4^2 5^{18}6^2,\\
+&3^1 4^3 5^{16}6^3,\quad 3^1 4^4 5^{14}6^4.
+\end{aligned}
+$$
+
+For each profile, the stored CNF uses cell variables $x_{rj}$ and enforces:
+
+1. the specified degree of every column;
+2. at most two columns containing each row triple;
+3. lexicographically nonincreasing rows and, within every equal-degree block,
+   lexicographically nonincreasing columns; and
+4. row degree at least ten, because deleting any row leaves at most
+   $Z(9,23,3,3)=103$ ones.
+
+The rare degree blocks are placed first. This changes only column names and
+exposes row symmetry. Double-lex is complete: choose a lexicographically
+maximum matrix in the finite orbit under row permutations and permutations
+inside equal-degree column blocks.
+
+Deterministic row-stabilizer cubes are available as an optional search aid.
+Once a prefix of columns is fixed, rows with the same prefix form a stabilizer
+cell; row lex order forces the next support to be an initial segment of every
+cell. Those partitions are not part of the proof trust boundary. Each stored
+DRAT trace is generated by a direct CaDiCaL run on the unsplit base CNF, then
+converted to LRAT and replayed against that exact base file. `lrat-check`
+projects the checked LRAT to a compact standard DRAT core, and `drat-trim`
+independently verifies that core. The compact core is the checked-in artifact.
+
+The certificate manifest records each formula hash, profile order, compressed
+DRAT hash, solver version, and successful DRAT-to-LRAT replay.
+When a compressed stream exceeds GitHub's single-file limit, it is stored as
+ordered byte chunks. The checker verifies every chunk and the hash of their
+exact concatenation before the replay script decompresses the reconstructed
+stream. This packaging has no logical role.
+Testing exactly 113 ones is sufficient: deleting ones preserves
+$K_{3,3}$-freeness.
+
+## 5. Matching lower bound
+
+[`z10_23_112_matrix.csv`](../data/z10_23_112_matrix.csv) is a $10\times23$
+Boolean matrix with 112 ones and no all-one $3\times3$ submatrix. It is obtained
+by deleting two 11-one rows from the repository's 134-one $12\times23$ witness;
+the stored CSV is checked directly, so the derivation is not a trust
+assumption. Hence
+
+$$
+Z(10,23,3,3)\ge112.
+$$
+
+Together with the traced exclusion of 113, this proves equality.
+
+## 6. Reproduction and trust boundary
+
+The core arithmetic and witness checks use only Python's standard library. The
+SAT generator requires `python-sat`; proof production used CaDiCaL 3.0.0 at
+commit `7b99c07f0bcab5824a5a3ce62c7066554017f641`. Proof conversion and final
+replay used `drat-trim` and `lrat-check` from commit
+`2e3b2dc0ecf938addbd779d42877b6ed69d9a985`. See the certificate manifest and
+[reproducibility guide](REPRODUCIBILITY.md) for exact commands.
+
+The DRAT cores, their `drat-trim` replays, and the independently checked derived
+LRAT traces establish unsatisfiability of the stored CNFs. The human proof and
+standard-library checker establish that the 25-profile split is exhaustive,
+that the twelve arithmetic eliminations are sound, and that the thirteen CNFs
+cover every remaining matrix up to symmetry. Lean checks the finite arithmetic
+endpoints, not these combinatorial or propositional reductions.

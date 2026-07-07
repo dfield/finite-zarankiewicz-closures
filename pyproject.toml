@@ -4,13 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "finite-zarankiewicz-closures"
-version = "1.4.0"
-description = "Reproducible proofs and certificates for six exact finite Zarankiewicz numbers"
+version = "1.5.0"
+description = "Reproducible proofs and certificates for eight exact finite Zarankiewicz numbers"
 readme = "README.md"
 requires-python = ">=3.9"
 license = {text = "MIT"}
 authors = [
-  {name = "GPT 5.6-Sol"}
+  {name = "GPT 5.6-Sol"},
+  {name = "Claude (Anthropic)"},
+  {name = "OpenAI Codex"},
 ]
 classifiers = [
   "Development Status :: 4 - Beta",

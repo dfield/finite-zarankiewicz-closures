@@ -6,7 +6,7 @@ column-type model is an LP/MIP file with one nonnegative integer variable for
 each possible column support.
 
 These generators are not the logical basis of the upper bounds.  They make all
-six excluded-target decision problems reproducible and cross-check the subset
+eight excluded-target decision problems reproducible and cross-check the subset
 translation used by the proofs.
 """
 

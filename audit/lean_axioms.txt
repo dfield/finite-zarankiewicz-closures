@@ -8,11 +8,20 @@
 'ZarankiewiczFiniteClosures.z10_21_deletion_bound' does not depend on any axioms
 'ZarankiewiczFiniteClosures.z11_19_deletion_bound' does not depend on any axioms
 'ZarankiewiczFiniteClosures.z11_20_deletion_bound' does not depend on any axioms
+'ZarankiewiczFiniteClosures.z11_23_deletion_bound' does not depend on any axioms
 'ZarankiewiczFiniteClosures.z10_21_excluded_target' depends on axioms: [propext, Quot.sound]
 'ZarankiewiczFiniteClosures.z11_19_excluded_target' depends on axioms: [propext, Quot.sound]
 'ZarankiewiczFiniteClosures.z11_20_excluded_target' depends on axioms: [propext, Quot.sound]
+'ZarankiewiczFiniteClosures.z11_23_excluded_target' depends on axioms: [propext, Quot.sound]
 'ZarankiewiczFiniteClosures.z10_penalty_eq_formula' does not depend on any axioms
 'ZarankiewiczFiniteClosures.z10_penalty_table' does not depend on any axioms
+'ZarankiewiczFiniteClosures.z10_23_affine_base' does not depend on any axioms
+'ZarankiewiczFiniteClosures.z10_23_penalty_budget' does not depend on any axioms
+'ZarankiewiczFiniteClosures.z10_23_low_column_impossible' depends on axioms: [propext, Quot.sound]
+'ZarankiewiczFiniteClosures.z10_23_two_degree_three_impossible' depends on axioms: [propext, Quot.sound]
+'ZarankiewiczFiniteClosures.z10_23_two_six_residue_minima' does not depend on any axioms
+'ZarankiewiczFiniteClosures.z10_23_three_six_residue_minima' does not depend on any axioms
+'ZarankiewiczFiniteClosures.z10_23_exceptional_profile_impossible' depends on axioms: [propext, Quot.sound]
 'ZarankiewiczFiniteClosures.classify_z10_22_degree_profile' depends on axioms: [propext, Classical.choice, Quot.sound]
 'ZarankiewiczFiniteClosures.z10_22_case_a_impossible' depends on axioms: [propext, Quot.sound]
 'ZarankiewiczFiniteClosures.z10_22_case_b_orbit_minima' does not depend on any axioms

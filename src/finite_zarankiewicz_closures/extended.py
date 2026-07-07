@@ -1,15 +1,17 @@
 """Exact finite results, frontier bounds, and certificates for the 2026 table.
 
 Alongside the marked-row proof of ``Z(9,23,3,3)=103``, this module records
-five further closures obtained by propagating and checking the open table in
+seven further closures obtained by propagating and checking the open table in
 Bhan--Nobili--Langer (2026): ``Z(10,21)=106``, ``Z(10,22)=110``,
-``Z(11,19)=106``, ``Z(11,20)=111``, and ``Z(12,23)=134``.  The deletion
-closures use established neighboring values; the other cases use finite
-degree-profile and deficit certificates.  The module also checks the improved
-upper bound ``Z(13,23)<=144``.
+``Z(10,23)=112``, ``Z(11,19)=106``, ``Z(11,20)=111``, ``Z(11,23)=123``, and
+``Z(12,23)=134``.  The deletion closures use established neighboring values;
+the other cases use finite degree-profile, deficit, and traced SAT
+certificates.  The module also checks the improved upper bound
+``Z(13,23)<=144``.
 
-Only the standard library is used.  In particular, the certificate checker
-does not trust an external integer-programming or SAT solver.
+Only the standard library is used by this arithmetic module.  The separate
+``Z(10,23)`` certificate layer binds the surviving formulas to independently
+replayable DRAT cores that are also converted to and checked as LRAT.
 """
 
 from __future__ import annotations
@@ -72,8 +74,10 @@ REPOSITORY_EXACT_VALUES = {
     (9, 23): 103,
     (10, 21): 106,
     (10, 22): 110,
+    (10, 23): 112,
     (11, 19): 106,
     (11, 20): 111,
+    (11, 23): 123,
     (12, 23): 134,
 }
 
@@ -166,6 +170,204 @@ def profile_dict(profile: Iterable[int]) -> dict[int, int]:
     """Return the nonzero entries of one degree-profile tuple."""
 
     return {degree: count for degree, count in enumerate(profile) if count}
+
+
+def _profile_label(profile: Mapping[int, int]) -> str:
+    """Render a compact, deterministic column-degree profile."""
+
+    return " ".join(f"{degree}^{count}" for degree, count in sorted(profile.items()))
+
+
+def _z10_23_exceptional_pair_residue_minimum() -> dict[str, int]:
+    """Enumerate the four exceptional columns of ``3 4^2 5^19 7``.
+
+    Degree-five columns contribute three to every row-pair capacity equation,
+    so only the degree-3, degree-4, degree-4, and degree-7 columns matter
+    modulo three.  Rows are represented by their four-bit membership pattern;
+    enumerating pattern multiplicities removes all row-label symmetry.
+    """
+
+    exceptional_degrees = (3, 7, 4, 4)
+    exceptional_weights = tuple(degree - 2 for degree in exceptional_degrees)
+    pattern_order = tuple(range(1, 1 << 4)) + (0,)
+    needs = list(exceptional_degrees)
+    counts = [0] * (1 << 4)
+    configurations = 0
+    legal_configurations = 0
+    minimum = math.inf
+
+    def exceptional_triples_are_legal() -> bool:
+        for column_triple in itertools.combinations(range(4), 3):
+            mask = sum(1 << column for column in column_triple)
+            shared_rows = sum(
+                count
+                for pattern, count in enumerate(counts)
+                if pattern & mask == mask
+            )
+            if shared_rows > 2:
+                return False
+        return True
+
+    def pair_residue_sum() -> int:
+        total = 0
+        used_patterns = [pattern for pattern, count in enumerate(counts) if count]
+        for left_index, left in enumerate(used_patterns):
+            for right in used_patterns[left_index:]:
+                pair_count = (
+                    counts[left] * (counts[left] - 1) // 2
+                    if left == right
+                    else counts[left] * counts[right]
+                )
+                common = left & right
+                exceptional = sum(
+                    exceptional_weights[column]
+                    for column in range(4)
+                    if common >> column & 1
+                )
+                total += pair_count * ((16 - exceptional) % 3)
+        return total
+
+    def visit(index: int, rows_left: int) -> None:
+        nonlocal configurations, legal_configurations, minimum
+        if index == len(pattern_order):
+            if rows_left or any(needs):
+                return
+            configurations += 1
+            if not exceptional_triples_are_legal():
+                return
+            legal_configurations += 1
+            minimum = min(minimum, pair_residue_sum())
+            return
+
+        pattern = pattern_order[index]
+        if pattern == 0:
+            if any(needs):
+                return
+            counts[0] = rows_left
+            visit(index + 1, 0)
+            counts[0] = 0
+            return
+
+        maximum = rows_left
+        for column in range(4):
+            if pattern >> column & 1:
+                maximum = min(maximum, needs[column])
+        for multiplicity in range(maximum + 1):
+            counts[pattern] = multiplicity
+            for column in range(4):
+                if pattern >> column & 1:
+                    needs[column] -= multiplicity
+            if all(need >= 0 for need in needs):
+                visit(index + 1, rows_left - multiplicity)
+            for column in range(4):
+                if pattern >> column & 1:
+                    needs[column] += multiplicity
+            counts[pattern] = 0
+
+    visit(0, 10)
+    result = {
+        "row_pattern_configurations": configurations,
+        "k33_legal_configurations": legal_configurations,
+        "minimum_pair_residue_sum": int(minimum),
+    }
+    expected = {
+        "row_pattern_configurations": 1577,
+        "k33_legal_configurations": 1380,
+        "minimum_pair_residue_sum": 39,
+    }
+    if result != expected:
+        raise AssertionError(f"unexpected Z(10,23) exceptional enumeration: {result}")
+    return result
+
+
+def z10_23_profile_report() -> dict[str, object]:
+    """Recompute the complete arithmetic front end at 113 ones.
+
+    Five profiles contain a column of degree at most two and four further
+    profiles contain two degree-three columns; deleting those columns violates
+    the established values ``Z(10,22)=110`` or ``Z(10,21)=106``.  Three
+    profiles die by row/pair-deficit residues.  The remaining thirteen are the
+    exact scope of the separately replayable SAT certificate family.
+    """
+
+    profiles = [profile_dict(profile) for profile in enumerate_degree_profiles(10, 23, 113)]
+    if len(profiles) != 25:
+        raise AssertionError(f"expected 25 profiles at 113, found {len(profiles)}")
+
+    low_degree: list[dict[int, int]] = []
+    two_degree_three: list[dict[int, int]] = []
+    residue: list[dict[int, int]] = []
+    sat: list[dict[int, int]] = []
+    simple_residue_profiles = {
+        ((4, 6), (5, 14), (6, 2), (7, 1)),
+        ((3, 1), (4, 3), (5, 17), (6, 1), (7, 1)),
+    }
+    exceptional_profile = ((3, 1), (4, 2), (5, 19), (7, 1))
+
+    for profile in profiles:
+        key = tuple(sorted(profile.items()))
+        if min(profile) <= 2:
+            low_degree.append(profile)
+        elif profile.get(3, 0) >= 2:
+            two_degree_three.append(profile)
+        elif key in simple_residue_profiles or key == exceptional_profile:
+            residue.append(profile)
+        else:
+            sat.append(profile)
+
+    expected_sat = {
+        ((4, 2), (5, 21)),
+        ((4, 3), (5, 19), (6, 1)),
+        ((4, 4), (5, 17), (6, 2)),
+        ((4, 4), (5, 18), (7, 1)),
+        ((4, 5), (5, 15), (6, 3)),
+        ((4, 5), (5, 16), (6, 1), (7, 1)),
+        ((4, 6), (5, 13), (6, 4)),
+        ((4, 7), (5, 11), (6, 5)),
+        ((3, 1), (5, 22)),
+        ((3, 1), (4, 1), (5, 20), (6, 1)),
+        ((3, 1), (4, 2), (5, 18), (6, 2)),
+        ((3, 1), (4, 3), (5, 16), (6, 3)),
+        ((3, 1), (4, 4), (5, 14), (6, 4)),
+    }
+    if {tuple(sorted(profile.items())) for profile in sat} != expected_sat:
+        raise AssertionError(f"unexpected SAT profile scope: {sat}")
+    if (len(low_degree), len(two_degree_three), len(residue), len(sat)) != (5, 4, 3, 13):
+        raise AssertionError("unexpected Z(10,23) profile partition")
+
+    # Profile 4^6 5^14 6^2 7: two degree-six columns overlap in t=2..6
+    # rows.  Modulo three, rows in exactly one/both have residues 2/1.
+    first_residue_minimum = min(24 - 3 * overlap for overlap in range(2, 7))
+    if first_residue_minimum != 6 or not first_residue_minimum > 3:
+        raise AssertionError("unexpected two-degree-six row residue minimum")
+
+    # Profile 3 4^3 5^17 6 7: use the degree-three/degree-six overlap t=0..3.
+    second_residue_minimum = min(18 - 3 * overlap for overlap in range(4))
+    if second_residue_minimum != 9 or not second_residue_minimum > 6:
+        raise AssertionError("unexpected degree-three/six row residue minimum")
+
+    exceptional = _z10_23_exceptional_pair_residue_minimum()
+    if exceptional["minimum_pair_residue_sum"] <= 18:
+        raise AssertionError("exceptional profile was not eliminated")
+
+    return {
+        "status": "ARITHMETIC_FRONT_END_VERIFIED",
+        "problem": "Z(10,23,3,3)",
+        "excluded_target": 113,
+        "triple_capacity": 240,
+        "profile_count": len(profiles),
+        "low_degree_column_profiles": [_profile_label(profile) for profile in low_degree],
+        "two_degree_three_profiles": [
+            _profile_label(profile) for profile in two_degree_three
+        ],
+        "residue_profiles": [_profile_label(profile) for profile in residue],
+        "sat_profiles": [_profile_label(profile) for profile in sat],
+        "simple_row_residue_minima": {
+            "4^6 5^14 6^2 7^1": first_residue_minimum,
+            "3^1 4^3 5^17 6^1 7^1": second_residue_minimum,
+        },
+        "exceptional_pair_residue": exceptional,
+    }
 
 
 def _pair_list(rows: int = 10) -> list[tuple[int, int]]:
@@ -620,6 +822,7 @@ def extended_frontier_report() -> dict[str, object]:
             "Z(10,21)<=106": deletion_upper(96, 10),
             "Z(11,19)<=106": deletion_upper(101, 19),
             "Z(11,20)<=111": deletion_upper(106, 20),
+            "Z(11,23)<=123": deletion_upper(112, 11),
         },
         "paper_bounds": {
             f"{rows},{columns}": {"lower": lower, "upper": upper}

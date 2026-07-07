@@ -1,4 +1,4 @@
-"""Uniform, case-specific certificates for the six exact values.
+"""Uniform, case-specific certificates for the eight exact values.
 
 Each stored JSON certificate is treated as untrusted.  This module rebuilds
 the witness invariants and the appropriate upper-bound certificate, then
@@ -16,8 +16,14 @@ from pathlib import Path
 from typing import Any, Mapping
 
 from .certificate import verify_certificate
-from .extended import deletion_upper, z10_22_certificate_report, z12_23_certificate_report
+from .extended import (
+    deletion_upper,
+    z10_22_certificate_report,
+    z10_23_profile_report,
+    z12_23_certificate_report,
+)
 from .matrix import read_boolean_csv, verify_by_row_triples
+from .sat_certificate import verify_z10_23_sat_manifest
 
 
 class CaseCertificateError(ValueError):
@@ -45,8 +51,10 @@ CASE_SPECS = (
     CaseSpec("z9_23_103", 9, 23, 103, "data/z9_23_103_matrix.csv"),
     CaseSpec("z10_21_106", 10, 21, 106, "data/z10_21_106_matrix.csv"),
     CaseSpec("z10_22_110", 10, 22, 110, "data/z10_22_110_matrix.csv"),
+    CaseSpec("z10_23_112", 10, 23, 112, "data/z10_23_112_matrix.csv"),
     CaseSpec("z11_19_106", 11, 19, 106, "data/z11_19_106_matrix.csv"),
     CaseSpec("z11_20_111", 11, 20, 111, "data/z11_20_111_matrix.csv"),
+    CaseSpec("z11_23_123", 11, 23, 123, "data/z11_23_123_matrix.csv"),
     CaseSpec("z12_23_134", 12, 23, 134, "data/z12_23_134_matrix.csv"),
 )
 CASE_BY_SLUG = {case.slug: case for case in CASE_SPECS}
@@ -116,6 +124,23 @@ def _upper_certificate(root: Path, case: CaseSpec) -> dict[str, Any]:
                 "case-B and case-C row-symmetry orbit enumeration"
             ),
         }
+    if case.slug == "z10_23_112":
+        path = root / "certificates" / "z10_23_sat.json"
+        detailed = json.loads(path.read_text(encoding="utf-8"))
+        sat_report = verify_z10_23_sat_manifest(detailed, root)
+        return {
+            "method": "profile_reduction_plus_replayable_sat",
+            "excluded_target": 113,
+            "arithmetic_front_end": z10_23_profile_report(),
+            "sat_manifest": "certificates/z10_23_sat.json",
+            "sat_manifest_sha256": _sha256(path),
+            "sat_integrity_report": sat_report,
+            "computer_assisted_component": (
+                "thirteen deterministic profile CNFs with DRAT cores replayed "
+                "through independent LRAT checking"
+            ),
+            "lean_kernel": "ZarankiewiczFiniteClosures.ArithmeticKernels",
+        }
     if case.slug == "z11_19_106":
         bound = deletion_upper(101, 19)
         if bound != 106:
@@ -160,6 +185,25 @@ def _upper_certificate(root: Path, case: CaseSpec) -> dict[str, Any]:
                     "formula_denominator": 19,
                     "recomputed_upper_bound": second,
                 },
+            ],
+            "lean_kernel": "ZarankiewiczFiniteClosures.ArithmeticKernels",
+        }
+    if case.slug == "z11_23_123":
+        bound = deletion_upper(112, 11)
+        if bound != 123:
+            raise CaseCertificateError("unexpected Z(11,23) deletion bound")
+        return {
+            "method": "vertex_deletion",
+            "excluded_target": 124,
+            "steps": [
+                {
+                    "source": "Z(10,23,3,3)<=112",
+                    "source_upper_bound": 112,
+                    "larger_part": 11,
+                    "formula_numerator": 1232,
+                    "formula_denominator": 10,
+                    "recomputed_upper_bound": bound,
+                }
             ],
             "lean_kernel": "ZarankiewiczFiniteClosures.ArithmeticKernels",
         }

@@ -1,24 +1,30 @@
-# Two further closures and new bounds on the 2026 frontier
+# Four further closures and new bounds on the 2026 frontier
 
-> **Attribution:** The results in this document were produced by **Claude (Anthropic)** in a verification-and-extension session dated 2026-07-05, building directly on this repository's four closures and on the sources cited in the [literature review](LITERATURE_REVIEW.md). They await independent expert review.
+> **Attribution:** The $Z(11,19)$ and $Z(12,23)$ results and the $Z(13,23)$ bound were produced by **Claude (Anthropic)** in a verification-and-extension session dated 2026-07-05. The traced $Z(10,23)$ certification and its $Z(11,23)$ consequence were completed with **OpenAI Codex** on 2026-07-06. They build directly on this repository's earlier closures and on the sources cited in the [literature review](LITERATURE_REVIEW.md), and await independent expert review.
 
 ## 1. Summary
 
 This document extends the repository's results on the Bhan--Nobili--Langer frontier ([BNL26], Figure 2) in three ways.
 
-**Two further exact values.**
+**Four further exact values.**
 
 $$
-\boxed{Z(11,19,3,3)=106,}
-\qquad
-\boxed{Z(12,23,3,3)=134.}
+\boxed{Z(10,23,3,3)=112},\qquad
+\boxed{Z(11,19,3,3)=106},
+$$
+
+$$
+\boxed{Z(11,23,3,3)=123},\qquad
+\boxed{Z(12,23,3,3)=134}.
 $$
 
 For $(11,19)$, the upper bound is the deletion bound already derived in [`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) from the established value $Z(11,18,3,3)=101$; the matching lower bound is a new explicit 106-one matrix, [`data/z11_19_106_matrix.csv`](../data/z11_19_106_matrix.csv), found by simulated annealing over fixed column-degree profiles and verified by exhaustive scan. Bhan--Nobili--Langer's best construction had 102 ones.
 
 For $(12,23)$, Section 3 proves $Z(12,23,3,3)\le134$ by a two-step deficit argument (their reported interval was $125$--$136$), and the matching lower bound is a new explicit 134-one matrix, [`data/z12_23_134_matrix.csv`](../data/z12_23_134_matrix.csv).
 
-With these closures, nine of the paper's 44 open cells are settled and **35 remain open**.
+For $(10,23)$, [`PROOF_Z10_23.md`](PROOF_Z10_23.md) reduces 113 ones to twelve arithmetic contradictions and thirteen deterministic CNFs, each carrying a DRAT core replayed through independent LRAT checking. The explicit 112-one matrix matches the upper bound. Vertex deletion then gives $Z(11,23)\le123$, and [`data/z11_23_123_matrix.csv`](../data/z11_23_123_matrix.csv) matches it; see [`PROOF_Z11_23.md`](PROOF_Z11_23.md).
+
+With these closures, eleven of the paper's 44 open cells are settled and **33 remain open**.
 
 **New elementary upper bounds.**
 
@@ -30,7 +36,7 @@ $$
 
 The previous published upper bounds were 136 and 145. The proofs use only the row-triple capacity count and the deficit mechanisms already present in this repository — the pair-deficit count of the $Z(10,22)$ proof and the marked-row residues of the $Z(9,23)$ proof — applied at new parameters, with residue moduli 10 and 4 at twelve rows and 5 at thirteen rows. Full proofs are in Sections 3 and 4; every arithmetic step, including the one finite enumeration, is checked by [`scripts/check_new_bounds.py`](../scripts/check_new_bounds.py).
 
-**A propagated bound table.** Closing the table of [BNL26] under the deletion lemma and under two-one-line extensions tightens 20 upper bounds and 17 lower bounds beyond the paper's published intervals, without any new search. The machine-readable result, with per-cell provenance, is [`analysis/new_bounds.json`](../analysis/new_bounds.json). Section 5 lists every change.
+**A propagated bound table.** Closing the table of [BNL26] under the deletion lemma and under two-one-line extensions tightens 21 upper bounds and 17 lower bounds beyond the paper's published intervals. The machine-readable result, with per-cell provenance, is [`analysis/new_bounds.json`](../analysis/new_bounds.json). Section 5 lists every change.
 
 ## 2. The value $Z(11,19,3,3)=106$
 
@@ -238,8 +244,8 @@ Seeding with the "previously established" cells of [BNL26] Figure 2 (values from
 
 | Cell | [BNL26] interval | New interval | Upper-bound mechanism |
 |---|---:|---:|---|
-| $(10,23)$ | 112--115 | 112--**114** | deletion from $Z(9,23)=103$ |
-| $(11,23)$ | 118--125 | **123**--125 | (lower bound lift from $Z(11,22)=121$) |
+| $(10,23)$ | 112--115 | **112** (closed) | arithmetic reduction plus replayed DRAT/LRAT certificates |
+| $(11,23)$ | 118--125 | **123** (closed) | deletion from $Z(10,23)=112$ plus explicit witness |
 | $(12,17)$ | 102--108 | 102--**104** | deletion from $Z(11,17)=96$ |
 | $(12,18)$ | 108--113 | 108--**110** | deletion from $Z(11,18)=101$ |
 | $(12,19)$ | 110--118 | 110--**115** | deletion from $Z(11,19)=106$ |
@@ -272,11 +278,7 @@ Cells not listed are unchanged. Note that $(12,19)$, $(12,20)$, and $(12,21)$ in
 
 - The $Z(11,19)$ **upper** bound and every deletion-propagated bound depend on the correctness of the established values in [BNL26] Figure 2 / Tan's Table 3 — the same dependency already accepted by [`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) for $Z(10,21)$ and $Z(11,20)$. The witness and both deficit theorems are self-contained.
 - The theorems of Sections 3 and 4 are fully elementary; [`scripts/check_new_bounds.py`](../scripts/check_new_bounds.py) re-derives the profile classifications by exhaustive enumeration and re-checks every displayed number, in the standard library only.
-- During the same session, per-profile SAT runs (CaDiCaL via PySAT, with sequential-counter cardinality encodings and double-lex symmetry breaking) produced two families of verdicts, recorded in [`analysis/sat_cross_check.json`](../analysis/sat_cross_check.json):
-  - **Cross-check of this repository.** Every capacity-feasible column-degree profile at all four previously excluded targets — $(9,23)$ at 104, $(10,21)$ at 107, $(10,22)$ at 111, and $(11,20)$ at 112 — returned `UNSAT`. This confirms the four published upper bounds by a mechanism independent of the marked-row, deletion, and pair-deficit proofs.
-  - **Frontier observations.** All 11 profiles of a hypothetical 114-one $10\times23$ matrix returned `UNSAT`. At 113 ones, 24 profiles returned `UNSAT`; the twenty-fifth profile, $1^15^{20}6^2$, is killed arithmetically (and is also impossible because deleting its degree-one column would leave 112 ones in a $10\times22$ matrix, contradicting $Z(10,22,3,3)=110$). Modulo the unlogged solver verdicts this gives $Z(10,23,3,3)\le112$, and Bhan--Nobili--Langer's 112-one construction then closes the cell at $Z(10,23,3,3)=112$.
-
-  **No claim in the solver-free table rests on those verdicts** — in particular the $(10,23)$ value is deliberately *not* entered in [`analysis/new_bounds.json`](../analysis/new_bounds.json), because no independently checkable proof trace was retained. The 2026-07-06 integration audit checked the profile catalog and small instances of the encoding but could not certify the recorded large UNSAT outcomes. Thus $Z(10,23,3,3)=112$ is a research lead, not a repository theorem. A proof-logged rerun (plus the elementary elimination of the one degree-one profile) would be required to upgrade it; see [`SAT_Z10_23_STATUS.md`](SAT_Z10_23_STATUS.md).
+- The original 2026-07-05 per-profile SAT sweep retained no proof traces and remains non-load-bearing historical evidence. It has now been superseded: the completed proof enumerates all 25 capacity-feasible profiles at 113 ones, eliminates twelve arithmetically, and stores deterministic formulas plus independently replayed DRAT/LRAT certificates for the remaining thirteen. [`analysis/sat_cross_check.json`](../analysis/sat_cross_check.json) records that transition, [`certificates/z10_23_sat.json`](../certificates/z10_23_sat.json) binds the artifacts, and [`SAT_Z10_23_STATUS.md`](SAT_Z10_23_STATUS.md) documents the completed promotion criteria.
 - The figure-2 transcription used here was re-read from the arXiv HTML of [BNL26] v2 during the session and matches [`analysis/extended_results.json`](../analysis/extended_results.json); the upper bounds equal $\min(\text{[Tan22] Table 3},\ \text{[DGH26] Table 2})$ cell-by-cell, and an exact-rational re-computation of the [DGH26] linear program reproduced their published values for every open cell.
 
 ## 7. Reproduction
@@ -284,6 +286,9 @@ Cells not listed are unchanged. Note that $(12,19)$, $(12,20)$, and $(12,21)$ in
 ```sh
 # everything claimed above (witness scan, both theorems, the propagated table)
 python3 scripts/check_new_bounds.py --check
+
+# optional, heavyweight semantic replay of all thirteen Z(10,23) proofs
+python3 scripts/replay_z10_23_certificates.py
 
 # regenerate the machine-readable table after an intentional change
 python3 scripts/check_new_bounds.py --write

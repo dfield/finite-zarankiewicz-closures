@@ -14,6 +14,7 @@ witness:
 
 certificate:
 	$(PYTHON) scripts/check_proof_certificate.py
+	$(PYTHON) scripts/build_z10_23_sat_manifest.py --check
 	$(PYTHON) scripts/check_case_certificates.py --check
 	$(PYTHON) scripts/check_frontier_certificate.py --check
 

@@ -1,76 +1,25 @@
 {
-    "description": "Per-profile SAT verdicts from the 2026-07-05 session. Solver: CaDiCaL 1.9.5 via PySAT; encoding: triple-coverage at-most-2 (sequential counter), exact column degrees, double-lex symmetry breaking. NO proof traces were retained: these verdicts are corroborating evidence only and no repository claim rests on them. See docs/NEW_BOUNDS.md section 6.",
-    "evidence_status": "UNVERIFIED_SESSION_RECORD",
- "frontier_observations": {
-        "10,23 at 113": {
-            "1x1,5x20,6x2": "FILTER-KILLED",
-            "2x1,4x1,5x19,6x2": "UNSAT",
-   "2x1,4x1,5x20,7x1": "UNSAT",
-   "2x1,4x2,5x17,6x3": "UNSAT",
-   "2x1,5x21,6x1": "UNSAT",
-   "3x1,4x1,5x20,6x1": "UNSAT",
-   "3x1,4x2,5x18,6x2": "UNSAT",
-   "3x1,4x2,5x19,7x1": "UNSAT",
-   "3x1,4x3,5x16,6x3": "UNSAT",
-   "3x1,4x3,5x17,6x1,7x1": "UNSAT",
-   "3x1,4x4,5x14,6x4": "UNSAT",
-   "3x1,5x22": "UNSAT",
-   "3x2,4x1,5x17,6x3": "UNSAT",
-   "3x2,4x2,5x15,6x4": "UNSAT",
-   "3x2,5x19,6x2": "UNSAT",
-   "3x2,5x20,7x1": "UNSAT",
-   "4x2,5x21": "UNSAT",
-   "4x3,5x19,6x1": "UNSAT",
-   "4x4,5x17,6x2": "UNSAT",
-   "4x4,5x18,7x1": "UNSAT",
-   "4x5,5x15,6x3": "UNSAT",
-   "4x5,5x16,6x1,7x1": "UNSAT",
-   "4x6,5x13,6x4": "UNSAT",
-   "4x6,5x14,6x2,7x1": "UNSAT",
-   "4x7,5x11,6x5": "UNSAT"
+  "certified_result": {
+    "arithmetic_eliminations": 12,
+    "arithmetic_profiles": 25,
+    "consequence": "Z(11,23,3,3)=123 by vertex deletion and a matching explicit witness",
+    "excluded_target": 113,
+    "proof_replay": "audit/z10_23_sat_replay.json",
+    "sat_manifest": "certificates/z10_23_sat.json",
+    "theorem": "Z(10,23,3,3)=112",
+    "traced_profiles": 13,
+    "witness": "data/z10_23_112_matrix.csv"
   },
-  "10,23 at 114": {
-   "2x1,5x20,6x2": "UNSAT",
-   "3x1,4x1,5x19,6x2": "UNSAT",
-   "3x1,4x1,5x20,7x1": "UNSAT",
-   "3x1,4x2,5x17,6x3": "UNSAT",
-   "3x1,5x21,6x1": "UNSAT",
-   "4x1,5x22": "UNSAT",
-   "4x2,5x20,6x1": "UNSAT",
-   "4x3,5x18,6x2": "UNSAT",
-   "4x3,5x19,7x1": "UNSAT",
-   "4x4,5x16,6x3": "UNSAT",
-   "4x5,5x14,6x4": "UNSAT"
-  },
-        "implication": "All 11 profiles at 114 returned UNSAT. At 113, 24 profiles returned UNSAT and the remaining profile 1x1,5x20,6x2 is excluded by the repository's arithmetic profile filter (equivalently, deleting its degree-one column contradicts Z(10,22,3,3)=110). Modulo the unlogged solver verdicts, Z(10,23,3,3) <= 112; Bhan--Nobili--Langer's 112-one construction then gives Z(10,23,3,3) = 112. This solver-assisted value is deliberately NOT entered in analysis/new_bounds.json, which stays solver-free."
- },
-    "repository_targets_cross_check": {
-  "10,21,107": {
-   "4x1,5x17,6x3": "UNSAT",
-   "4x1,5x18,6x1,7x1": "UNSAT",
-   "4x2,5x15,6x4": "UNSAT",
-   "5x19,6x2": "UNSAT",
-   "5x20,7x1": "FILTER-KILLED"
-  },
-  "10,22,111": {
-   "4x1,5x19,6x2": "UNSAT",
-   "4x1,5x20,7x1": "UNSAT",
-   "4x2,5x17,6x3": "UNSAT",
-   "5x21,6x1": "UNSAT"
-  },
-  "11,20,112": {
-   "4x1,5x6,6x13": "UNSAT",
-   "4x1,5x7,6x11,7x1": "UNSAT",
-   "4x2,5x4,6x14": "UNSAT",
-   "5x10,6x8,7x2": "UNSAT",
-   "5x8,6x12": "UNSAT",
-   "5x9,6x10,7x1": "UNSAT"
-  },
-  "9,23,104": {
-   "3x1,4x9,5x13": "FILTER-KILLED",
-   "4x11,5x12": "FILTER-KILLED",
-   "4x12,5x10,6x1": "FILTER-KILLED"
+  "description": "The unlogged 2026-07-05 SAT sweep was a useful discovery record but was not proof. It has been superseded by deterministic profile CNFs and compressed DRAT cores replayed through independent LRAT checking for every surviving 113-one profile.",
+  "evidence_status": "SUPERSEDED_BY_REPLAYABLE_CERTIFICATE",
+  "historical_untraced_session": {
+    "date": "2026-07-05",
+    "profile_counts": {
+      "113": 25,
+      "114": 11
     },
-    "review_note": "The degree-profile catalogs and encoding were independently checked during the 2026-07-06 integration review, but the large UNSAT verdicts could not be certified because the original run retained no formulas, logs, or proof traces. Z(10,23,3,3)=112 is therefore not a repository theorem."
-}
+    "status": "CORROBORATING_ONLY",
+    "summary": "The original sweep reported every capacity-feasible profile UNSAT or arithmetically filtered, but retained no proof traces. None of those verdicts is load-bearing in the completed proof."
+  },
+  "schema_version": 2
 }

@@ -17,11 +17,24 @@ PATTERNS = (
     "certificates/*.drat",
     "certificates/*.json",
     "certificates/*.lrat",
+    "certificates/z10_23/*.drat.xz",
+    "certificates/z10_23/*.drat.xz.part-*",
     "data/*.csv",
     "models/*.cnf",
     "models/*.json",
     "models/*.lp",
+    "models/z10_23/*.cnf",
 )
+
+
+def sha256(path: Path) -> str:
+    """Hash one artifact without reading a potentially large trace at once."""
+
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
 
 
 def render() -> str:
@@ -29,7 +42,7 @@ def render() -> str:
 
     paths = sorted({path for pattern in PATTERNS for path in ROOT.glob(pattern) if path.is_file()})
     return "".join(
-        f"{hashlib.sha256(path.read_bytes()).hexdigest()}  {path.relative_to(ROOT).as_posix()}\n"
+        f"{sha256(path)}  {path.relative_to(ROOT).as_posix()}\n"
         for path in paths
     )
 

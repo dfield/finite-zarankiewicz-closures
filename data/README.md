@@ -21,19 +21,21 @@ Bhan, Nobili, and Langer publicly established the 103 lower bound before this re
 
 ## Additional witnesses
 
-Five further matrices support the extended finite-table results:
+Seven further matrices support the extended finite-table results:
 
 | File | Dimensions | Ones | Role |
 |---|---:|---:|---|
 | [`z10_21_106_matrix.csv`](z10_21_106_matrix.csv) | $10\times21$ | 106 | Lower bound matching the deletion upper bound |
 | [`z10_22_110_matrix.csv`](z10_22_110_matrix.csv) | $10\times22$ | 110 | Lower bound matching the pair-deficit upper bound |
+| [`z10_23_112_matrix.csv`](z10_23_112_matrix.csv) | $10\times23$ | 112 | Lower bound matching the replayable profile-SAT upper bound |
 | [`z11_19_106_matrix.csv`](z11_19_106_matrix.csv) | $11\times19$ | 106 | Lower bound matching the deletion upper bound from $Z(11,18,3,3)=101$ |
 | [`z11_20_111_matrix.csv`](z11_20_111_matrix.csv) | $11\times20$ | 111 | Lower bound matching the two-step deletion upper bound |
+| [`z11_23_123_matrix.csv`](z11_23_123_matrix.csv) | $11\times23$ | 123 | Lower bound matching deletion from $Z(10,23,3,3)=112$ |
 | [`z12_23_134_matrix.csv`](z12_23_134_matrix.csv) | $12\times23$ | 134 | Lower bound matching the two-stage deficit theorem $Z(12,23,3,3)\le134$ |
 
-The 110-one matrix is row-regular with row sum 11, and every row triple occurs in exactly two columns. The $11\times19$ matrix has column degrees $5^86^{11}$ and row degrees $(8,9^3,10^6,11)$; the $12\times23$ matrix has column degrees $4^15^26^{20}$ and row degrees $(11^{10},12^2)$. Their exhaustive direct scans inspect 159,885 and 389,620 candidate $3\times3$ submatrices respectively.
+The 110-one matrix is row-regular with row sum 11, and every row triple occurs in exactly two columns. The $11\times19$ matrix has column degrees $5^86^{11}$ and row degrees $(8,9^3,10^6,11)$; the $12\times23$ matrix has column degrees $4^15^26^{20}$ and row degrees $(11^{10},12^2)$. Deleting one or two 11-one rows from that last witness gives the stored 123- and 112-one witnesses. Every CSV is nevertheless verified directly as an independent artifact.
 
-Verify all five additional matrices with both the package checker and the independent direct scanner:
+Verify all seven additional matrices with both the package checker and the independent direct scanner:
 
 ```sh
 PYTHONPATH=src python3 scripts/check_extended_results.py --check
