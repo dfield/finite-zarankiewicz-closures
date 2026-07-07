@@ -21,6 +21,7 @@ PATTERNS = (
     "certificates/z10_23/*.drat.xz.part-*",
     "certificates/z10_23/*.cubes.jsonl",
     "certificates/z10_23/*.cube-proof-index.jsonl",
+    "certificates/z10_23/*.cube-proofs.release.json",
     "certificates/z10_23/*.cube-proofs.tar.xz",
     "certificates/z10_23/*.cube-proofs.tar.xz.part-*",
     "data/*.csv",
