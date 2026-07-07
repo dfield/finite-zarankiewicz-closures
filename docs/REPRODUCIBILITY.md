@@ -164,6 +164,12 @@ not trust its search outcomes: it recomputes trie completeness, independently
 proves every leaf, performs both replay stages, and writes the deterministic
 archive and proof index.
 
+For the two profiles with three or four degree-four columns, the recorded
+catalog generation additionally used `--depth-factor 5 --escalate-after 5`:
+the budget is 200,000 conflicts through depth five, then grows by a factor of
+five at each deeper split. This changes only cover granularity. Completeness
+and every final leaf are checked independently of the exploratory budget.
+
 External output is summarized in [`audit/model_validation.json`](../audit/model_validation.json), [`audit/certificate_replay.json`](../audit/certificate_replay.json), and [`audit/z10_23_sat_replay.json`](../audit/z10_23_sat_replay.json). Temporary paths and timing noise are intentionally not stored.
 
 ## Artifact integrity

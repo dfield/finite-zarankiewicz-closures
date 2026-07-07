@@ -195,12 +195,16 @@ def generate_cubes(
     output: Path,
     conflict_budget: int,
     maximum_depth: int,
+    depth_factor: int = 1,
+    escalate_after: int = 99,
 ) -> dict[str, object]:
     """Generate an adaptive search-cube catalog (not a proof artifact)."""
 
     canonical = canonical_profile(profile)
     if canonical not in SAT_PROFILES:
         raise ValueError(f"profile is not in the thirteen-case SAT scope: {canonical}")
+    if conflict_budget <= 0 or maximum_depth <= 0 or depth_factor <= 0 or escalate_after < 0:
+        raise ValueError("cube budgets, depth, and factor must be positive")
     output.mkdir(parents=True, exist_ok=True)
     slug = profile_slug(canonical)
     formula_path = output / f"{slug}.cnf"
@@ -234,9 +238,12 @@ def generate_cubes(
             def visit(prefix: list[set[int]]) -> None:
                 nonlocal calls
                 calls += 1
-                solver.conf_budget(conflict_budget)
-                answer = solver.solve_limited(assumptions=_assumptions(prefix))
                 depth = len(prefix)
+                budget = conflict_budget * (
+                    depth_factor ** max(0, depth - escalate_after)
+                )
+                solver.conf_budget(budget)
+                answer = solver.solve_limited(assumptions=_assumptions(prefix))
                 if answer is False:
                     statistics[f"unsat_depth_{depth}"] += 1
                     record(prefix, "solver_unsat")
@@ -276,6 +283,8 @@ def generate_cubes(
             "count": leaf_count,
             "conflict_budget": conflict_budget,
             "maximum_depth": maximum_depth,
+            "depth_factor": depth_factor,
+            "escalate_after": escalate_after,
             "solver": "CaDiCaL 1.9.5 via python-sat 1.9.dev2",
             "calls": calls,
             "statistics": dict(sorted(statistics.items())),
@@ -471,6 +480,8 @@ def main(argv: Optional[list[str]] = None) -> int:
         if name == "cubes":
             command.add_argument("--conflicts", type=int, default=20_000)
             command.add_argument("--maximum-depth", type=int, default=10)
+            command.add_argument("--depth-factor", type=int, default=1)
+            command.add_argument("--escalate-after", type=int, default=99)
         elif name == "direct":
             command.add_argument("--reuse-raw", action="store_true")
     args = parser.parse_args(argv)
@@ -479,7 +490,14 @@ def main(argv: Optional[list[str]] = None) -> int:
         return 0
     args.output = args.output.resolve()
     if args.command == "cubes":
-        result = generate_cubes(args.profile, args.output, args.conflicts, args.maximum_depth)
+        result = generate_cubes(
+            args.profile,
+            args.output,
+            args.conflicts,
+            args.maximum_depth,
+            args.depth_factor,
+            args.escalate_after,
+        )
     else:
         result = direct_prove(args.profile, args.output, args.reuse_raw)
     print(json.dumps(result, indent=2, sort_keys=True))
