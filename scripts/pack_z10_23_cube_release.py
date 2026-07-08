@@ -72,7 +72,7 @@ def pack(
             f"archive compression failed: xz={returncode}\n"
             + xz_errors.decode(errors="replace")[-2000:]
         )
-    subprocess.run(["xz", "-t", str(archive)], check=True)
+    subprocess.run(["xz", f"-T{threads}", "-t", str(archive)], check=True)
 
     total_bytes = archive.stat().st_size
     stream_sha256 = sha256(archive)
