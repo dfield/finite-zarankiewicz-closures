@@ -11,6 +11,7 @@ converts it to LRAT with ``drat-trim``, and checks that LRAT with the independen
 from __future__ import annotations
 
 import hashlib
+import io
 from itertools import zip_longest
 import json
 import lzma
@@ -28,6 +29,41 @@ class SatCertificateError(ValueError):
 
 _CUBE_RELEASE_REPOSITORY = "dfield/finite-zarankiewicz-closures"
 _CUBE_RELEASE_TAG = "z10-23-certificate-v1"
+
+
+class _ConcatenatedReader(io.RawIOBase):
+    """Expose ordered byte chunks as one non-seekable binary stream."""
+
+    def __init__(self, paths: list[Path]) -> None:
+        super().__init__()
+        self._paths = iter(paths)
+        self._current = None
+
+    def readable(self) -> bool:
+        return True
+
+    def readinto(self, buffer: Any) -> int:
+        view = memoryview(buffer).cast("B")
+        written = 0
+        while written < len(view):
+            if self._current is None:
+                try:
+                    self._current = next(self._paths).open("rb")
+                except StopIteration:
+                    break
+            count = self._current.readinto(view[written:])
+            if count:
+                written += count
+                continue
+            self._current.close()
+            self._current = None
+        return written
+
+    def close(self) -> None:
+        if self._current is not None:
+            self._current.close()
+            self._current = None
+        super().close()
 
 
 def _sha256(path: Path) -> str:
@@ -242,6 +278,51 @@ def _check_cube_archive(root: Path, payload: Mapping[str, Any]) -> int:
     return total_bytes
 
 
+def _check_jsonl_parts(
+    root: Path,
+    payload: Mapping[str, Any],
+    label: str,
+) -> list[Path]:
+    """Verify one ordered split XZ stream and return its local part paths."""
+
+    parts = payload.get("parts")
+    if (
+        payload.get("compression") != "xz"
+        or payload.get("format") != "JSONL+xz+split"
+        or not isinstance(parts, list)
+        or len(parts) < 2
+    ):
+        raise SatCertificateError(f"invalid split {label} metadata")
+    names = [part.get("file") for part in parts if isinstance(part, dict)]
+    if (
+        len(names) != len(parts)
+        or not all(isinstance(name, str) for name in names)
+        or names != sorted(names)
+    ):
+        raise SatCertificateError(f"split {label} parts are not in canonical order")
+    digest = hashlib.sha256()
+    total_bytes = 0
+    paths = []
+    for part in parts:
+        path, expected_hash = _resolve_artifact(root, part)
+        if ".jsonl.xz.part-" not in path.name or path.stat().st_size >= 100_000_000:
+            raise SatCertificateError(f"unexpected split {label} part: {path}")
+        part_digest = hashlib.sha256()
+        with path.open("rb") as handle:
+            for block in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(block)
+                part_digest.update(block)
+        if part_digest.hexdigest() != expected_hash:
+            raise SatCertificateError(f"SAT artifact hash mismatch: {part['file']}")
+        total_bytes += path.stat().st_size
+        paths.append(path)
+    if digest.hexdigest() != payload.get("sha256"):
+        raise SatCertificateError(f"reassembled split {label} hash mismatch")
+    if total_bytes != payload.get("bytes"):
+        raise SatCertificateError(f"reassembled split {label} size mismatch")
+    return paths
+
+
 def _iter_jsonl(
     root: Path,
     payload: Mapping[str, Any],
@@ -249,11 +330,20 @@ def _iter_jsonl(
 ) -> Iterator[Mapping[str, Any]]:
     """Yield hash-checked JSONL objects while enforcing the declared count."""
 
-    path = _check_hashed_file(root, payload)
+    split_paths = None
+    if "parts" in payload:
+        split_paths = _check_jsonl_parts(root, payload, label)
+        path = split_paths[0]
+    else:
+        path = _check_hashed_file(root, payload)
     count = 0
+    raw = None
     try:
         compression = payload.get("compression")
-        if compression is None:
+        if split_paths is not None:
+            raw = _ConcatenatedReader(split_paths)
+            handle = lzma.open(io.BufferedReader(raw), "rt", encoding="ascii")
+        elif compression is None:
             if not path.name.endswith(".jsonl"):
                 raise SatCertificateError(f"uncompressed {label} lacks a .jsonl name: {path}")
             handle = path.open(encoding="ascii")
@@ -276,6 +366,9 @@ def _iter_jsonl(
                 yield record
     except (UnicodeDecodeError, json.JSONDecodeError, lzma.LZMAError) as error:
         raise SatCertificateError(f"malformed {label}: {path}") from error
+    finally:
+        if raw is not None:
+            raw.close()
     if payload.get("count") != count:
         raise SatCertificateError(f"{label} count mismatch: {path}")
 

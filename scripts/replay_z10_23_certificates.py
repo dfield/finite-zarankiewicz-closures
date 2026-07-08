@@ -8,6 +8,7 @@ from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 from contextlib import contextmanager
 from functools import lru_cache
 import hashlib
+import io
 import json
 import lzma
 import os
@@ -24,6 +25,7 @@ MANIFEST = ROOT / "certificates" / "z10_23_sat.json"
 sys.path.insert(0, str(ROOT / "src"))
 
 from finite_zarankiewicz_closures.sat_certificate import (  # noqa: E402
+    _ConcatenatedReader,
     load_and_verify_z10_23_sat_manifest,
 )
 
@@ -129,17 +131,28 @@ def _sha256(path: Path) -> str:
 def _jsonl_records(payload: Mapping[str, Any]) -> Iterator[Mapping[str, Any]]:
     """Stream one integrity-checked manifest JSONL artifact, optionally through XZ."""
 
-    path = ROOT / payload["file"]
-    if payload.get("compression") == "xz":
-        handle = lzma.open(path, "rt", encoding="ascii")
-    elif payload.get("compression") is None:
-        handle = path.open(encoding="ascii")
+    raw = None
+    if "parts" in payload:
+        raw = _ConcatenatedReader(
+            [ROOT / part["file"] for part in payload["parts"]]
+        )
+        handle = lzma.open(io.BufferedReader(raw), "rt", encoding="ascii")
     else:
+        path = ROOT / payload["file"]
+    if raw is None and payload.get("compression") == "xz":
+        handle = lzma.open(path, "rt", encoding="ascii")
+    elif raw is None and payload.get("compression") is None:
+        handle = path.open(encoding="ascii")
+    elif raw is None:
         raise ValueError(f"unexpected JSONL compression: {payload.get('compression')}")
-    with handle:
-        for line in handle:
-            if line.strip():
-                yield json.loads(line)
+    try:
+        with handle:
+            for line in handle:
+                if line.strip():
+                    yield json.loads(line)
+    finally:
+        if raw is not None:
+            raw.close()
 
 
 @lru_cache(maxsize=None)

@@ -52,6 +52,12 @@ leaf-core archives are split into GitHub release assets. In both cases the
 manifest binds every part and the SHA-256 and byte length of each exact
 concatenation. The replay script reassembles each stream before decompression;
 chunking changes only transport, not the DRAT proof.
+Large JSONL catalogs and proof indexes may themselves be XZ-compressed and,
+when necessary, split into ordered sub-100 MB byte chunks. The integrity gate
+hashes every chunk and its exact concatenation, decompresses the reconstructed
+stream with the standard library, checks its declared record count, and
+matches every proof record to the corresponding catalog leaf before accepting
+the cover.
 
 ```sh
 python3 scripts/replay_z10_23_certificates.py

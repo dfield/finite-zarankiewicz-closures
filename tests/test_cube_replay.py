@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import io
 import json
+import lzma
 from pathlib import Path
 import tarfile
 import tempfile
@@ -13,6 +14,28 @@ from scripts import replay_z10_23_certificates as replay
 
 
 class CubeReplayTests(unittest.TestCase):
+    def test_jsonl_reader_reassembles_split_xz_stream(self) -> None:
+        raw = lzma.compress(b'{"value":1}\n{"value":2}\n')
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            split = len(raw) // 2
+            parts = []
+            for index, block in enumerate((raw[:split], raw[split:])):
+                path = root / f"records.jsonl.xz.part-{index:02d}"
+                path.write_bytes(block)
+                parts.append({"file": path.name})
+            with patch.object(replay, "ROOT", root):
+                records = list(
+                    replay._jsonl_records(
+                        {
+                            "parts": parts,
+                            "compression": "xz",
+                            "format": "JSONL+xz+split",
+                        }
+                    )
+                )
+            self.assertEqual(records, [{"value": 1}, {"value": 2}])
+
     @staticmethod
     def _fixture(root: Path, count: int = 7) -> tuple[dict[str, object], Path]:
         catalog = [

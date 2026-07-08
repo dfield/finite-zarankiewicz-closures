@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import io
 import json
 import lzma
 from pathlib import Path
@@ -26,6 +27,41 @@ PROFILES = (
     "3x1,4x3,5x16,6x3",
     "3x1,4x4,5x14,6x4",
 )
+
+
+class _ConcatenatedReader(io.RawIOBase):
+    """Expose ordered byte chunks as one binary stream for XZ decoding."""
+
+    def __init__(self, paths: tuple[Path, ...]) -> None:
+        super().__init__()
+        self._paths = iter(paths)
+        self._current = None
+
+    def readable(self) -> bool:
+        return True
+
+    def readinto(self, buffer: object) -> int:
+        view = memoryview(buffer).cast("B")
+        written = 0
+        while written < len(view):
+            if self._current is None:
+                try:
+                    self._current = next(self._paths).open("rb")
+                except StopIteration:
+                    break
+            count = self._current.readinto(view[written:])
+            if count:
+                written += count
+                continue
+            self._current.close()
+            self._current = None
+        return written
+
+    def close(self) -> None:
+        if self._current is not None:
+            self._current.close()
+            self._current = None
+        super().close()
 
 
 def _slug(profile: str) -> str:
@@ -105,7 +141,49 @@ def _proof_metadata(slug: str) -> dict[str, object]:
     }
 
 
-def _jsonl_metadata(path: Path) -> dict[str, object]:
+def _jsonl_metadata(artifact: object) -> dict[str, object]:
+    if isinstance(artifact, tuple):
+        paths = artifact
+        digest = hashlib.sha256()
+        total_bytes = 0
+        part_metadata = []
+        for part in paths:
+            size = part.stat().st_size
+            if size >= 100_000_000:
+                raise ValueError(f"JSONL part exceeds GitHub's single-file limit: {part}")
+            part_digest = hashlib.sha256()
+            with part.open("rb") as handle:
+                for block in iter(lambda: handle.read(1024 * 1024), b""):
+                    digest.update(block)
+                    part_digest.update(block)
+            total_bytes += size
+            part_metadata.append(
+                {
+                    "file": str(part.relative_to(ROOT)),
+                    "sha256": part_digest.hexdigest(),
+                    "bytes": size,
+                }
+            )
+        raw = _ConcatenatedReader(paths)
+        try:
+            with lzma.open(io.BufferedReader(raw), "rt", encoding="ascii") as handle:
+                count = sum(1 for line in handle if line.strip())
+        finally:
+            raw.close()
+        return {
+            "parts": part_metadata,
+            "sha256": digest.hexdigest(),
+            "bytes": total_bytes,
+            "count": count,
+            "compression": "xz",
+            "format": "JSONL+xz+split",
+        }
+
+    if not isinstance(artifact, Path):
+        raise TypeError("unexpected JSONL artifact")
+    path = artifact
+    if path.stat().st_size >= 100_000_000:
+        raise ValueError(f"JSONL artifact exceeds GitHub's single-file limit: {path}")
     if path.suffix == ".xz":
         with lzma.open(path, "rt", encoding="ascii") as handle:
             count = sum(1 for line in handle if line.strip())
@@ -123,12 +201,14 @@ def _jsonl_metadata(path: Path) -> dict[str, object]:
     return metadata
 
 
-def _jsonl_artifact(directory: Path, name: str) -> Path:
+def _jsonl_artifact(directory: Path, name: str) -> object:
     candidates = [directory / name, directory / f"{name}.xz"]
     present = [path for path in candidates if path.is_file()]
-    if len(present) != 1:
+    parts = tuple(sorted(directory.glob(f"{name}.xz.part-*")))
+    representations = len(present) + bool(parts)
+    if representations != 1 or (parts and len(parts) < 2):
         raise ValueError(f"expected exactly one JSONL representation for {name}")
-    return present[0]
+    return parts or present[0]
 
 
 def _cube_archive_metadata(slug: str) -> dict[str, object]:
@@ -205,7 +285,7 @@ def render() -> str:
         cube_exists = any(
             (proof_directory / name).is_file()
             for name in (f"{slug}.cubes.jsonl", f"{slug}.cubes.jsonl.xz")
-        )
+        ) or bool(list(proof_directory.glob(f"{slug}.cubes.jsonl.xz.part-*")))
         if direct_exists == cube_exists:
             raise ValueError(f"expected exactly one proof strategy for {slug}")
         strategy = "direct_cadical" if direct_exists else "row_stabilizer_cube_cover"

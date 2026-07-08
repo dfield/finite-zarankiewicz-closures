@@ -77,6 +77,35 @@ class CaseCertificateTests(unittest.TestCase):
             with self.assertRaises(SatCertificateError):
                 _load_jsonl(root, payload, "test records")
 
+            raw = path.read_bytes()
+            split_at = len(raw) // 2
+            parts = []
+            for index, block in enumerate((raw[:split_at], raw[split_at:])):
+                part = root / f"records.jsonl.xz.part-{index:02d}"
+                part.write_bytes(block)
+                parts.append(
+                    {
+                        "file": part.name,
+                        "sha256": hashlib.sha256(block).hexdigest(),
+                        "bytes": len(block),
+                    }
+                )
+            split_payload = {
+                "parts": parts,
+                "sha256": hashlib.sha256(raw).hexdigest(),
+                "bytes": len(raw),
+                "count": 2,
+                "compression": "xz",
+                "format": "JSONL+xz+split",
+            }
+            self.assertEqual(
+                _load_jsonl(root, split_payload, "test records"),
+                [{"value": 1}, {"value": 2}],
+            )
+            split_payload["parts"][0]["sha256"] = "0" * 64
+            with self.assertRaises(SatCertificateError):
+                _load_jsonl(root, split_payload, "test records")
+
     def test_release_backed_cube_archive_metadata_is_strict(self) -> None:
         payload = self._release_archive_payload()
         self.assertEqual(_check_cube_archive(ROOT, payload), 24)
