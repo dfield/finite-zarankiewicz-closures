@@ -1,5 +1,7 @@
 *.drat.xz binary -delta
 *.drat.xz.part-* binary -delta
+*.jsonl.xz binary -delta
+*.jsonl.xz.part-* binary -delta
 *.cnf text eol=lf
 *.lp text eol=lf
 *.csv text eol=lf
