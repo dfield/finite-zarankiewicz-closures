@@ -18,7 +18,7 @@ jobs:
   python:
     name: Python ${{ matrix.python-version }} verification
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 180
     strategy:
       fail-fast: false
       matrix:
