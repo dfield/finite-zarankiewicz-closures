@@ -17,7 +17,7 @@ sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(ROOT / "src"))
 
 from finite_zarankiewicz_closures.cube_cover import verify_cube_catalog  # noqa: E402
-from search.z10_23_certify import SAT_PROFILES, canonical_profile  # noqa: E402
+from search.z10_23_profiles import SAT_PROFILES, canonical_profile  # noqa: E402
 
 
 def sha256(path: Path) -> str:
