@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -28,49 +29,67 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _check_artifact_directory(directory: Path, suffix: str, count: int) -> None:
+    """Reject missing, extra, or noncanonical leaf artifacts without a large set."""
+
+    pattern = re.compile(rf"leaf-([0-9]{{8}}){re.escape(suffix)}")
+    observed = 0
+    for path in directory.iterdir():
+        match = pattern.fullmatch(path.name)
+        if not path.is_file() or match is None or int(match.group(1)) >= count:
+            raise RuntimeError(f"proof workspace contains an extra artifact: {path.name}")
+        observed += 1
+    if observed != count:
+        raise RuntimeError("proof workspace contains missing leaf artifacts")
+
+
 def finalize(profile: str, catalog: Path, work: Path, formula: Path) -> dict[str, object]:
     canonical = canonical_profile(profile)
     if canonical not in SAT_PROFILES:
         raise ValueError(f"profile is outside the thirteen-case scope: {canonical}")
-    leaves = [json.loads(line) for line in catalog.read_text(encoding="ascii").splitlines()]
-    cover_report = verify_cube_catalog(canonical, leaves)
-    records = []
-    for index, leaf in enumerate(leaves):
-        checkpoint = work / "checkpoints" / f"leaf-{index:08d}.json"
-        proof = work / "proofs" / f"leaf-{index:08d}.drat"
-        if not checkpoint.is_file() or not proof.is_file():
-            raise RuntimeError(f"missing proof leaf {index}")
-        record = json.loads(checkpoint.read_text(encoding="ascii"))
-        if (
-            record.get("index") != index
-            or record.get("masks") != leaf.get("masks")
-            or record.get("literals", []) != leaf.get("literals", [])
-            or record.get("file") != f"proofs/leaf-{index:08d}.drat"
-            or record.get("bytes") != proof.stat().st_size
-            or record.get("sha256") != sha256(proof)
-            or record.get("status") != "VERIFIED"
-            or record.get("solver_options") != ["--unsat", "-q", "-P2"]
-            or record.get("replay")
-            != "drat-trim -> LRAT -> lrat-check; projected DRAT -> drat-trim"
-        ):
-            raise RuntimeError(f"invalid proof leaf {index}")
-        records.append(record)
-
-    expected_names = {f"leaf-{index:08d}" for index in range(len(leaves))}
-    proof_names = {path.stem for path in (work / "proofs").glob("leaf-*.drat")}
-    checkpoint_names = {
-        path.stem for path in (work / "checkpoints").glob("leaf-*.json")
-    }
-    if proof_names != expected_names or checkpoint_names != expected_names:
-        raise RuntimeError("proof workspace contains missing or extra leaves")
+    with catalog.open(encoding="ascii") as handle:
+        cover_report = verify_cube_catalog(
+            canonical, (json.loads(line) for line in handle)
+        )
 
     stored_catalog = work / "cubes.jsonl"
     if catalog.resolve() != stored_catalog.resolve():
         shutil.copyfile(catalog, stored_catalog)
     index_path = work / "proof-index.jsonl"
-    with index_path.open("w", encoding="ascii") as handle:
-        for record in records:
-            handle.write(json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n")
+    leaf_count = 0
+    proof_bytes = 0
+    with (
+        catalog.open(encoding="ascii") as catalog_handle,
+        index_path.open("w", encoding="ascii") as index_handle,
+    ):
+        for index, line in enumerate(catalog_handle):
+            leaf = json.loads(line)
+            checkpoint = work / "checkpoints" / f"leaf-{index:08d}.json"
+            proof = work / "proofs" / f"leaf-{index:08d}.drat"
+            if not checkpoint.is_file() or not proof.is_file():
+                raise RuntimeError(f"missing proof leaf {index}")
+            record = json.loads(checkpoint.read_text(encoding="ascii"))
+            if (
+                record.get("index") != index
+                or record.get("masks") != leaf.get("masks")
+                or record.get("literals", []) != leaf.get("literals", [])
+                or record.get("file") != f"proofs/leaf-{index:08d}.drat"
+                or record.get("bytes") != proof.stat().st_size
+                or record.get("sha256") != sha256(proof)
+                or record.get("status") != "VERIFIED"
+                or record.get("solver_options") != ["--unsat", "-q", "-P2"]
+                or record.get("replay")
+                != "drat-trim -> LRAT -> lrat-check; projected DRAT -> drat-trim"
+            ):
+                raise RuntimeError(f"invalid proof leaf {index}")
+            index_handle.write(
+                json.dumps(record, sort_keys=True, separators=(",", ":")) + "\n"
+            )
+            leaf_count += 1
+            proof_bytes += int(record["bytes"])
+
+    _check_artifact_directory(work / "proofs", ".drat", leaf_count)
+    _check_artifact_directory(work / "checkpoints", ".json", leaf_count)
 
     header = formula.read_bytes().splitlines()[0].split()
     if header[:2] != [b"p", b"cnf"] or len(header) != 4:
@@ -88,20 +107,20 @@ def finalize(profile: str, catalog: Path, work: Path, formula: Path) -> dict[str
         },
         "catalog": {
             "file": stored_catalog.name,
-            "count": len(leaves),
+            "count": leaf_count,
             "bytes": stored_catalog.stat().st_size,
             "sha256": sha256(stored_catalog),
             "completeness": cover_report,
         },
         "proof_index": {
             "file": index_path.name,
-            "count": len(records),
+            "count": leaf_count,
             "bytes": index_path.stat().st_size,
             "sha256": sha256(index_path),
         },
         "proofs": {
-            "count": len(records),
-            "bytes": sum(int(record["bytes"]) for record in records),
+            "count": leaf_count,
+            "bytes": proof_bytes,
             "verification": "every leaf independently DRAT/LRAT replayed",
         },
         "toolchain": {

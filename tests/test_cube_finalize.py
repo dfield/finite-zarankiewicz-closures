@@ -81,6 +81,15 @@ class CubeFinalizeTests(unittest.TestCase):
                 len((work / "proof-index.jsonl").read_text().splitlines()),
                 len(leaves),
             )
+            (proofs / "unexpected.drat").write_bytes(proof_bytes)
+            with (
+                patch(
+                    "search.z10_23_cube_finalize.subprocess.run",
+                    return_value=SimpleNamespace(stdout="sc2021"),
+                ),
+                self.assertRaises(RuntimeError),
+            ):
+                finalize(PROFILE, catalog, work, formula)
 
 
 if __name__ == "__main__":
