@@ -4,8 +4,9 @@
 from __future__ import annotations
 
 import argparse
-from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import FIRST_COMPLETED, Future, ThreadPoolExecutor, wait
 from contextlib import contextmanager
+from functools import lru_cache
 import hashlib
 import json
 import lzma
@@ -125,8 +126,8 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def _jsonl_records(payload: Mapping[str, Any]) -> list[Mapping[str, Any]]:
-    """Load one hash-checked manifest JSONL artifact, optionally through XZ."""
+def _jsonl_records(payload: Mapping[str, Any]) -> Iterator[Mapping[str, Any]]:
+    """Stream one integrity-checked manifest JSONL artifact, optionally through XZ."""
 
     path = ROOT / payload["file"]
     if payload.get("compression") == "xz":
@@ -136,7 +137,22 @@ def _jsonl_records(payload: Mapping[str, Any]) -> list[Mapping[str, Any]]:
     else:
         raise ValueError(f"unexpected JSONL compression: {payload.get('compression')}")
     with handle:
-        return [json.loads(line) for line in handle if line.strip()]
+        for line in handle:
+            if line.strip():
+                yield json.loads(line)
+
+
+@lru_cache(maxsize=None)
+def _base_formula(path_text: str) -> tuple[int, int, bytes]:
+    """Read one base formula once for all replay threads in its profile."""
+
+    base = Path(path_text)
+    raw = base.read_bytes()
+    header, separator, body = raw.partition(b"\n")
+    fields = header.split()
+    if not separator or fields[:2] != [b"p", b"cnf"] or len(fields) != 4:
+        raise ValueError(f"malformed base formula: {base}")
+    return int(fields[2]), int(fields[3]), body
 
 
 def _leaf_formula(
@@ -147,12 +163,7 @@ def _leaf_formula(
 ) -> None:
     """Append one cube's cell literals as unit clauses to the base formula."""
 
-    raw = base.read_bytes()
-    header, separator, body = raw.partition(b"\n")
-    fields = header.split()
-    if not separator or fields[:2] != [b"p", b"cnf"] or len(fields) != 4:
-        raise ValueError(f"malformed base formula: {base}")
-    variables, clauses = int(fields[2]), int(fields[3])
+    variables, clauses, body = _base_formula(str(base.resolve()))
     units = [
         row * 23 + column + 1
         if mask & (1 << row)
@@ -210,63 +221,109 @@ def _replay_cube_case(
     workers: int,
 ) -> dict[str, Any]:
     proof = case["proof"]
-    catalog = _jsonl_records(proof["catalog"])
-    index = _jsonl_records(proof["proof_index"])
     with tempfile.TemporaryDirectory(prefix="z10_23_cube_archive_") as directory:
         extracted = Path(directory)
-        expected = {record["file"]: record for record in index}
-        observed: set[str] = set()
-        with _cube_archive(case) as archive_path:
-            with tarfile.open(archive_path, mode="r:xz") as archive:
-                for member in archive:
-                    path = Path(member.name)
-                    if path.is_absolute() or ".." in path.parts or member.issym() or member.islnk():
-                        raise ValueError(f"unsafe cube-proof archive member: {member.name}")
-                    if member.isdir():
-                        continue
-                    if not member.isfile() or member.name not in expected:
-                        raise ValueError(f"unexpected cube-proof archive member: {member.name}")
-                    if member.name in observed:
-                        raise ValueError(f"duplicate cube-proof archive member: {member.name}")
-                    destination = extracted / member.name
-                    destination.parent.mkdir(parents=True, exist_ok=True)
-                    source = archive.extractfile(member)
-                    if source is None:
-                        raise ValueError(f"unreadable cube-proof archive member: {member.name}")
-                    with destination.open("wb") as handle:
-                        shutil.copyfileobj(source, handle, length=1024 * 1024)
-                    record = expected[member.name]
-                    if destination.stat().st_size != record["bytes"] or _sha256(destination) != record["sha256"]:
-                        raise ValueError(f"cube-proof member integrity failure: {member.name}")
-                    observed.add(member.name)
-        if observed != set(expected):
-            raise ValueError("cube-proof archive does not contain exactly the indexed leaves")
+        failures: list[dict[str, Any]] = []
+        pending: dict[Future[tuple[bool, str]], tuple[int, Path]] = {}
+        leaf_count = 0
 
-        failures = []
-        with ThreadPoolExecutor(max_workers=workers) as executor:
-            futures = {
-                executor.submit(
-                    _replay_cube_leaf,
-                    formula,
-                    extracted / record["file"],
-                    catalog[position]["masks"],
-                    catalog[position].get("literals", []),
-                    drat_trim,
-                    lrat_check,
-                ): position
-                for position, record in enumerate(index)
-            }
-            for future in as_completed(futures):
-                verified, output_tail = future.result()
-                if not verified:
-                    failures.append(
-                        {"leaf": futures[future], "output_tail": output_tail}
-                    )
+        def collect(done: set[Future[tuple[bool, str]]]) -> None:
+            for future in done:
+                position, path = pending.pop(future)
+                try:
+                    verified, output_tail = future.result()
+                    if not verified:
+                        failures.append({"leaf": position, "output_tail": output_tail})
+                finally:
+                    path.unlink(missing_ok=True)
+
+        with _cube_archive(case) as archive_path:
+            catalog = _jsonl_records(proof["catalog"])
+            index = _jsonl_records(proof["proof_index"])
+            with ThreadPoolExecutor(max_workers=workers) as executor:
+                with tarfile.open(archive_path, mode="r|xz") as archive:
+                    for member in archive:
+                        if member.isdir():
+                            continue
+                        path = Path(member.name)
+                        if (
+                            path.is_absolute()
+                            or ".." in path.parts
+                            or member.issym()
+                            or member.islnk()
+                            or not member.isfile()
+                        ):
+                            raise ValueError(
+                                f"unsafe cube-proof archive member: {member.name}"
+                            )
+                        leaf = next(catalog, None)
+                        record = next(index, None)
+                        if leaf is None or record is None:
+                            raise ValueError(
+                                f"unexpected cube-proof archive member: {member.name}"
+                            )
+                        expected_name = f"proofs/leaf-{leaf_count:08d}.drat"
+                        if (
+                            member.name != expected_name
+                            or record.get("file") != expected_name
+                            or record.get("index") != leaf_count
+                            or record.get("masks") != leaf.get("masks")
+                            or record.get("literals", []) != leaf.get("literals", [])
+                        ):
+                            raise ValueError(
+                                f"cube-proof archive order mismatch at leaf {leaf_count}"
+                            )
+                        destination = extracted / member.name
+                        destination.parent.mkdir(parents=True, exist_ok=True)
+                        source = archive.extractfile(member)
+                        if source is None:
+                            raise ValueError(
+                                f"unreadable cube-proof archive member: {member.name}"
+                            )
+                        digest = hashlib.sha256()
+                        size = 0
+                        with destination.open("wb") as handle:
+                            while block := source.read(1024 * 1024):
+                                digest.update(block)
+                                handle.write(block)
+                                size += len(block)
+                        if (
+                            size != record["bytes"]
+                            or digest.hexdigest() != record["sha256"]
+                        ):
+                            raise ValueError(
+                                f"cube-proof member integrity failure: {member.name}"
+                            )
+                        future = executor.submit(
+                            _replay_cube_leaf,
+                            formula,
+                            destination,
+                            leaf["masks"],
+                            leaf.get("literals", []),
+                            drat_trim,
+                            lrat_check,
+                        )
+                        pending[future] = (leaf_count, destination)
+                        leaf_count += 1
+                        if len(pending) >= max(2, workers * 2):
+                            done, _ = wait(pending, return_when=FIRST_COMPLETED)
+                            collect(done)
+                            if failures:
+                                break
+                    if not failures and (
+                        next(catalog, None) is not None or next(index, None) is not None
+                    ):
+                        raise ValueError(
+                            "cube-proof archive does not contain exactly the indexed leaves"
+                        )
+                if pending:
+                    done, _ = wait(pending)
+                    collect(done)
         return {
             "profile": case["profile"],
             "strategy": case["strategy"],
             "verified": not failures,
-            "leaf_count": len(index),
+            "leaf_count": leaf_count,
             "drat_checker": "drat-trim",
             "drat_verified": not failures,
             "lrat_checker": "lrat-check",
