@@ -125,6 +125,20 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def _jsonl_records(payload: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+    """Load one hash-checked manifest JSONL artifact, optionally through XZ."""
+
+    path = ROOT / payload["file"]
+    if payload.get("compression") == "xz":
+        handle = lzma.open(path, "rt", encoding="ascii")
+    elif payload.get("compression") is None:
+        handle = path.open(encoding="ascii")
+    else:
+        raise ValueError(f"unexpected JSONL compression: {payload.get('compression')}")
+    with handle:
+        return [json.loads(line) for line in handle if line.strip()]
+
+
 def _leaf_formula(
     base: Path,
     masks: list[int],
@@ -196,10 +210,8 @@ def _replay_cube_case(
     workers: int,
 ) -> dict[str, Any]:
     proof = case["proof"]
-    catalog_path = ROOT / proof["catalog"]["file"]
-    index_path = ROOT / proof["proof_index"]["file"]
-    catalog = [json.loads(line) for line in catalog_path.read_text(encoding="ascii").splitlines()]
-    index = [json.loads(line) for line in index_path.read_text(encoding="ascii").splitlines()]
+    catalog = _jsonl_records(proof["catalog"])
+    index = _jsonl_records(proof["proof_index"])
     with tempfile.TemporaryDirectory(prefix="z10_23_cube_archive_") as directory:
         extracted = Path(directory)
         expected = {record["file"]: record for record in index}

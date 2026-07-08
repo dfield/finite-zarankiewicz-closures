@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
+import lzma
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -13,6 +16,7 @@ from finite_zarankiewicz_closures.case_certificates import (
 from finite_zarankiewicz_closures.sat_certificate import (
     SatCertificateError,
     _check_cube_archive,
+    _load_jsonl,
     verify_z10_23_sat_manifest,
 )
 
@@ -21,6 +25,27 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class CaseCertificateTests(unittest.TestCase):
+    def test_xz_jsonl_artifact_is_hash_checked_and_loaded(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / "records.jsonl.xz"
+            with lzma.open(path, "wt", encoding="ascii") as handle:
+                handle.write('{"value":1}\n{"value":2}\n')
+            payload = {
+                "file": path.name,
+                "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                "bytes": path.stat().st_size,
+                "count": 2,
+                "compression": "xz",
+            }
+            self.assertEqual(
+                _load_jsonl(root, payload, "test records"),
+                [{"value": 1}, {"value": 2}],
+            )
+            payload["compression"] = "unrecorded"
+            with self.assertRaises(SatCertificateError):
+                _load_jsonl(root, payload, "test records")
+
     def test_release_backed_cube_archive_metadata_is_strict(self) -> None:
         payload = {
             "format": "TAR+DRAT+xz+github-release-parts",

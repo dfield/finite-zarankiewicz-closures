@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import lzma
 from pathlib import Path
 import re
 from typing import Any, Mapping
@@ -244,12 +245,28 @@ def _load_jsonl(root: Path, payload: Mapping[str, Any], label: str) -> list[Mapp
     path = _check_hashed_file(root, payload)
     records: list[Mapping[str, Any]] = []
     try:
-        for line_number, line in enumerate(path.read_text(encoding="ascii").splitlines(), start=1):
-            record = json.loads(line)
-            if not isinstance(record, dict):
-                raise SatCertificateError(f"{label} record is not an object: {path}:{line_number}")
-            records.append(record)
-    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        compression = payload.get("compression")
+        if compression is None:
+            if not path.name.endswith(".jsonl"):
+                raise SatCertificateError(f"uncompressed {label} lacks a .jsonl name: {path}")
+            handle = path.open(encoding="ascii")
+        elif compression == "xz":
+            if not path.name.endswith(".jsonl.xz"):
+                raise SatCertificateError(f"compressed {label} lacks a .jsonl.xz name: {path}")
+            handle = lzma.open(path, "rt", encoding="ascii")
+        else:
+            raise SatCertificateError(f"unexpected {label} compression: {compression}")
+        with handle:
+            for line_number, line in enumerate(handle, start=1):
+                if not line.strip():
+                    continue
+                record = json.loads(line)
+                if not isinstance(record, dict):
+                    raise SatCertificateError(
+                        f"{label} record is not an object: {path}:{line_number}"
+                    )
+                records.append(record)
+    except (UnicodeDecodeError, json.JSONDecodeError, lzma.LZMAError) as error:
         raise SatCertificateError(f"malformed {label}: {path}") from error
     if payload.get("count") != len(records):
         raise SatCertificateError(f"{label} count mismatch: {path}")

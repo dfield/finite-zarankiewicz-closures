@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import lzma
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -105,12 +106,29 @@ def _proof_metadata(slug: str) -> dict[str, object]:
 
 
 def _jsonl_metadata(path: Path) -> dict[str, object]:
-    return {
+    if path.suffix == ".xz":
+        with lzma.open(path, "rt", encoding="ascii") as handle:
+            count = sum(1 for line in handle if line.strip())
+    else:
+        with path.open(encoding="ascii") as handle:
+            count = sum(1 for line in handle if line.strip())
+    metadata: dict[str, object] = {
         "file": str(path.relative_to(ROOT)),
         "sha256": _sha256(path),
         "bytes": path.stat().st_size,
-        "count": sum(1 for line in path.read_text(encoding="ascii").splitlines() if line),
+        "count": count,
     }
+    if path.suffix == ".xz":
+        metadata["compression"] = "xz"
+    return metadata
+
+
+def _jsonl_artifact(directory: Path, name: str) -> Path:
+    candidates = [directory / name, directory / f"{name}.xz"]
+    present = [path for path in candidates if path.is_file()]
+    if len(present) != 1:
+        raise ValueError(f"expected exactly one JSONL representation for {name}")
+    return present[0]
 
 
 def _cube_archive_metadata(slug: str) -> dict[str, object]:
@@ -165,10 +183,8 @@ def _cube_archive_metadata(slug: str) -> dict[str, object]:
 
 def _cube_proof_metadata(slug: str) -> dict[str, object]:
     directory = ROOT / "certificates" / "z10_23"
-    catalog = directory / f"{slug}.cubes.jsonl"
-    index = directory / f"{slug}.cube-proof-index.jsonl"
-    if not catalog.is_file() or not index.is_file():
-        raise ValueError(f"missing cube-cover catalog or proof index for {slug}")
+    catalog = _jsonl_artifact(directory, f"{slug}.cubes.jsonl")
+    index = _jsonl_artifact(directory, f"{slug}.cube-proof-index.jsonl")
     return {
         "format": "row-stabilizer-cube-cover",
         "catalog": _jsonl_metadata(catalog),
@@ -186,7 +202,10 @@ def render() -> str:
         direct_exists = (proof_directory / f"{slug}.drat.xz").is_file() or bool(
             list(proof_directory.glob(f"{slug}.drat.xz.part-*"))
         )
-        cube_exists = (proof_directory / f"{slug}.cubes.jsonl").is_file()
+        cube_exists = any(
+            (proof_directory / name).is_file()
+            for name in (f"{slug}.cubes.jsonl", f"{slug}.cubes.jsonl.xz")
+        )
         if direct_exists == cube_exists:
             raise ValueError(f"expected exactly one proof strategy for {slug}")
         strategy = "direct_cadical" if direct_exists else "row_stabilizer_cube_cover"
