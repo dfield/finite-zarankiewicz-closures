@@ -7,8 +7,10 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import shutil
 import subprocess
 import tarfile
+import threading
 
 
 PART_BYTES = 1_800_000_000
@@ -16,14 +18,6 @@ RELEASE = {
     "repository": "dfield/finite-zarankiewicz-closures",
     "tag": "z10-23-certificate-v1",
 }
-
-
-def sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for block in iter(lambda: handle.read(1024 * 1024), b""):
-            digest.update(block)
-    return digest.hexdigest()
 
 
 def pack(
@@ -44,15 +38,80 @@ def pack(
         raise ValueError("invalid archive resource setting")
 
     archive = work / f"{slug}.cube-proofs.tar.xz"
-    with archive.open("wb") as output:
-        xz = subprocess.Popen(
-            ["xz", f"-T{threads}", preset, "-c"],
-            stdin=subprocess.PIPE,
-            stdout=output,
-            stderr=subprocess.PIPE,
-        )
-        if xz.stdin is None or xz.stderr is None:
-            raise RuntimeError("failed to open xz stream")
+    archive.unlink(missing_ok=True)
+    for stale in work.glob(f"{archive.name}.part-*"):
+        stale.unlink()
+
+    xz = subprocess.Popen(
+        ["xz", f"-T{threads}", preset, "-c"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    if xz.stdin is None or xz.stdout is None or xz.stderr is None:
+        raise RuntimeError("failed to open xz stream")
+
+    parts: list[dict[str, object]] = []
+    stream_digest = hashlib.sha256()
+    stream_bytes = 0
+    drain_errors: list[BaseException] = []
+
+    def drain_parts() -> None:
+        nonlocal stream_bytes
+        part_index = 0
+        destination = None
+        destination_path = None
+        part_digest = hashlib.sha256()
+        part_size = 0
+        try:
+            while block := xz.stdout.read(8 * 1024 * 1024):
+                stream_digest.update(block)
+                stream_bytes += len(block)
+                offset = 0
+                while offset < len(block):
+                    if destination is None:
+                        destination_path = work / (
+                            f"{archive.name}.part-{part_index:02d}"
+                        )
+                        destination = destination_path.open("wb")
+                        part_digest = hashlib.sha256()
+                        part_size = 0
+                    count = min(part_bytes - part_size, len(block) - offset)
+                    chunk = block[offset : offset + count]
+                    destination.write(chunk)
+                    part_digest.update(chunk)
+                    part_size += count
+                    offset += count
+                    if part_size == part_bytes:
+                        destination.close()
+                        parts.append(
+                            {
+                                "name": destination_path.name,
+                                "bytes": part_size,
+                                "sha256": part_digest.hexdigest(),
+                            }
+                        )
+                        destination = None
+                        part_index += 1
+            if destination is not None:
+                destination.close()
+                parts.append(
+                    {
+                        "name": destination_path.name,
+                        "bytes": part_size,
+                        "sha256": part_digest.hexdigest(),
+                    }
+                )
+        except BaseException as error:
+            drain_errors.append(error)
+            if destination is not None:
+                destination.close()
+            xz.stdout.close()
+
+    drainer = threading.Thread(target=drain_parts, name="cube-archive-splitter")
+    drainer.start()
+    tar_error = None
+    try:
         with tarfile.open(
             fileobj=xz.stdin,
             mode="w|",
@@ -70,42 +129,51 @@ def pack(
                 info.uname = info.gname = ""
                 with path.open("rb") as handle:
                     tar.addfile(info, handle)
-        xz.stdin.close()
-        xz_errors = xz.stderr.read()
-        xz.stderr.close()
-        returncode = xz.wait()
+    except BaseException as error:
+        tar_error = error
+    finally:
+        try:
+            xz.stdin.close()
+        except BrokenPipeError as error:
+            if tar_error is None:
+                tar_error = error
+    xz_errors = xz.stderr.read()
+    xz.stderr.close()
+    returncode = xz.wait()
+    drainer.join()
+    xz.stdout.close()
+    if drain_errors:
+        raise RuntimeError("archive splitter failed") from drain_errors[0]
+    if tar_error is not None:
+        raise RuntimeError("archive construction failed") from tar_error
     if returncode != 0:
         raise RuntimeError(
             f"archive compression failed: xz={returncode}\n"
             + xz_errors.decode(errors="replace")[-2000:]
         )
-    subprocess.run(["xz", f"-T{threads}", "-t", str(archive)], check=True)
+    if not parts or sum(int(part["bytes"]) for part in parts) != stream_bytes:
+        raise RuntimeError("archive splitter produced an incomplete stream")
 
-    total_bytes = archive.stat().st_size
-    stream_sha256 = sha256(archive)
-    for stale in work.glob(f"{archive.name}.part-*"):
-        stale.unlink()
-    parts = []
-    with archive.open("rb") as source:
-        part_index = 0
-        while source.tell() < total_bytes:
-            part = archive.with_name(f"{archive.name}.part-{part_index:02d}")
-            remaining = part_bytes
-            with part.open("wb") as destination:
-                while remaining:
-                    block = source.read(min(8 * 1024 * 1024, remaining))
-                    if not block:
-                        break
-                    destination.write(block)
-                    remaining -= len(block)
-            parts.append(
-                {
-                    "name": part.name,
-                    "bytes": part.stat().st_size,
-                    "sha256": sha256(part),
-                }
-            )
-            part_index += 1
+    tester = subprocess.Popen(
+        ["xz", f"-T{threads}", "-t"],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.PIPE,
+    )
+    if tester.stdin is None or tester.stderr is None:
+        raise RuntimeError("failed to open xz integrity check")
+    for part in parts:
+        with (work / str(part["name"])).open("rb") as source:
+            shutil.copyfileobj(source, tester.stdin, length=8 * 1024 * 1024)
+    tester.stdin.close()
+    tester_errors = tester.stderr.read()
+    tester.stderr.close()
+    tester_returncode = tester.wait()
+    if tester_returncode != 0:
+        raise RuntimeError(
+            f"archive integrity check failed: xz={tester_returncode}\n"
+            + tester_errors.decode(errors="replace")[-2000:]
+        )
 
     release_metadata = {
         "format": "TAR+DRAT+xz+github-release-parts",
@@ -122,8 +190,8 @@ def pack(
         },
         "release": RELEASE,
         "parts": parts,
-        "bytes": total_bytes,
-        "sha256": stream_sha256,
+        "bytes": stream_bytes,
+        "sha256": stream_digest.hexdigest(),
     }
     sidecar = work / f"{slug}.cube-proofs.release.json"
     sidecar.write_text(

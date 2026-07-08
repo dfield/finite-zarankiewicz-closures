@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import hashlib
+import io
 import json
 from pathlib import Path
 import tarfile
@@ -34,8 +36,10 @@ class CubePackTests(unittest.TestCase):
             combined = b"".join(
                 (work / part["name"]).read_bytes() for part in second["parts"]
             )
-            self.assertEqual(combined, archive.read_bytes())
-            with tarfile.open(archive, mode="r:xz") as handle:
+            self.assertEqual(len(combined), second["bytes"])
+            self.assertEqual(hashlib.sha256(combined).hexdigest(), second["sha256"])
+            self.assertFalse(archive.exists())
+            with tarfile.open(fileobj=io.BytesIO(combined), mode="r:xz") as handle:
                 self.assertEqual(
                     handle.getnames(),
                     [
