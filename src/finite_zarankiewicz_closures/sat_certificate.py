@@ -294,10 +294,17 @@ def _check_jsonl_parts(
     ):
         raise SatCertificateError(f"invalid split {label} metadata")
     names = [part.get("file") for part in parts if isinstance(part, dict)]
+    base = (
+        names[0].removesuffix(".part-00")
+        if names and isinstance(names[0], str)
+        else ""
+    )
+    expected_names = [f"{base}.part-{index:02d}" for index in range(len(parts))]
     if (
         len(names) != len(parts)
         or not all(isinstance(name, str) for name in names)
-        or names != sorted(names)
+        or not base.endswith(".jsonl.xz")
+        or names != expected_names
     ):
         raise SatCertificateError(f"split {label} parts are not in canonical order")
     digest = hashlib.sha256()

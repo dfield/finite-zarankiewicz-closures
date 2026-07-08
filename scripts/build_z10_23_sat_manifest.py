@@ -205,8 +205,15 @@ def _jsonl_artifact(directory: Path, name: str) -> object:
     candidates = [directory / name, directory / f"{name}.xz"]
     present = [path for path in candidates if path.is_file()]
     parts = tuple(sorted(directory.glob(f"{name}.xz.part-*")))
+    expected_parts = tuple(
+        directory / f"{name}.xz.part-{index:02d}" for index in range(len(parts))
+    )
     representations = len(present) + bool(parts)
-    if representations != 1 or (parts and len(parts) < 2):
+    if (
+        representations != 1
+        or (parts and len(parts) < 2)
+        or (parts and parts != expected_parts)
+    ):
         raise ValueError(f"expected exactly one JSONL representation for {name}")
     return parts or present[0]
 

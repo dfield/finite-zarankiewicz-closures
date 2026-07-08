@@ -32,6 +32,10 @@ class SatManifestBuilderTests(unittest.TestCase):
             self.assertEqual(metadata["format"], "JSONL+xz+split")
             self.assertEqual(len(metadata["parts"]), 2)
 
+            paths[1].rename(root / "sample.jsonl.xz.part-02")
+            with self.assertRaises(ValueError):
+                builder._jsonl_artifact(root, "sample.jsonl")
+
 
 if __name__ == "__main__":
     unittest.main()
