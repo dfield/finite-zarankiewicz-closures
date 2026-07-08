@@ -137,6 +137,18 @@ class CaseCertificateTests(unittest.TestCase):
             with self.assertRaises(SatCertificateError):
                 _check_cube_archive(ROOT, candidate)
 
+        large = copy.deepcopy(payload)
+        large["parts"] = [
+            {
+                "name": f"sample.cube-proofs.tar.xz.part-{index:06d}",
+                "bytes": 1,
+                "sha256": f"{index:064x}",
+            }
+            for index in range(101)
+        ]
+        large["bytes"] = 101
+        self.assertEqual(_check_cube_archive(ROOT, large), 101)
+
     def test_cube_catalog_and_compressed_index_are_checked_in_one_stream(self) -> None:
         profile = "3x1,4x2,5x18,6x2"
         degrees = ordered_degrees(profile)
