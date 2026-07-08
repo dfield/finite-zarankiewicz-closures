@@ -129,6 +129,9 @@ class CaseCertificateTests(unittest.TestCase):
             lambda value: value["release"].__setitem__("tag", "unrecorded"),
             lambda value: value["compression"]["xz_options"].append("unrecorded"),
             lambda value: value["parts"].reverse(),
+            lambda value: value["parts"][1].__setitem__(
+                "name", "sample.cube-proofs.tar.xz.part-02"
+            ),
             lambda value: value["parts"][0].__setitem__("sha256", "bad"),
             lambda value: value.__setitem__("bytes", 25),
         ):

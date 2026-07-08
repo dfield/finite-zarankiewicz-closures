@@ -66,6 +66,28 @@ class _ConcatenatedReader(io.RawIOBase):
         super().close()
 
 
+def _canonical_numbered_parts(names: list[Any], marker: str) -> bool:
+    """Recognize one fixed-width, contiguous ``part-N`` filename sequence."""
+
+    matches = [
+        re.fullmatch(rf"(.+{re.escape(marker)})([0-9]+)", name)
+        if isinstance(name, str)
+        else None
+        for name in names
+    ]
+    bases = {match.group(1) for match in matches if match is not None}
+    widths = {len(match.group(2)) for match in matches if match is not None}
+    indexes = [int(match.group(2)) for match in matches if match is not None]
+    return (
+        bool(names)
+        and all(match is not None for match in matches)
+        and len(bases) == 1
+        and len(widths) == 1
+        and next(iter(widths), 0) >= 2
+        and indexes == list(range(len(names)))
+    )
+
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -163,8 +185,7 @@ def _check_proof_artifact(root: Path, payload: Mapping[str, Any]) -> int:
     relative_names = [part.get("file") for part in parts if isinstance(part, dict)]
     if (
         len(relative_names) != len(parts)
-        or not all(isinstance(name, str) for name in relative_names)
-        or relative_names != sorted(relative_names)
+        or not _canonical_numbered_parts(relative_names, ".drat.xz.part-")
     ):
         raise SatCertificateError("split proof parts are not in canonical order")
     digest = hashlib.sha256()
@@ -211,11 +232,13 @@ def _check_cube_archive(root: Path, payload: Mapping[str, Any]) -> int:
         names = [part.get("name") for part in parts if isinstance(part, dict)]
         if (
             len(names) != len(parts)
-            or not all(isinstance(name, str) for name in names)
-            or names != sorted(names)
+            or not _canonical_numbered_parts(
+                names, ".cube-proofs.tar.xz.part-"
+            )
             or any(
                 ".cube-proofs.tar.xz.part-" not in name or "/" in name or "\\" in name
                 for name in names
+                if isinstance(name, str)
             )
         ):
             raise SatCertificateError("release-backed cube-proof parts are not canonical")
@@ -253,8 +276,9 @@ def _check_cube_archive(root: Path, payload: Mapping[str, Any]) -> int:
     names = [part.get("file") for part in parts if isinstance(part, dict)]
     if (
         len(names) != len(parts)
-        or not all(isinstance(name, str) for name in names)
-        or names != sorted(names)
+        or not _canonical_numbered_parts(
+            names, ".cube-proofs.tar.xz.part-"
+        )
     ):
         raise SatCertificateError("cube-proof archive parts are not in canonical order")
     digest = hashlib.sha256()
@@ -294,23 +318,9 @@ def _check_jsonl_parts(
     ):
         raise SatCertificateError(f"invalid split {label} metadata")
     names = [part.get("file") for part in parts if isinstance(part, dict)]
-    matches = [
-        re.fullmatch(r"(.+\.jsonl\.xz\.part-)([0-9]+)", name)
-        if isinstance(name, str)
-        else None
-        for name in names
-    ]
-    bases = {match.group(1) for match in matches if match is not None}
-    widths = {len(match.group(2)) for match in matches if match is not None}
-    indexes = [int(match.group(2)) for match in matches if match is not None]
     if (
         len(names) != len(parts)
-        or not all(isinstance(name, str) for name in names)
-        or any(match is None for match in matches)
-        or len(bases) != 1
-        or len(widths) != 1
-        or next(iter(widths), 0) < 2
-        or indexes != list(range(len(parts)))
+        or not _canonical_numbered_parts(names, ".jsonl.xz.part-")
     ):
         raise SatCertificateError(f"split {label} parts are not in canonical order")
     digest = hashlib.sha256()
