@@ -32,7 +32,16 @@ class SatManifestBuilderTests(unittest.TestCase):
             self.assertEqual(metadata["format"], "JSONL+xz+split")
             self.assertEqual(len(metadata["parts"]), 2)
 
-            paths[1].rename(root / "sample.jsonl.xz.part-02")
+            six_digit_paths = []
+            for index, path in enumerate(paths):
+                renamed = root / f"sample.jsonl.xz.part-{index:06d}"
+                path.rename(renamed)
+                six_digit_paths.append(renamed)
+            self.assertEqual(
+                builder._jsonl_artifact(root, "sample.jsonl"),
+                tuple(six_digit_paths),
+            )
+            six_digit_paths[1].rename(root / "sample.jsonl.xz.part-000002")
             with self.assertRaises(ValueError):
                 builder._jsonl_artifact(root, "sample.jsonl")
 

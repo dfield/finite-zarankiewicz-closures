@@ -80,9 +80,11 @@ class CaseCertificateTests(unittest.TestCase):
             raw = path.read_bytes()
             split_at = len(raw) // 2
             parts = []
+            part_paths = []
             for index, block in enumerate((raw[:split_at], raw[split_at:])):
                 part = root / f"records.jsonl.xz.part-{index:02d}"
                 part.write_bytes(block)
+                part_paths.append(part)
                 parts.append(
                     {
                         "file": part.name,
@@ -108,7 +110,15 @@ class CaseCertificateTests(unittest.TestCase):
             split_payload["parts"][0]["sha256"] = hashlib.sha256(
                 raw[:split_at]
             ).hexdigest()
-            split_payload["parts"][1]["file"] = "records.jsonl.xz.part-02"
+            for index, part in enumerate(part_paths):
+                renamed = root / f"records.jsonl.xz.part-{index:06d}"
+                part.rename(renamed)
+                split_payload["parts"][index]["file"] = renamed.name
+            self.assertEqual(
+                _load_jsonl(root, split_payload, "test records"),
+                [{"value": 1}, {"value": 2}],
+            )
+            split_payload["parts"][1]["file"] = "records.jsonl.xz.part-000002"
             with self.assertRaises(SatCertificateError):
                 _load_jsonl(root, split_payload, "test records")
 

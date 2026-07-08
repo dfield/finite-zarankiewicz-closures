@@ -204,15 +204,29 @@ def _jsonl_metadata(artifact: object) -> dict[str, object]:
 def _jsonl_artifact(directory: Path, name: str) -> object:
     candidates = [directory / name, directory / f"{name}.xz"]
     present = [path for path in candidates if path.is_file()]
-    parts = tuple(sorted(directory.glob(f"{name}.xz.part-*")))
-    expected_parts = tuple(
-        directory / f"{name}.xz.part-{index:02d}" for index in range(len(parts))
+    prefix = f"{name}.xz.part-"
+    indexed_parts = []
+    for path in directory.glob(f"{prefix}*"):
+        suffix = path.name.removeprefix(prefix)
+        if not suffix.isdigit():
+            raise ValueError(f"noncanonical JSONL part name: {path}")
+        indexed_parts.append((int(suffix), len(suffix), path))
+    indexed_parts.sort()
+    parts = tuple(path for _, _, path in indexed_parts)
+    widths = {width for _, width, _ in indexed_parts}
+    canonical_parts = (
+        not parts
+        or (
+            len(widths) == 1
+            and next(iter(widths)) >= 2
+            and [index for index, _, _ in indexed_parts] == list(range(len(parts)))
+        )
     )
     representations = len(present) + bool(parts)
     if (
         representations != 1
         or (parts and len(parts) < 2)
-        or (parts and parts != expected_parts)
+        or not canonical_parts
     ):
         raise ValueError(f"expected exactly one JSONL representation for {name}")
     return parts or present[0]
