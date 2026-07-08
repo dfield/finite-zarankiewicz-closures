@@ -18,7 +18,13 @@ class CubePackTests(unittest.TestCase):
             (proofs / "leaf-00000000.drat").write_bytes(b"first proof\n")
             (proofs / "leaf-00000001.drat").write_bytes(b"second proof\n")
             (work / "metadata.json").write_text(
-                json.dumps({"status": "VERIFIED_CUBE_LEAF_PROOFS"}) + "\n",
+                json.dumps(
+                    {
+                        "status": "VERIFIED_CUBE_LEAF_PROOFS",
+                        "proofs": {"count": 2},
+                    }
+                )
+                + "\n",
                 encoding="ascii",
             )
             first = pack("sample", work, threads=1, preset="-0", part_bytes=37)

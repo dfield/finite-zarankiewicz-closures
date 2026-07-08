@@ -36,6 +36,10 @@ def pack(
     metadata = json.loads((work / "metadata.json").read_text(encoding="ascii"))
     if metadata.get("status") != "VERIFIED_CUBE_LEAF_PROOFS":
         raise RuntimeError("finalized proof metadata is missing")
+    proof_metadata = metadata.get("proofs")
+    proof_count = proof_metadata.get("count") if isinstance(proof_metadata, dict) else None
+    if not isinstance(proof_count, int) or proof_count <= 0:
+        raise RuntimeError("finalized proof count is missing")
     if threads <= 0 or not 0 < part_bytes < 2_000_000_000:
         raise ValueError("invalid archive resource setting")
 
@@ -54,7 +58,10 @@ def pack(
             mode="w|",
             format=tarfile.PAX_FORMAT,
         ) as tar:
-            for path in sorted((work / "proofs").glob("leaf-*.drat")):
+            for index in range(proof_count):
+                path = work / "proofs" / f"leaf-{index:08d}.drat"
+                if not path.is_file():
+                    raise RuntimeError(f"missing finalized proof leaf {index}")
                 info = tarfile.TarInfo(f"proofs/{path.name}")
                 info.size = path.stat().st_size
                 info.mtime = 0
