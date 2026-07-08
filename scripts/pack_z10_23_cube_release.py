@@ -71,7 +71,7 @@ def pack(
                 while offset < len(block):
                     if destination is None:
                         destination_path = work / (
-                            f"{archive.name}.part-{part_index:02d}"
+                            f"{archive.name}.part-{part_index:06d}"
                         )
                         destination = destination_path.open("wb")
                         part_digest = hashlib.sha256()
