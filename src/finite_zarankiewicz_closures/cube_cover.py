@@ -13,6 +13,7 @@ prefix trie containing every permitted child at every non-leaf node.
 from __future__ import annotations
 
 import collections
+from functools import lru_cache
 import heapq
 import itertools
 from pathlib import Path
@@ -117,8 +118,12 @@ def _support(mask: int) -> set[int]:
     return {row for row in range(ROWS) if mask & (1 << row)}
 
 
-def child_masks(prefix_masks: list[int], degrees: list[int]) -> list[int]:
-    """Enumerate all canonical next-column supports for one fixed prefix."""
+@lru_cache(maxsize=100_000)
+def _child_masks_cached(
+    prefix_masks: tuple[int, ...],
+    degrees: tuple[int, ...],
+) -> tuple[int, ...]:
+    """Enumerate canonical children while bounding reusable prefix state."""
 
     column = len(prefix_masks)
     if not 0 < column < len(degrees):
@@ -157,7 +162,13 @@ def child_masks(prefix_masks: list[int], degrees: list[int]) -> list[int]:
         ):
             continue
         children.append(sum(1 << row for row in support))
-    return children
+    return tuple(children)
+
+
+def child_masks(prefix_masks: list[int], degrees: list[int]) -> list[int]:
+    """Enumerate all canonical next-column supports for one fixed prefix."""
+
+    return list(_child_masks_cached(tuple(prefix_masks), tuple(degrees)))
 
 
 def verify_cube_catalog(
