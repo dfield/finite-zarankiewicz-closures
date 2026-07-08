@@ -11,11 +11,12 @@ converts it to LRAT with ``drat-trim``, and checks that LRAT with the independen
 from __future__ import annotations
 
 import hashlib
+from itertools import zip_longest
 import json
 import lzma
 from pathlib import Path
 import re
-from typing import Any, Mapping
+from typing import Any, Iterator, Mapping
 
 from .cube_cover import CubeCoverError, verify_cube_catalog
 from .extended import z10_23_profile_report
@@ -241,9 +242,15 @@ def _check_cube_archive(root: Path, payload: Mapping[str, Any]) -> int:
     return total_bytes
 
 
-def _load_jsonl(root: Path, payload: Mapping[str, Any], label: str) -> list[Mapping[str, Any]]:
+def _iter_jsonl(
+    root: Path,
+    payload: Mapping[str, Any],
+    label: str,
+) -> Iterator[Mapping[str, Any]]:
+    """Yield hash-checked JSONL objects while enforcing the declared count."""
+
     path = _check_hashed_file(root, payload)
-    records: list[Mapping[str, Any]] = []
+    count = 0
     try:
         compression = payload.get("compression")
         if compression is None:
@@ -265,12 +272,18 @@ def _load_jsonl(root: Path, payload: Mapping[str, Any], label: str) -> list[Mapp
                     raise SatCertificateError(
                         f"{label} record is not an object: {path}:{line_number}"
                     )
-                records.append(record)
+                count += 1
+                yield record
     except (UnicodeDecodeError, json.JSONDecodeError, lzma.LZMAError) as error:
         raise SatCertificateError(f"malformed {label}: {path}") from error
-    if payload.get("count") != len(records):
+    if payload.get("count") != count:
         raise SatCertificateError(f"{label} count mismatch: {path}")
-    return records
+
+
+def _load_jsonl(root: Path, payload: Mapping[str, Any], label: str) -> list[Mapping[str, Any]]:
+    """Load a small JSONL artifact; large proof paths use ``_iter_jsonl``."""
+
+    return list(_iter_jsonl(root, payload, label))
 
 
 def _check_cube_proof(
@@ -287,36 +300,62 @@ def _check_cube_proof(
     archive_payload = payload.get("archive")
     if not all(isinstance(item, dict) for item in (catalog_payload, index_payload, archive_payload)):
         raise SatCertificateError(f"incomplete cube-cover metadata for {profile}")
-    catalog = _load_jsonl(root, catalog_payload, "cube catalog")
-    try:
-        cover_report = verify_cube_catalog(profile, catalog)
-    except CubeCoverError as error:
-        raise SatCertificateError(f"invalid cube cover for {profile}: {error}") from error
-    index = _load_jsonl(root, index_payload, "cube proof index")
-    if len(index) != len(catalog):
+    catalog_count = catalog_payload.get("count")
+    index_count = index_payload.get("count")
+    if (
+        not isinstance(catalog_count, int)
+        or catalog_count <= 0
+        or index_count != catalog_count
+    ):
         raise SatCertificateError(f"cube proof count differs from catalog for {profile}")
     hex_digest = re.compile(r"[0-9a-f]{64}")
-    for position, (leaf, proof) in enumerate(zip(catalog, index)):
-        expected_file = f"proofs/leaf-{position:08d}.drat"
-        if (
-            proof.get("index") != position
-            or proof.get("masks") != leaf.get("masks")
-            or proof.get("literals", []) != leaf.get("literals", [])
-        ):
-            raise SatCertificateError(f"cube proof index mismatch for {profile} leaf {position}")
-        if proof.get("file") != expected_file:
-            raise SatCertificateError(f"noncanonical cube proof name for {profile} leaf {position}")
-        if (
-            not isinstance(proof.get("bytes"), int)
-            or proof["bytes"] <= 0
-            or not isinstance(proof.get("sha256"), str)
-            or hex_digest.fullmatch(proof["sha256"]) is None
-            or proof.get("status") != "VERIFIED"
-            or proof.get("solver_options") != ["--unsat", "-q", "-P2"]
-            or proof.get("replay")
-            != "drat-trim -> LRAT -> lrat-check; projected DRAT -> drat-trim"
-        ):
-            raise SatCertificateError(f"invalid cube proof record for {profile} leaf {position}")
+    missing = object()
+
+    def checked_catalog() -> Iterator[Mapping[str, Any]]:
+        catalog = _iter_jsonl(root, catalog_payload, "cube catalog")
+        index = _iter_jsonl(root, index_payload, "cube proof index")
+        for position, pair in enumerate(zip_longest(catalog, index, fillvalue=missing)):
+            leaf, proof = pair
+            if leaf is missing or proof is missing:
+                raise SatCertificateError(
+                    f"cube proof count differs from catalog for {profile}"
+                )
+            if not isinstance(leaf, Mapping) or not isinstance(proof, Mapping):
+                raise SatCertificateError(
+                    f"invalid cube proof record for {profile} leaf {position}"
+                )
+            expected_file = f"proofs/leaf-{position:08d}.drat"
+            if (
+                proof.get("index") != position
+                or proof.get("masks") != leaf.get("masks")
+                or proof.get("literals", []) != leaf.get("literals", [])
+            ):
+                raise SatCertificateError(
+                    f"cube proof index mismatch for {profile} leaf {position}"
+                )
+            if proof.get("file") != expected_file:
+                raise SatCertificateError(
+                    f"noncanonical cube proof name for {profile} leaf {position}"
+                )
+            if (
+                not isinstance(proof.get("bytes"), int)
+                or proof["bytes"] <= 0
+                or not isinstance(proof.get("sha256"), str)
+                or hex_digest.fullmatch(proof["sha256"]) is None
+                or proof.get("status") != "VERIFIED"
+                or proof.get("solver_options") != ["--unsat", "-q", "-P2"]
+                or proof.get("replay")
+                != "drat-trim -> LRAT -> lrat-check; projected DRAT -> drat-trim"
+            ):
+                raise SatCertificateError(
+                    f"invalid cube proof record for {profile} leaf {position}"
+                )
+            yield leaf
+
+    try:
+        cover_report = verify_cube_catalog(profile, checked_catalog())
+    except CubeCoverError as error:
+        raise SatCertificateError(f"invalid cube cover for {profile}: {error}") from error
     archive_bytes = _check_cube_archive(root, archive_payload)
     return archive_bytes, cover_report
 

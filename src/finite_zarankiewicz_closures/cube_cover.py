@@ -13,18 +13,74 @@ prefix trie containing every permitted child at every non-leaf node.
 from __future__ import annotations
 
 import collections
+import heapq
 import itertools
-from typing import Any, Iterable, Mapping
+from pathlib import Path
+import tempfile
+from typing import Any, Iterable, Iterator, Mapping
 
 
 ROWS = 10
 COLUMNS = 23
 TARGET = 113
-_LEAF = "__leaf__"
+_SORT_CHUNK_RECORDS = 250_000
 
 
 class CubeCoverError(ValueError):
     """Raised when a row-stabilizer cube catalog is not a complete partition."""
+
+
+def _encode_path(path: Iterable[int]) -> bytes:
+    """Encode a mask path so byte ordering agrees with tuple ordering."""
+
+    return b"".join(mask.to_bytes(2, "big") for mask in path)
+
+
+class _ExternalPathSorter:
+    """Sort many short paths with bounded memory and standard-library storage."""
+
+    def __init__(self, chunk_records: int = _SORT_CHUNK_RECORDS) -> None:
+        self._chunk_records = chunk_records
+        self._buffer: list[bytes] = []
+        self._chunks: list[Path] = []
+        self._temporary = tempfile.TemporaryDirectory(prefix="cube_cover_sort_")
+
+    def add(self, path: Iterable[int]) -> None:
+        self._buffer.append(_encode_path(path))
+        if len(self._buffer) >= self._chunk_records:
+            self._flush()
+
+    def _flush(self) -> None:
+        if not self._buffer:
+            return
+        path = Path(self._temporary.name) / f"chunk-{len(self._chunks):06d}.bin"
+        with path.open("wb") as handle:
+            for encoded in sorted(self._buffer):
+                if len(encoded) > 255:
+                    raise CubeCoverError("cube path exceeds the sorter encoding")
+                handle.write(bytes((len(encoded),)))
+                handle.write(encoded)
+        self._chunks.append(path)
+        self._buffer.clear()
+
+    @staticmethod
+    def _read(path: Path) -> Iterator[bytes]:
+        with path.open("rb") as handle:
+            while length := handle.read(1):
+                size = length[0]
+                encoded = handle.read(size)
+                if len(encoded) != size:
+                    raise CubeCoverError("truncated cube-cover sort chunk")
+                yield encoded
+
+    def sorted_paths(self) -> Iterator[bytes]:
+        if not self._chunks:
+            return iter(sorted(self._buffer))
+        self._flush()
+        return heapq.merge(*(self._read(path) for path in self._chunks))
+
+    def close(self) -> None:
+        self._temporary.cleanup()
 
 
 def parse_profile(profile: str) -> dict[int, int]:
@@ -112,129 +168,132 @@ def verify_cube_catalog(
 
     degrees = ordered_degrees(profile)
     expected_root = (1 << degrees[0]) - 1
-    trie: dict[Any, Any] = {}
     depth_counts: collections.Counter[int] = collections.Counter()
     partial_literal_counts: collections.Counter[int] = collections.Counter()
     virtual_depth_counts: collections.Counter[int] = collections.Counter()
     record_count = 0
+    sorter = _ExternalPathSorter()
+    try:
+        for index, record in enumerate(records):
+            if not isinstance(record, Mapping):
+                raise CubeCoverError(f"cube record {index} is not an object")
+            masks = record.get("masks")
+            reason = record.get("reason")
+            if reason not in {"proof_required", "solver_unsat", "no_canonical_child"}:
+                raise CubeCoverError(f"cube record {index} has an invalid reason")
+            if (
+                not isinstance(masks, list)
+                or not 1 <= len(masks) <= COLUMNS
+                or any(
+                    not isinstance(mask, int) or not 0 <= mask < (1 << ROWS)
+                    for mask in masks
+                )
+            ):
+                raise CubeCoverError(f"cube record {index} has invalid masks")
+            if masks[0] != expected_root:
+                raise CubeCoverError(f"cube record {index} has a noncanonical root")
+            for column, mask in enumerate(masks):
+                if bin(mask).count("1") != degrees[column]:
+                    raise CubeCoverError(
+                        f"cube record {index} has the wrong degree at column {column}"
+                    )
+            literals = record.get("literals", [])
+            if not isinstance(literals, list) or any(
+                not isinstance(literal, int)
+                or isinstance(literal, bool)
+                or literal == 0
+                for literal in literals
+            ):
+                raise CubeCoverError(f"cube record {index} has invalid partial literals")
+            literal_rows: dict[int, bool] = {}
+            for literal in literals:
+                variable = abs(literal) - 1
+                row, column = divmod(variable, COLUMNS)
+                if row >= ROWS or column != len(masks):
+                    raise CubeCoverError(
+                        f"cube record {index} has a literal outside its immediate next column"
+                    )
+                if row in literal_rows:
+                    raise CubeCoverError(f"cube record {index} repeats a partial cell")
+                literal_rows[row] = literal > 0
 
-    def insert_leaf(path: list[int]) -> None:
-        node = trie
-        for mask in path:
-            if _LEAF in node:
-                raise CubeCoverError("cube catalog contains a leaf and its descendant")
-            node = node.setdefault(mask, {})
-        if node:
+            if literal_rows:
+                if len(masks) >= len(degrees):
+                    raise CubeCoverError(f"cube record {index} extends a full assignment")
+                matching_children = [
+                    child
+                    for child in child_masks(masks, degrees)
+                    if all(
+                        bool(child & (1 << row)) == value
+                        for row, value in literal_rows.items()
+                    )
+                ]
+                if not matching_children:
+                    raise CubeCoverError(
+                        f"cube record {index} has no matching canonical next-column support"
+                    )
+                for child in matching_children:
+                    sorter.add(masks + [child])
+                    virtual_depth_counts[len(masks) + 1] += 1
+                partial_literal_counts[len(literals)] += 1
+            else:
+                sorter.add(masks)
+                virtual_depth_counts[len(masks)] += 1
+            depth_counts[len(masks)] += 1
+            record_count += 1
+        if record_count == 0:
+            raise CubeCoverError("cube catalog does not have the unique canonical root")
+
+        paths = sorter.sorted_paths()
+        current = next(paths, None)
+        visited_leaves = 0
+
+        def visit(prefix: list[int]) -> None:
+            nonlocal current, visited_leaves
+            encoded = _encode_path(prefix)
+            if current == encoded:
+                visited_leaves += 1
+                current = next(paths, None)
+                return
+            if current is None or not current.startswith(encoded):
+                raise CubeCoverError(
+                    f"incomplete cube split at depth {len(prefix)}"
+                )
+            if len(prefix) >= len(degrees):
+                raise CubeCoverError("full column assignment is not a proved leaf")
+            expected = sorted(child_masks(prefix, degrees))
+            if not expected:
+                raise CubeCoverError(
+                    f"incomplete cube split at depth {len(prefix)}: expected no children"
+                )
+            for mask in expected:
+                visit(prefix + [mask])
+
+        visit([expected_root])
+        if current is not None:
             raise CubeCoverError("cube catalog contains overlapping or duplicate leaves")
-        node[_LEAF] = True
-
-    for index, record in enumerate(records):
-        if not isinstance(record, Mapping):
-            raise CubeCoverError(f"cube record {index} is not an object")
-        masks = record.get("masks")
-        reason = record.get("reason")
-        if reason not in {"proof_required", "solver_unsat", "no_canonical_child"}:
-            raise CubeCoverError(f"cube record {index} has an invalid reason")
-        if (
-            not isinstance(masks, list)
-            or not 1 <= len(masks) <= COLUMNS
-            or any(not isinstance(mask, int) or not 0 <= mask < (1 << ROWS) for mask in masks)
-        ):
-            raise CubeCoverError(f"cube record {index} has invalid masks")
-        if masks[0] != expected_root:
-            raise CubeCoverError(f"cube record {index} has a noncanonical root")
-        for column, mask in enumerate(masks):
-            if bin(mask).count("1") != degrees[column]:
-                raise CubeCoverError(
-                    f"cube record {index} has the wrong degree at column {column}"
-                )
-        literals = record.get("literals", [])
-        if not isinstance(literals, list) or any(
-            not isinstance(literal, int) or isinstance(literal, bool) or literal == 0
-            for literal in literals
-        ):
-            raise CubeCoverError(f"cube record {index} has invalid partial literals")
-        literal_rows: dict[int, bool] = {}
-        for literal in literals:
-            variable = abs(literal) - 1
-            row, column = divmod(variable, COLUMNS)
-            if row >= ROWS or column != len(masks):
-                raise CubeCoverError(
-                    f"cube record {index} has a literal outside its immediate next column"
-                )
-            if row in literal_rows:
-                raise CubeCoverError(f"cube record {index} repeats a partial cell")
-            literal_rows[row] = literal > 0
-
-        if literal_rows:
-            if len(masks) >= len(degrees):
-                raise CubeCoverError(f"cube record {index} extends a full assignment")
-            matching_children = [
-                child
-                for child in child_masks(masks, degrees)
-                if all(
-                    bool(child & (1 << row)) == value
-                    for row, value in literal_rows.items()
-                )
-            ]
-            if not matching_children:
-                raise CubeCoverError(
-                    f"cube record {index} has no matching canonical next-column support"
-                )
-            for child in matching_children:
-                insert_leaf(masks + [child])
-                virtual_depth_counts[len(masks) + 1] += 1
-            partial_literal_counts[len(literals)] += 1
-        else:
-            insert_leaf(masks)
-            virtual_depth_counts[len(masks)] += 1
-        depth_counts[len(masks)] += 1
-        record_count += 1
-    if record_count == 0 or set(trie) != {expected_root}:
-        raise CubeCoverError("cube catalog does not have the unique canonical root")
-
-    visited_leaves = 0
-
-    def visit(prefix: list[int], node: Mapping[Any, Any]) -> None:
-        nonlocal visited_leaves
-        if _LEAF in node:
-            if len(node) != 1:
-                raise CubeCoverError("cube leaf has descendants")
-            visited_leaves += 1
-            return
-        if len(prefix) >= len(degrees):
-            raise CubeCoverError("full column assignment is not a proved leaf")
-        expected = child_masks(prefix, degrees)
-        observed = [key for key in node if isinstance(key, int)]
-        if set(observed) != set(expected) or len(observed) != len(expected):
-            raise CubeCoverError(
-                f"incomplete cube split at depth {len(prefix)}: "
-                f"expected {len(expected)}, found {len(observed)}"
-            )
-        for mask in expected:
-            visit(prefix + [mask], node[mask])
-
-    visit([expected_root], trie[expected_root])
-    virtual_leaf_count = sum(virtual_depth_counts.values())
-    if visited_leaves != virtual_leaf_count:
-        raise CubeCoverError("cube trie traversal did not visit every leaf")
-    return {
-        "status": "COMPLETE",
-        "profile": profile,
-        "leaf_count": record_count,
-        "minimum_depth": min(depth_counts),
-        "maximum_depth": max(depth_counts),
-        "depth_counts": {
-            str(depth): depth_counts[depth] for depth in sorted(depth_counts)
-        },
-        "partial_leaf_count": sum(partial_literal_counts.values()),
-        "partial_literal_counts": {
-            str(count): partial_literal_counts[count]
-            for count in sorted(partial_literal_counts)
-        },
-        "canonical_leaf_count": virtual_leaf_count,
-        "canonical_depth_counts": {
-            str(depth): virtual_depth_counts[depth]
-            for depth in sorted(virtual_depth_counts)
-        },
-    }
+        virtual_leaf_count = sum(virtual_depth_counts.values())
+        if visited_leaves != virtual_leaf_count:
+            raise CubeCoverError("cube traversal did not visit every virtual leaf")
+        return {
+            "status": "COMPLETE",
+            "profile": profile,
+            "leaf_count": record_count,
+            "minimum_depth": min(depth_counts),
+            "maximum_depth": max(depth_counts),
+            "depth_counts": {
+                str(depth): depth_counts[depth] for depth in sorted(depth_counts)
+            },
+            "partial_leaf_count": sum(partial_literal_counts.values()),
+            "partial_literal_counts": {
+                str(count): partial_literal_counts[count]
+                for count in sorted(partial_literal_counts)
+            },
+            "canonical_leaf_count": virtual_leaf_count,
+            "canonical_depth_counts": {
+                str(depth): virtual_depth_counts[depth]
+                for depth in sorted(virtual_depth_counts)
+            },
+        }
+    finally:
+        sorter.close()

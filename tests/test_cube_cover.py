@@ -4,6 +4,7 @@ import copy
 import unittest
 
 from finite_zarankiewicz_closures.cube_cover import (
+    _ExternalPathSorter,
     CubeCoverError,
     child_masks,
     ordered_degrees,
@@ -69,6 +70,21 @@ def split_leaf_by_next_cell(
 
 
 class CubeCoverTests(unittest.TestCase):
+    def test_external_path_sorter_merges_multiple_chunks(self) -> None:
+        sorter = _ExternalPathSorter(chunk_records=2)
+        try:
+            paths = ([7, 4, 2], [7], [7, 3], [7, 4], [7, 3, 9])
+            for path in paths:
+                sorter.add(path)
+            observed = list(sorter.sorted_paths())
+            expected = sorted(
+                b"".join(mask.to_bytes(2, "big") for mask in path)
+                for path in paths
+            )
+            self.assertEqual(observed, expected)
+        finally:
+            sorter.close()
+
     def test_depth_three_frontier_is_complete(self) -> None:
         for profile in PROFILES:
             with self.subTest(profile=profile):
