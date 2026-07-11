@@ -17,6 +17,7 @@ witness matrix is checked by exhaustive scan.
 | `tier2.py` | configuration-level residue filter (found the five profile kills behind the $Z(12,23,3,3)\le134$ theorem) | Python 3.9+ |
 | `z10_23_certify.py` | deterministic profile CNFs, complete fixed row-stabilizer frontiers, optional adaptive search cubes, and direct checked compressed DRAT cores for $Z(10,23,3,3)=112$ | `python-sat`, CaDiCaL, `drat-trim`, `lrat-check` |
 | `z10_23_cube_certify.py` | completeness checking plus proof production and independent replay for full or partially fixed canonical cube leaves | CaDiCaL, `drat-trim`, `lrat-check` |
+| `z10_23_residual_refine.py` | deterministic structural refinement of timeout manifests, with complete-cover rechecking and reuse/parent-to-child maps | Python standard library |
 | `z10_23_cube_finalize.py` | deterministic validation and indexing of a proof family produced in distributed shards | CaDiCaL |
 | `lp_dgh.py` | exact-rational Davies--Gill--Horsley LP, reproduces their published table | Python 3.9+ |
 
@@ -71,6 +72,22 @@ column. The checker expands each such partial leaf over every matching
 canonical support and still requires an exact, prefix-free partition, so this
 adaptive refinement changes proof granularity without trusting a solver
 verdict for coverage.
+
+For a distributed timeout pass, refine only the recorded residual leaves while
+retaining a complete global catalog:
+
+```sh
+python3 z10_23_residual_refine.py '3x1,4x4,5x14,6x4' \
+  --catalog build/r6/cubes.jsonl \
+  --residual build/r6/unresolved.shard-00.jsonl \
+  --residual build/r6/unresolved.shard-01.jsonl \
+  --residual build/r6/unresolved.shard-02.jsonl \
+  --output build/r7 --split-bits 1 --shards 3
+```
+
+The command checks the input cover, requires every residual record to match
+its indexed catalog leaf, bisects that leaf inside its immediate next column,
+and checks the resulting complete cover before publishing any task files.
 
 Proof conversion, hashing, and compression stream their large intermediate
 files. Direct traces at or above GitHub's 100 MB repository-file limit are
