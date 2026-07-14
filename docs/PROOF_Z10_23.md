@@ -1,28 +1,26 @@
-# Proof dossier for $Z(10,23,3,3)=112$
+# Candidate dossier for $Z(10,23,3,3)=112$
 
-## 1. Statement and evidence boundary
+## 1. Status and evidence boundary
 
-This case is computer-assisted:
+The proposed equality
 
 $$
-\boxed{Z(10,23,3,3)=112}.
+Z(10,23,3,3)=112
 $$
 
-The lower bound is an explicit Boolean matrix checked by two exhaustive
-verifiers. The upper bound has a standard-library arithmetic front end and a
-SAT back end. Each SAT case has a deterministic CNF. Ten are refuted by one
-compressed DRAT core; the three hardest are refuted by complete canonical
-prefix covers with one compressed DRAT core per leaf. `drat-trim` verifies
-every core and converts it to LRAT, which the independent `lrat-check` program
-accepts. The Lean development checks the arithmetic endpoints; it does not
-replay SAT proofs or formalize the Boolean-matrix reduction.
+is **not yet an established theorem in this repository**. The checked matrix proves $Z(10,23,3,3)\ge112$. The arithmetic front end reduces the excluded target 113 to thirteen SAT instances, but a final proof manifest and independent replay audit covering every instance are not present at this publication boundary.
 
-## 2. Translate columns into row sets
+The unconditional result currently supported here is
 
-Suppose for a contradiction that a $10\times23$ $K_{3,3}$-free Boolean matrix
-has 113 ones. For column $j$, let $E_j\subseteq[10]$ be its support and put
-$d_j=|E_j|$. If $\lambda_T$ is the number of columns containing a row triple
-$T$, then $K_{3,3}$-freeness is equivalent to $\lambda_T\le2$. Hence
+$$
+112\le Z(10,23,3,3)\le114.
+$$
+
+The authoritative status record is [`analysis/result_status.json`](../analysis/result_status.json).
+
+## 2. Translation to row subsets
+
+Suppose that a $10\times23$ $K_{3,3}$-free Boolean matrix has 113 ones. For column $j$, let $E_j\subseteq[10]$ be its support and put $d_j=|E_j|$. If $\lambda_T$ is the number of columns containing a row triple $T$, then $K_{3,3}$-freeness is equivalent to $\lambda_T\le2$. Therefore
 
 $$
 \sum_{j=1}^{23}\binom{d_j}{3}
@@ -36,56 +34,29 @@ $$
 p(d)=\binom d3-10d+40.
 $$
 
-Its values are
+The values are
 
 $$
 (p(0),\ldots,p(10))=(40,30,20,11,4,0,0,5,16,34,60).
 $$
 
-Therefore
+Consequently,
 
 $$
-\sum_j p(d_j)
+\sum_jp(d_j)
 =\sum_j\binom{d_j}{3}-10\cdot113+40\cdot23
-\le240-210=30. \tag{2}
+\le30. \tag{2}
 $$
 
-Exhausting the nonnegative integer solutions to the column count, degree sum,
-and (1) gives exactly 25 profiles. The standard-library function
-`z10_23_profile_report()` regenerates the list rather than trusting it.
+Exhausting the nonnegative integer solutions to the column count, degree sum, and (1) gives exactly 25 profiles. The standard-library function `z10_23_profile_report()` regenerates this list.
 
-## 3. Twelve profiles are arithmetic
+## 3. Twelve profiles have arithmetic contradictions
 
-### 3.1 Low-degree deletions
+Five profiles contain a column of degree at most two. Deleting that column leaves at least 111 ones in a $10\times22$ matrix, contradicting the established value $Z(10,22,3,3)=110$.
 
-Five profiles have a column of degree at most two:
+Four profiles contain two degree-three columns. Deleting both leaves 107 ones in a $10\times21$ matrix, contradicting $Z(10,21,3,3)=106$.
 
-$$
-2^1 5^{21}6^1,\quad
-2^1 4^1 5^{19}6^2,\quad
-2^1 4^2 5^{17}6^3,\quad
-2^1 4^1 5^{20}7^1,\quad
-1^1 5^{20}6^2.
-$$
-
-Deleting that column leaves at least 111 ones in a $10\times22$ matrix,
-contradicting $Z(10,22,3,3)=110$.
-
-Four more profiles have two degree-three columns:
-
-$$
-3^2 5^{19}6^2,\quad
-3^2 4^1 5^{17}6^3,\quad
-3^2 4^2 5^{15}6^4,\quad
-3^2 5^{20}7^1.
-$$
-
-Deleting both leaves 107 ones in a $10\times21$ matrix, contradicting
-$Z(10,21,3,3)=106$.
-
-### 3.2 Two short row-residue contradictions
-
-For a row $r$, define its row-triple deficit by
+Two further profiles are eliminated by row-deficit congruences. For a row $r$, put
 
 $$
 D_r=72-\sum_{j:r\in E_j}\binom{d_j-1}{2}\ge0.
@@ -97,47 +68,23 @@ $$
 s=240-\sum_j\binom{d_j}{3},
 $$
 
-then double counting gives $\sum_rD_r=3s$.
+then double counting gives $\sum_rD_r=3s$. The profiles $4^6 5^{14}6^2 7^1$ and $3^1 4^3 5^{17}6^1 7^1$ have minimum residue sums 6 and 9, respectively, exceeding their budgets 3 and 6.
 
-For profile $4^6 5^{14}6^2 7^1$, one has $s=1$. Modulo three, only the two
-degree-six columns contribute. If they meet in $t$ rows, where $2\le t\le6$,
-then rows in exactly one of them have least residue two and rows in both have
-least residue one. Thus
-
-$$
-\sum_rD_r\ge2(12-2t)+t=24-3t\ge6>3=3s.
-$$
-
-For profile $3^1 4^3 5^{17}6^1 7^1$, one has $s=2$. Modulo three, only the
-degree-three and degree-six columns contribute. If their intersection has size
-$t\le3$, the same calculation gives
-
-$$
-\sum_rD_r\ge2(9-2t)+t=18-3t\ge9>6=3s.
-$$
-
-### 3.3 One finite pair-residue contradiction
-
-It remains to eliminate $3^1 4^2 5^{19}7^1$, whose slack is $s=6$. For a row
-pair $P$, put
+The twelfth profile, $3^1 4^2 5^{19}7^1$, is eliminated by a finite pair-residue enumeration. For a row pair $P$,
 
 $$
 D_P=16-\sum_{j:P\subseteq E_j}(d_j-2)\ge0,
 \qquad
-\sum_PD_P=3s=18. \tag{3}
+\sum_PD_P=18. \tag{3}
 $$
 
-Degree-five columns vanish modulo three. A row is represented by its membership
-pattern in the four exceptional columns of degrees $3,7,4,4$. Enumerating
-unlabelled multiplicities of the 16 patterns gives 1,577 configurations; 1,380
-obey the requirement that every triple of exceptional columns share at most
-two rows. Across those legal configurations, the minimum sum of the least
-nonnegative pair residues in (3) is 39. Since $39>18$, the profile is
-impossible. The checker recomputes all three numbers.
+Enumerating unlabelled row-membership multiplicities in the four exceptional columns gives 1,577 configurations, of which 1,380 satisfy the triple-overlap restriction. The minimum legal sum of the least nonnegative residues in (3) is 39, contradicting the budget 18. The checker recomputes all three counts.
 
-## 4. The thirteen traced SAT cases
+Thus twelve of the 25 profiles are unconditionally impossible.
 
-The remaining profiles are
+## 4. The thirteen remaining proof obligations
+
+The profiles still requiring propositional certificates are
 
 $$
 \begin{aligned}
@@ -151,107 +98,59 @@ $$
 \end{aligned}
 $$
 
-For each profile, the stored CNF uses cell variables $x_{rj}$ and enforces:
+For each profile, the deterministic CNF uses cell variables $x_{rj}$ and enforces:
 
 1. the specified degree of every column;
 2. at most two columns containing each row triple;
-3. lexicographically nonincreasing rows and, within every equal-degree block,
-   lexicographically nonincreasing columns; and
-4. row degree at least ten, because deleting any row leaves at most
-   $Z(9,23,3,3)=103$ ones.
+3. lexicographically nonincreasing rows and, inside equal-degree blocks, lexicographically nonincreasing columns; and
+4. row degree at least ten, since deleting any row leaves at most $Z(9,23,3,3)=103$ ones.
 
-The rare degree blocks are placed first. This changes only column names and
-exposes row symmetry. Double-lex is complete: choose a lexicographically
-maximum matrix in the finite orbit under row permutations and permutations
-inside equal-degree column blocks.
+The generic models and partial proof-production files are useful, but they do not by themselves prove unsatisfiability. Before the equality may be promoted, the repository must contain and verify all of the following:
 
-Ten profiles have a direct CaDiCaL refutation of the unsplit base CNF. The
-three profiles
+1. a final manifest binding all thirteen exact CNFs by SHA-256;
+2. a checked DRAT proof for every direct case and every retained cover leaf;
+3. independent DRAT-to-LRAT conversion and LRAT replay;
+4. a deterministic completeness check for every split cover, rejecting missing, overlapping, duplicate, or noncanonical leaves; and
+5. a recorded end-to-end replay audit whose inputs match the checked-in or release-bound artifacts.
 
-$$
-3^1 4^2 5^{18}6^2,\qquad
-3^1 4^3 5^{16}6^3,qquad
-3^1 4^4 5^{14}6^4
-$$
+The AWS workflow is producing and recovering these artifacts. Operational `UNSAT` output, checkpoint presence, or an S3 upload is not theorem evidence. See [`AWS_Z10_23_RUN.md`](AWS_Z10_23_RUN.md) and [`SAT_Z10_23_STATUS.md`](SAT_Z10_23_STATUS.md).
 
-use complete adaptive row-stabilizer covers. Their deterministic starting
-frontiers have depth four: 1,479 prefixes for $3^1 4^2 5^{18}6^2$ and 773
-prefixes for each of the other two profiles. A prefix that is difficult to
-refute directly may be replaced by a complete partition using selected cells
-of its immediate next column, and refinement may continue recursively.
-Catalog generation and refinement make no SAT claim; every retained leaf is
-independently refuted by the proof-producing step.
+## 5. Established lower and upper bounds
 
-Once a prefix of columns is fixed, rows
-with the same prefix form a stabilizer cell; row lex order forces the next
-support to be an initial segment of every cell. Equal-degree column lex order
-fixes the order of consecutive supports, and supports that would place one
-row triple in three columns are impossible. Starting with the initial segment
-forced for the first column, these rules enumerate every possible next
-support of a satisfying assignment.
-
-The standard-library checker expands every partial next-column assignment over
-the canonical supports that match it, then builds a trie from the resulting
-virtual leaves. At every nonleaf prefix it recomputes the complete permitted
-child set and requires an exact match; it also rejects duplicate, overlapping,
-wrong-degree, wrong-literal, and noncanonical leaves. Thus the retained leaves
-are a prefix-free partition of every possible satisfying cell assignment, not
-a collection of sampled search states. The stored `proof_required` label makes
-explicit that the catalog alone asserts no solver result. For each retained
-leaf, its cell literals are appended to the unchanged base CNF as unit clauses
-and CaDiCaL produces a DRAT refutation.
-
-For both strategies, `drat-trim` converts the solver trace to LRAT,
-`lrat-check` checks that LRAT and projects it to a compact standard DRAT core,
-and `drat-trim` independently verifies the projected core. The compact direct
-cores are checked in; the much larger deterministic leaf-core archives are
-GitHub release assets bound by checked-in names, sizes, and SHA-256 digests.
-Consequently, the three cover proofs rely on both independently checked leaf
-refutations and the deterministic trie completeness check; no incremental
-solver status is accepted as evidence.
-The leaf producer records CaDiCaL options `--unsat -q -P2`; the preprocessing
-choice affects runtime only, since the resulting proof is replayed from the
-stored leaf formula.
-
-The certificate manifest records each formula hash, profile order, compressed
-proof hash, solver version, and successful DRAT-to-LRAT replay. For a cover it
-also binds the leaf catalog, per-leaf proof index, and deterministic tar/xz
-archive.
-When a compressed stream exceeds GitHub's single-file limit, it is stored as
-ordered byte chunks. The checker verifies every chunk and the hash of their
-exact concatenation before the replay script decompresses the reconstructed
-stream. This packaging has no logical role.
-Testing exactly 113 ones is sufficient: deleting ones preserves
-$K_{3,3}$-freeness.
-
-## 5. Matching lower bound
-
-[`z10_23_112_matrix.csv`](../data/z10_23_112_matrix.csv) is a $10\times23$
-Boolean matrix with 112 ones and no all-one $3\times3$ submatrix. It is obtained
-by deleting two 11-one rows from the repository's 134-one $12\times23$ witness;
-the stored CSV is checked directly, so the derivation is not a trust
-assumption. Hence
+[`z10_23_112_matrix.csv`](../data/z10_23_112_matrix.csv) is a $10\times23$ Boolean matrix with 112 ones and no all-one $3\times3$ submatrix. Two exhaustive verifiers check it directly. Hence
 
 $$
 Z(10,23,3,3)\ge112.
 $$
 
-Together with the traced exclusion of 113, this proves equality.
+The established value $Z(9,23,3,3)=103$ gives, by vertex deletion,
+
+$$
+Z(10,23,3,3)
+\le\left\lfloor\frac{10\cdot103}{9}\right\rfloor
+=114.
+$$
+
+Therefore the publishable conclusion is
+
+$$
+\boxed{112\le Z(10,23,3,3)\le114}.
+$$
+
+If the thirteen propositional obligations are all replayably refuted, the upper endpoint improves to 112 and the proposed equality follows.
 
 ## 6. Reproduction and trust boundary
 
-The core arithmetic and witness checks use only Python's standard library. The
-SAT generator requires `python-sat`; proof production used CaDiCaL 3.0.0 at
-commit `7b99c07f0bcab5824a5a3ce62c7066554017f641`. Proof conversion and final
-replay used `drat-trim` and `lrat-check` from commit
-`2e3b2dc0ecf938addbd779d42877b6ed69d9a985`. See the certificate manifest and
-[reproducibility guide](REPRODUCIBILITY.md) for exact commands.
+The witness, profile enumeration, twelve arithmetic eliminations, and current interval are covered by the core gate:
 
-The direct DRAT cores and the complete families of leaf cores, their
-`drat-trim` replays, and the independently checked derived LRAT traces
-establish unsatisfiability of the stored CNFs. The human proof and
-standard-library checker establish that the 25-profile split is exhaustive,
-that the twelve arithmetic eliminations are sound, that the three prefix tries
-are complete, and that the thirteen CNFs cover every remaining matrix up to
-symmetry. Lean checks the finite arithmetic endpoints, not these combinatorial
-or propositional reductions.
+```bash
+make verify
+```
+
+The Lean development checks arithmetic endpoints only; it does not replay SAT proofs or formalize the Boolean-matrix reduction. Once a complete SAT manifest and all bound assets exist, the separate heavyweight gate is:
+
+```bash
+make candidate-certificate
+```
+
+That gate is deliberately not part of the publishable theorem suite yet. The original untraced solver sweep remains `CORROBORATING_ONLY` in [`analysis/sat_cross_check.json`](../analysis/sat_cross_check.json).

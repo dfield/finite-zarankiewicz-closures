@@ -225,7 +225,7 @@
       "ones": 15
     }
   ],
-  "scope": "Small-instance semantic validation only; the mathematical proofs, not raw-cell solver runs, establish the eight excluded-target impossibility claims.",
+  "scope": "Small-instance semantic validation only. Six excluded-target impossibilities are established by separate proofs; two models correspond to candidates.",
   "seed": 20260704,
   "solver": {
     "name": "CaDiCaL",

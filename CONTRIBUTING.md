@@ -1,38 +1,33 @@
 # Reviewing and contributing
 
-Independent scrutiny is especially welcome because this repository presents eight new exact finite results and has not yet completed peer review.
+Independent scrutiny is especially welcome because these results have not completed peer review.
 
 ## Suggested review order
 
-1. Read [`docs/PROOF.md`](docs/PROOF.md) without consulting the code. Check the two double counts, the penalty-based degree classification, and each marked-row residue.
-2. Run `make witness` and inspect the explicit matrix in [`data/`](data/).
-3. Run `make certificate` and compare all eight case certificates with their proof sections.
-4. Run `make test`; the tests include deliberate corruptions and exhaustive small cardinality checks.
-5. Inspect the arithmetic formalization boundary in [`lean/README.md`](lean/README.md), then run `lake build` inside `lean/`.
-6. Treat the generic SAT/MIP models and the three historical terminal traces as corroborating evidence. For $Z(10,23)$, separately audit the reduction in [`docs/PROOF_Z10_23.md`](docs/PROOF_Z10_23.md) and replay the thirteen load-bearing DRAT cores through the LRAT checker.
-7. For the seven additional results and the new frontier bound, read [`docs/EXTENDED_RESULTS.md`](docs/EXTENDED_RESULTS.md) and [`docs/NEW_BOUNDS.md`](docs/NEW_BOUNDS.md), run `make extended`, and inspect the explicit 33-cell claim boundary.
+1. Read [`analysis/result_status.json`](analysis/result_status.json) so the theorem/candidate boundary is explicit.
+2. Read [`docs/PROOF.md`](docs/PROOF.md) and the five other established case dossiers without consulting the code.
+3. Run `make verify`; compare the six case certificates with their proof sections.
+4. Inspect [`lean/README.md`](lean/README.md), then run `lake build` inside `lean/`.
+5. Treat generic SAT/MIP models as regression artifacts, not upper-bound proofs.
+6. Review [`docs/PROOF_Z10_23.md`](docs/PROOF_Z10_23.md) and [`docs/PROOF_Z11_23.md`](docs/PROOF_Z11_23.md) as candidate dossiers. Do not report their proposed equalities as established.
+7. Review [`docs/NEW_BOUNDS.md`](docs/NEW_BOUNDS.md) and the explicit 35-cell frontier.
 
 ## Useful issue reports
 
-Please open an issue for any of the following:
+Please report:
 
-- a mathematical gap or ambiguous quantifier in either proof document;
-- an earlier source that closes any of these exact cases or contains one of the arguments;
-- a missing or previously solved cell in the remaining 33-case frontier;
-- a witness checker or certificate mutation that is incorrectly accepted;
-- a mismatch between a proof equation and its Python or Lean counterpart;
+- a mathematical gap or ambiguous quantifier;
+- an earlier source for any claimed result;
+- a missing or previously solved cell in the 35-case frontier;
+- a witness or certificate mutation that is incorrectly accepted;
+- a mismatch between prose, Python, JSON, or Lean;
 - a deterministic artifact that does not regenerate byte-for-byte; or
-- documentation that overstates the scope of a computational or formal check.
+- any wording that promotes a candidate beyond its evidence.
 
-For a proposed mathematical correction, include the section and displayed equation. For a reproducibility failure, include the command, interpreter or checker version, exit code, and complete error output. Please do not include private machine paths or credentials in an issue.
+For a mathematical correction, identify the section and displayed equation. For a reproducibility failure, include the command, tool version, exit code, and complete error output, without private paths or credentials.
 
 ## Change discipline
 
-Changes to the proofs should be accompanied by corresponding updates to:
-
-- the exact certificate and its mutation tests;
-- the Lean arithmetic file when the changed step is inside its declared scope;
-- the proof/code map in [`docs/METHODS.md`](docs/METHODS.md); and
-- the audit limitations if the trust boundary changes.
+Changes to established proofs must update the case certificate, mutation tests, Lean arithmetic when in scope, proof/code map, and audit boundary. Candidate promotion additionally requires a complete replayable proof family, independent audit, machine-readable status change, and removal of every provisional caveat in one coherent commit.
 
 Generated models and analyses should be changed through their generators. Run `make verify` before submitting a patch.

@@ -25,6 +25,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from finite_zarankiewicz_closures.certificate import verify_certificate  # noqa: E402
 from finite_zarankiewicz_closures.case_certificates import (  # noqa: E402
+    ALL_CASE_SPECS,
     CASE_SPECS,
     verify_case_certificate,
 )
@@ -58,6 +59,7 @@ EXPECTED_FILES = (
     "docs/METHODS.md",
     "docs/ADVERSARIAL_AUDIT.md",
     "docs/REPRODUCIBILITY.md",
+    "docs/AWS_Z10_23_RUN.md",
     "docs/EXTENDED_RESULTS.md",
     "data/z9_23_103_matrix.csv",
     "data/z10_21_106_matrix.csv",
@@ -71,11 +73,8 @@ EXPECTED_FILES = (
     "certificates/z9_23_103.json",
     "certificates/z10_21_106.json",
     "certificates/z10_22_110.json",
-    "certificates/z10_23_112.json",
-    "certificates/z10_23_sat.json",
     "certificates/z11_19_106.json",
     "certificates/z11_20_111.json",
-    "certificates/z11_23_123.json",
     "certificates/z12_23_134.json",
     "certificates/z13_23_upper_144.json",
     "models/cells_9x23_exact_104.cnf",
@@ -99,7 +98,7 @@ EXPECTED_FILES = (
     "analysis/extended_results.json",
     "analysis/new_bounds.json",
     "analysis/sat_cross_check.json",
-    "audit/z10_23_sat_replay.json",
+    "analysis/result_status.json",
     "lean/ZarankiewiczZ923/ArithmeticKernel.lean",
     "lean/ZarankiewiczFiniteClosures/ArithmeticKernels.lean",
     "artifacts.sha256",
@@ -327,12 +326,14 @@ def check_models() -> dict[str, object]:
 
     manifest = json.loads((ROOT / "models" / "manifest.json").read_text(encoding="utf-8"))
     if manifest.get("schema_version") != 2 or set(manifest.get("cases", {})) != {
-        case.slug for case in CASE_SPECS
+        case.slug for case in ALL_CASE_SPECS
     }:
-        raise AssertionError("model manifest does not cover every exact case")
+        raise AssertionError("model manifest does not cover every tracked case")
     case_reports = {}
-    for case in CASE_SPECS:
+    for case in ALL_CASE_SPECS:
         entry = manifest["cases"][case.slug]
+        if entry.get("publication_status") != case.publication_status:
+            raise AssertionError(f"wrong publication status: {case.slug}")
         cell_metadata = entry["cell_cnf"]
         column_metadata = entry["column_lp"]
         cell = ROOT / cell_metadata["file"]
@@ -362,6 +363,7 @@ def check_models() -> dict[str, object]:
         ):
             raise AssertionError(f"column LP has unexpected structure: {case.slug}")
         case_reports[case.slug] = {
+            "publication_status": case.publication_status,
             "cell_variables": cell_variables,
             "cell_clauses": cell_clauses,
             "forbidden_prefix_clauses": cell_metadata["forbidden_submatrix_clauses"],
@@ -388,12 +390,27 @@ def check_json_and_recorded_reports() -> dict[str, object]:
     for relative in (
         "audit/model_validation.json",
         "audit/certificate_replay.json",
-        "audit/z10_23_sat_replay.json",
     ):
         report = json.loads((ROOT / relative).read_text(encoding="utf-8"))
         if report.get("status") != "VERIFIED":
             raise AssertionError(f"recorded audit report is not verified: {relative}")
-    return {"json_files_parsed": parsed, "verified_recorded_reports": 3}
+    status = json.loads(
+        (ROOT / "analysis" / "result_status.json").read_text(encoding="utf-8")
+    )
+    expected_exact = {case.theorem for case in CASE_SPECS}
+    if status.get("schema_version") != 1 or set(
+        status.get("established_exact_values", [])
+    ) != expected_exact:
+        raise AssertionError("result-status exact theorem boundary is inconsistent")
+    candidate_targets = {
+        item.get("target") for item in status.get("candidates", [])
+    }
+    if candidate_targets != {"Z(10,23,3,3)", "Z(11,23,3,3)"} or any(
+        item.get("status") != "UPPER_BOUND_NOT_YET_CERTIFIED"
+        for item in status.get("candidates", [])
+    ):
+        raise AssertionError("result-status candidate boundary is inconsistent")
+    return {"json_files_parsed": parsed, "verified_recorded_reports": 2}
 
 
 def check_mathematical_artifacts() -> dict[str, object]:
@@ -445,7 +462,7 @@ def check_mathematical_artifacts() -> dict[str, object]:
     )
     verify_z13_23_upper_certificate(stored_z13_certificate)
     frontier = extended_frontier_report()
-    if frontier["source_open_cases"] != 44 or frontier["remaining_open_cases"] != 33:
+    if frontier["source_open_cases"] != 44 or frontier["remaining_open_cases"] != 35:
         raise AssertionError("extended frontier count mismatch")
     case_certificate_reports = []
     for case in CASE_SPECS:

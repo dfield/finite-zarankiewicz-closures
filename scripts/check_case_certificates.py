@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate or byte-check all case-specific exact-value certificates."""
+"""Generate or byte-check the six established exact-value certificates."""
 
 from __future__ import annotations
 

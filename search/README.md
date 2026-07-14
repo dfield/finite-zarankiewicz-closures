@@ -3,9 +3,10 @@
 Most of these programs were used to *discover* the results documented in
 [`docs/NEW_BOUNDS.md`](../docs/NEW_BOUNDS.md). Unlogged verdicts are not
 proofs: the elementary bounds are rechecked by
-[`scripts/check_new_bounds.py`](../scripts/check_new_bounds.py), the
-$Z(10,23)$ SAT case carries a DRAT core replayed through independent LRAT checking, and every
-witness matrix is checked by exhaustive scan.
+[`scripts/check_new_bounds.py`](../scripts/check_new_bounds.py), and every
+witness matrix is checked by exhaustive scan. The $Z(10,23)$ proof-production
+tools are active research infrastructure; their final complete replay has not
+yet been accepted into the theorem gate.
 
 | File | Purpose | Dependencies |
 |---|---|---|
@@ -15,7 +16,7 @@ witness matrix is checked by exhaustive scan.
 | `filters.py` | the general row/pair deficit profile filter behind the two new upper-bound theorems | Python 3.9+ |
 | `sat_tool.py` | per-profile SAT feasibility (sequential-counter cardinalities, double-lex symmetry breaking) | `pip install python-sat` |
 | `tier2.py` | configuration-level residue filter (found the five profile kills behind the $Z(12,23,3,3)\le134$ theorem) | Python 3.9+ |
-| `z10_23_certify.py` | deterministic profile CNFs, complete fixed row-stabilizer frontiers, optional adaptive search cubes, and direct checked compressed DRAT cores for $Z(10,23,3,3)=112$ | `python-sat`, CaDiCaL, `drat-trim`, `lrat-check` |
+| `z10_23_certify.py` | deterministic profile CNFs, fixed row-stabilizer frontiers, adaptive search cubes, and direct proof production for the $Z(10,23)=112$ candidate | `python-sat`, CaDiCaL, `drat-trim`, `lrat-check` |
 | `z10_23_cube_certify.py` | completeness checking plus proof production and independent replay for full or partially fixed canonical cube leaves | CaDiCaL, `drat-trim`, `lrat-check` |
 | `z10_23_residual_refine.py` | deterministic structural refinement of timeout manifests, with complete-cover rechecking and reuse/parent-to-child maps | Python standard library |
 | `z10_23_cube_finalize.py` | deterministic validation and indexing of a proof family produced in distributed shards | CaDiCaL |
@@ -52,7 +53,7 @@ cadical profile.cnf profile.drat
 drat-trim profile.cnf profile.drat
 ```
 
-For the completed case, list the exact SAT scope, regenerate a direct proof,
+For the candidate case, list the exact SAT scope, regenerate a direct proof,
 write a fixed proof frontier, or generate an adaptive cube partition for
 search experiments:
 
@@ -98,10 +99,10 @@ CaDiCaL run left a raw trace after an interrupted parent process, pass
 `--reuse-raw` to `direct` to validate and convert that trace without solving
 the profile again. Incremental assumption runs over a cube catalog are useful
 search evidence, but their raw trace is not accepted as a proof of the unsplit
-base CNF. Every checked-in trace is produced directly from the corresponding
-base formula and replayed against that same file.
+base CNF. Any trace proposed for the final certificate must be produced from
+the corresponding formula and replayed against that same file.
 
 An `UNSAT` line without the emitted formula, its hash, and a checked proof
-trace is not accepted as a repository theorem. The checked-in CNFs and DRAT/LRAT
-files, rather than the generator's authority, are the load-bearing SAT
-artifacts.
+trace is not accepted as a repository theorem. Only a complete, hash-bound
+family of CNFs and independently replayed DRAT/LRAT files can become
+load-bearing SAT evidence; the current partial family is not sufficient.

@@ -44,7 +44,7 @@
   },
   "10,23": {
    "lower": 112,
-   "lower_source": "BNL2026",
+   "lower_source": "checked-candidate-witness",
    "upper": 114,
    "upper_source": "deletion-from-(9,23)"
   },
@@ -92,7 +92,7 @@
   },
   "11,23": {
    "lower": 123,
-   "lower_source": "two-one-line-extension-of-(11, 22)",
+   "lower_source": "checked-candidate-witness",
    "upper": 125,
    "upper_source": "literature"
   },
@@ -437,7 +437,7 @@
  "notes": [
   "Every lower bound is an explicit construction from the cited source, extended monotonically (a new row or column with two ones never creates K33).",
   "Every upper bound is the literature value, the deficit theorems of docs/NEW_BOUNDS.md, or a floor(k/(k-1) * bound) deletion propagation.",
-  "Solver verdicts are intentionally excluded from this table."
+  "Z(10,23)>=112 and Z(11,23)>=123 are checked witness bounds, not exact-value seeds. The proposed Z(10,23)=112 still requires a complete replayable refutation at 113 ones."
  ],
  "scope": "Z(m,n,3,3) for 8<=m<=16, 16<=n<=23"
 }

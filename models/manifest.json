@@ -25,6 +25,7 @@
       "columns": 21,
       "excluded_target": 107,
       "monotonicity_note": "Testing exactly 107 ones suffices because deleting ones preserves K_3,3-freeness.",
+      "publication_status": "established",
       "rows": 10,
       "slug": "z10_21_106"
     },
@@ -53,6 +54,7 @@
       "columns": 22,
       "excluded_target": 111,
       "monotonicity_note": "Testing exactly 111 ones suffices because deleting ones preserves K_3,3-freeness.",
+      "publication_status": "established",
       "rows": 10,
       "slug": "z10_22_110"
     },
@@ -81,6 +83,7 @@
       "columns": 23,
       "excluded_target": 113,
       "monotonicity_note": "Testing exactly 113 ones suffices because deleting ones preserves K_3,3-freeness.",
+      "publication_status": "candidate",
       "rows": 10,
       "slug": "z10_23_112"
     },
@@ -109,6 +112,7 @@
       "columns": 19,
       "excluded_target": 107,
       "monotonicity_note": "Testing exactly 107 ones suffices because deleting ones preserves K_3,3-freeness.",
+      "publication_status": "established",
       "rows": 11,
       "slug": "z11_19_106"
     },
@@ -137,6 +141,7 @@
       "columns": 20,
       "excluded_target": 112,
       "monotonicity_note": "Testing exactly 112 ones suffices because deleting ones preserves K_3,3-freeness.",
+      "publication_status": "established",
       "rows": 11,
       "slug": "z11_20_111"
     },
@@ -165,6 +170,7 @@
       "columns": 23,
       "excluded_target": 124,
       "monotonicity_note": "Testing exactly 124 ones suffices because deleting ones preserves K_3,3-freeness.",
+      "publication_status": "candidate",
       "rows": 11,
       "slug": "z11_23_123"
     },
@@ -193,6 +199,7 @@
       "columns": 23,
       "excluded_target": 135,
       "monotonicity_note": "Testing exactly 135 ones suffices because deleting ones preserves K_3,3-freeness.",
+      "publication_status": "established",
       "rows": 12,
       "slug": "z12_23_134"
     },
@@ -221,6 +228,7 @@
       "columns": 23,
       "excluded_target": 104,
       "monotonicity_note": "Testing exactly 104 ones suffices because deleting ones preserves K_3,3-freeness.",
+      "publication_status": "established",
       "rows": 9,
       "slug": "z9_23_103"
     }

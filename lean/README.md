@@ -1,36 +1,26 @@
-# Lean arithmetic audit for all eight exact values
+# Lean arithmetic audit
 
-This directory formalizes the finite arithmetic kernels for every exact result in the repository.
+Lean checks arithmetic kernels for the six established exact values, the $Z(13,23)\le144$ bound, and selected arithmetic implications used in the two candidate dossiers.
 
-| Result | Lean coverage |
-|---|---|
-| $Z(9,23,3,3)=103$ | penalty formula and table, three-profile classification, three marked-row contradictions |
-| $Z(10,21,3,3)=106$ | deletion-bound quotient and the excluded-target arithmetic contradiction |
-| $Z(10,22,3,3)=110$ | penalty formula and table, four-profile classification, case-B minima table, and four terminal contradictions |
-| $Z(10,23,3,3)=112$ | deletion and residue endpoints for the arithmetic profile reduction |
-| $Z(11,19,3,3)=106$ | deletion-bound quotient and excluded-target arithmetic contradiction |
-| $Z(11,20,3,3)=111$ | both deletion-bound quotients and both excluded-target arithmetic contradictions |
-| $Z(11,23,3,3)=123$ | deletion-bound quotient and excluded-target arithmetic contradiction |
-| $Z(12,23,3,3)=134$ | penalty formula, profile classifications at 136 and 135, pair equation, recorded row-type minimum, and five terminal contradictions |
-| $Z(13,23,3,3)\le144$ | penalty formula, three-profile classification, and marked-row deficit endpoint |
+| Result | Status | Lean coverage |
+|---|---|---|
+| $Z(9,23)=103$ | established | penalty table, profile classification, marked-row contradictions |
+| $Z(10,21)=106$ | established | deletion quotient and excluded-target arithmetic |
+| $Z(10,22)=110$ | established | penalty table, profile classification, finite minima, terminal contradictions |
+| $Z(10,23)=112$ | **candidate** | arithmetic profile-reduction endpoints only |
+| $Z(11,19)=106$ | established | deletion quotient and excluded-target arithmetic |
+| $Z(11,20)=111$ | established | two deletion quotients and contradictions |
+| $Z(11,23)=123$ | **candidate** | conditional deletion quotient; the $Z(10,23)\le112$ premise is not supplied |
+| $Z(12,23)=134$ | established | classifications at 136 and 135, pair equation, row-type minimum, terminal contradictions |
+| $Z(13,23)\le144$ | established bound | profile classification and marked-row endpoint |
 
-The project intentionally makes a narrower claim than “the eight exact theorems are fully formalized.” The Boolean-matrix definitions, combinatorial double counts, deletion lemma, witness CSVs, finite row-symmetry/row-type enumerations, SAT reduction, and DRAT-to-LRAT replay remain in the human-readable proofs and independently checked certificates. Lean checks the arithmetic consequences supplied by those layers.
+The project does not claim end-to-end formalization. Boolean-matrix definitions, combinatorial double counts, deletion premises, witnesses, finite enumerations, and SAT replay live outside Lean. A checked arithmetic implication cannot promote a candidate whose premise is missing.
 
-The project pins Lean 4.29.0, uses only the bundled `Std` library, and contains no external packages, custom axioms, or admitted results.
+The project pins Lean 4.29.0, uses only bundled `Std`, and contains no custom axioms or admitted results.
 
-## Build
-
-From this directory:
-
-```sh
+```bash
 lake build
 lake env lean AxiomAudit.lean
 ```
 
-For the source-level admission guard used by the audit:
-
-```sh
-rg -n '^[[:space:]]*(sorry|admit|axiom)\b|:=[[:space:]]*(by[[:space:]]+)?(sorry|admit)\b' . --glob '*.lean'
-```
-
-[`AxiomAudit.lean`](AxiomAudit.lean) prints every theorem's axiom dependencies. Executable tables and quotient computations use no axioms; the `omega` proofs use Lean's standard `propext`, `Classical.choice`, and `Quot.sound` principles where reported.
+[`AxiomAudit.lean`](AxiomAudit.lean) prints theorem dependencies. Executable tables and quotient computations use no axioms; `omega` proofs use Lean's standard principles where reported.

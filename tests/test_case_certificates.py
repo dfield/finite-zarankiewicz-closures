@@ -9,6 +9,8 @@ import unittest
 from pathlib import Path
 
 from finite_zarankiewicz_closures.case_certificates import (
+    ALL_CASE_SPECS,
+    CANDIDATE_CASE_SPECS,
     CASE_SPECS,
     CaseCertificateError,
     verify_case_certificate,
@@ -24,6 +26,7 @@ from finite_zarankiewicz_closures.cube_cover import child_masks, ordered_degrees
 
 
 ROOT = Path(__file__).resolve().parents[1]
+Z10_SAT_MANIFEST = ROOT / "certificates" / "z10_23_sat.json"
 
 
 class CaseCertificateTests(unittest.TestCase):
@@ -214,8 +217,12 @@ class CaseCertificateTests(unittest.TestCase):
             self.assertEqual(archive_bytes, 24)
             self.assertEqual(report["leaf_count"], len(catalog))
 
+    @unittest.skipUnless(
+        Z10_SAT_MANIFEST.is_file(),
+        "candidate Z(10,23) certificate has not yet been completed",
+    )
     def test_z10_23_sat_manifest_rejects_scope_and_toolchain_mutations(self) -> None:
-        path = ROOT / "certificates" / "z10_23_sat.json"
+        path = Z10_SAT_MANIFEST
         manifest = json.loads(path.read_text(encoding="utf-8"))
         scope_mutation = copy.deepcopy(manifest)
         scope_mutation["profiles"][0]["profile"] = "4x1,5x22"
@@ -274,6 +281,14 @@ class CaseCertificateTests(unittest.TestCase):
                 report = verify_case_certificate(certificate, ROOT)
                 self.assertEqual(report["status"], "VERIFIED")
 
+    def test_publication_gate_excludes_active_candidates(self) -> None:
+        self.assertEqual(len(ALL_CASE_SPECS), 8)
+        self.assertEqual(len(CASE_SPECS), 6)
+        self.assertEqual(
+            {case.slug for case in CANDIDATE_CASE_SPECS},
+            {"z10_23_112", "z11_23_123"},
+        )
+
     def test_each_case_rejects_mutation(self) -> None:
         for case in CASE_SPECS:
             with self.subTest(case=case.slug):
@@ -293,17 +308,11 @@ class CaseCertificateTests(unittest.TestCase):
             "z10_22_110": lambda c: c["upper_bound"]["detailed_report"]["case_c"].__setitem__(
                 "minimum_pair_residue_sum", 11
             ),
-            "z10_23_112": lambda c: c["upper_bound"]["sat_integrity_report"].__setitem__(
-                "sat_profiles", 12
-            ),
             "z11_19_106": lambda c: c["upper_bound"]["steps"][0].__setitem__(
                 "source_upper_bound", 102
             ),
             "z11_20_111": lambda c: c["upper_bound"]["steps"][1].__setitem__(
                 "recomputed_upper_bound", 112
-            ),
-            "z11_23_123": lambda c: c["upper_bound"]["steps"][0].__setitem__(
-                "recomputed_upper_bound", 124
             ),
             "z12_23_134": lambda c: c["upper_bound"]["detailed_report"]["at_135"][
                 "cases"

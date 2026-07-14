@@ -1,7 +1,7 @@
 PYTHON ?= python3
 export PYTHONPATH := src
 
-.PHONY: all analysis audit certificate checksums extended models new-bounds test verify witness
+.PHONY: all analysis audit candidate-certificate certificate checksums extended models new-bounds test verify witness
 
 all: verify
 
@@ -14,9 +14,13 @@ witness:
 
 certificate:
 	$(PYTHON) scripts/check_proof_certificate.py
-	$(PYTHON) scripts/build_z10_23_sat_manifest.py --check
 	$(PYTHON) scripts/check_case_certificates.py --check
 	$(PYTHON) scripts/check_frontier_certificate.py --check
+
+# Optional heavyweight gate. It becomes available only after every Z(10,23)
+# proof asset and the final SAT manifest have been harvested into the clone.
+candidate-certificate:
+	$(PYTHON) scripts/build_z10_23_sat_manifest.py --check
 
 extended:
 	$(PYTHON) scripts/check_extended_results.py --check

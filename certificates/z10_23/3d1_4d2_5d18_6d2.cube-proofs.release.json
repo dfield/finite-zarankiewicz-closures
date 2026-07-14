@@ -1,0 +1,69 @@
+{
+  "bytes": 16476359596,
+  "compression": {
+    "archive": "deterministic PAX tar",
+    "xz_options": [
+      "-T8",
+      "-3"
+    ],
+    "xz_version": "xz (XZ Utils) 5.4.1"
+  },
+  "format": "TAR+DRAT+xz+github-release-parts",
+  "parts": [
+    {
+      "bytes": 1800000000,
+      "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-00",
+      "sha256": "90148633846f12c73db6ce3f8410fff65b6f1aa0433d307644bf370bb7c09de8"
+    },
+    {
+      "bytes": 1800000000,
+      "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-01",
+      "sha256": "d6b0cd19db9257ba03fb67562085fe113534d8d93ab759523ddee53bf231a288"
+    },
+    {
+      "bytes": 1800000000,
+      "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-02",
+      "sha256": "b785ddcdf4ca03549343ecdc7db09bb3a3d96d85a8128583681bcf45c8f57835"
+    },
+    {
+      "bytes": 1800000000,
+      "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-03",
+      "sha256": "f2f824e680543380210a093e926ba3f45a388d98a06d0db7a6b691f0d44a7f97"
+    },
+    {
+      "bytes": 1800000000,
+      "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-04",
+      "sha256": "7ea5b77d8a34bd11d0768de6b2416e3dc494a26612ef492c041e148503caca89"
+    },
+    {
+      "bytes": 1800000000,
+      "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-05",
+      "sha256": "caf6e51f308c644c7cb8a17afd7ccf0ed718eafc11dcbda297370b86bb58e903"
+    },
+    {
+      "bytes": 1800000000,
+      "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-06",
+      "sha256": "1dab51c88cdfaf0bcf96f215f874894bad74402b00d72463344428fde36ce287"
+    },
+    {
+      "bytes": 1800000000,
+      "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-07",
+      "sha256": "a8a11e13aabb8750d3e4aabd3fd6a69e834c9ecb46ed6e136dd0364462a267fe"
+    },
+    {
+      "bytes": 1800000000,
+      "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-08",
+      "sha256": "f9eaac6bd406dfd9686465b4386213be4e886b7bdf9e6045e3778f58fd8a7057"
+    },
+    {
+      "bytes": 276359596,
+      "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-09",
+      "sha256": "c9a2c3078030fdf702bb46d5ae5750bb8631702fed68daafd8db73d2ca190ad4"
+    }
+  ],
+  "release": {
+    "repository": "dfield/finite-zarankiewicz-closures",
+    "tag": "z10-23-certificate-v1"
+  },
+  "sha256": "9ff048b2954ba7e87dde97b6b6d5e30d6c70e78cc36a7e816ce5b4927fca6dba"
+}

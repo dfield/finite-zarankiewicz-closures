@@ -1,49 +1,27 @@
-# Witness data
+# Checked witness matrices
 
-[`z9_23_103_matrix.csv`](z9_23_103_matrix.csv) is the explicit lower-bound witness for
+Every CSV is an independently checked lower-bound witness. Six match established upper bounds; two support candidates only.
 
-$$
-Z(9,23,3,3)\ge103.
-$$
+| File | Dimensions | Ones | Publication role |
+|---|---:|---:|---|
+| [`z9_23_103_matrix.csv`](z9_23_103_matrix.csv) | $9\times23$ | 103 | exact-value witness |
+| [`z10_21_106_matrix.csv`](z10_21_106_matrix.csv) | $10\times21$ | 106 | exact-value witness |
+| [`z10_22_110_matrix.csv`](z10_22_110_matrix.csv) | $10\times22$ | 110 | exact-value witness |
+| [`z10_23_112_matrix.csv`](z10_23_112_matrix.csv) | $10\times23$ | 112 | **candidate lower bound only** |
+| [`z11_19_106_matrix.csv`](z11_19_106_matrix.csv) | $11\times19$ | 106 | exact-value witness |
+| [`z11_20_111_matrix.csv`](z11_20_111_matrix.csv) | $11\times20$ | 111 | exact-value witness |
+| [`z11_23_123_matrix.csv`](z11_23_123_matrix.csv) | $11\times23$ | 123 | **candidate lower bound only** |
+| [`z12_23_134_matrix.csv`](z12_23_134_matrix.csv) | $12\times23$ | 134 | exact-value witness |
 
-The file has exactly nine rows, 23 comma-separated Boolean entries per row, and 103 ones. Row and column indices used by programs are zero-based; the proof uses ordinary one-based mathematical labels.
+The package checker uses row-triple capacities; the independent scanner examines all candidate $3\times3$ submatrices. Run both paths with:
 
-Verify it in two independent ways from the repository root:
-
-```sh
+```bash
 python3 scripts/verify_witness.py
 python3 scripts/verify_witness_independent.py
-```
-
-The first checks the 84 row-triple capacities. The second is standalone and examines all 148,764 candidate $3\times3$ submatrices. The matrix is also maximal: changing any one of its zero entries to one creates a forbidden submatrix, as tested in `tests/test_matrix.py`.
-
-Bhan, Nobili, and Langer publicly established the 103 lower bound before this repository. See [`docs/LITERATURE_REVIEW.md`](../docs/LITERATURE_REVIEW.md) for attribution and source details.
-
-## Additional witnesses
-
-Seven further matrices support the extended finite-table results:
-
-| File | Dimensions | Ones | Role |
-|---|---:|---:|---|
-| [`z10_21_106_matrix.csv`](z10_21_106_matrix.csv) | $10\times21$ | 106 | Lower bound matching the deletion upper bound |
-| [`z10_22_110_matrix.csv`](z10_22_110_matrix.csv) | $10\times22$ | 110 | Lower bound matching the pair-deficit upper bound |
-| [`z10_23_112_matrix.csv`](z10_23_112_matrix.csv) | $10\times23$ | 112 | Lower bound matching the replayable profile-SAT upper bound |
-| [`z11_19_106_matrix.csv`](z11_19_106_matrix.csv) | $11\times19$ | 106 | Lower bound matching the deletion upper bound from $Z(11,18,3,3)=101$ |
-| [`z11_20_111_matrix.csv`](z11_20_111_matrix.csv) | $11\times20$ | 111 | Lower bound matching the two-step deletion upper bound |
-| [`z11_23_123_matrix.csv`](z11_23_123_matrix.csv) | $11\times23$ | 123 | Lower bound matching deletion from $Z(10,23,3,3)=112$ |
-| [`z12_23_134_matrix.csv`](z12_23_134_matrix.csv) | $12\times23$ | 134 | Lower bound matching the two-stage deficit theorem $Z(12,23,3,3)\le134$ |
-
-The 110-one matrix is row-regular with row sum 11, and every row triple occurs in exactly two columns. The $11\times19$ matrix has column degrees $5^86^{11}$ and row degrees $(8,9^3,10^6,11)$; the $12\times23$ matrix has column degrees $4^15^26^{20}$ and row degrees $(11^{10},12^2)$. Deleting one or two 11-one rows from that last witness gives the stored 123- and 112-one witnesses. Every CSV is nevertheless verified directly as an independent artifact.
-
-Verify all seven additional matrices with both the package checker and the independent direct scanner:
-
-```sh
 PYTHONPATH=src python3 scripts/check_extended_results.py --check
 python3 scripts/verify_extended_witnesses_independent.py
 ```
 
-Recheck the two later upper-bound theorems and the propagated table with:
+A valid matrix proves only a lower bound. In particular, the 112- and 123-one files do not establish their proposed equalities without matching upper bounds.
 
-```sh
-python3 scripts/check_new_bounds.py --check
-```
+Bhan--Nobili--Langer publicly supplied five of the matching lower bounds. The provenance of every construction is discussed in [`docs/LITERATURE_REVIEW.md`](../docs/LITERATURE_REVIEW.md).

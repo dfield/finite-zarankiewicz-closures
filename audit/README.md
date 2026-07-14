@@ -1,8 +1,9 @@
 # Recorded audit reports
 
-- [`model_validation.json`](model_validation.json) records CaDiCaL agreement on the known $3\times4$ case and 30 seeded fixed matrices.
-- [`certificate_replay.json`](certificate_replay.json) records successful DRAT and LRAT replay for all three terminal cases.
-- [`z10_23_sat_replay.json`](z10_23_sat_replay.json) records successful DRAT replay and independent derived-LRAT replay for all thirteen $Z(10,23)$ profile formulas.
-- `lean_axioms.txt` records the output of the Lean axiom audit for all eight exact results and the additional frontier bound.
+- [`model_validation.json`](model_validation.json) records validation of the generic decision encodings.
+- [`certificate_replay.json`](certificate_replay.json) records DRAT and LRAT replay for the three terminal cases in the established $Z(9,23)$ proof.
+- [`lean_axioms.txt`](lean_axioms.txt) records the Lean axiom audit for arithmetic kernels. Candidate arithmetic theorems in that report do not establish their missing combinatorial or SAT premises.
 
-The reports omit temporary paths, timing data, and host identifiers. They are evidence of specific runs, not substitutes for rerunning the commands. The audit narrative and limitations are in [`docs/ADVERSARIAL_AUDIT.md`](../docs/ADVERSARIAL_AUDIT.md).
+There is deliberately no completed `z10_23_sat_replay.json` in this publication boundary. Such a report must cover all thirteen surviving profiles before the candidate can be promoted.
+
+Recorded reports omit temporary paths, timing data, and host identifiers. They are evidence of specific runs, not substitutes for rerunning the commands. See [`docs/ADVERSARIAL_AUDIT.md`](../docs/ADVERSARIAL_AUDIT.md).

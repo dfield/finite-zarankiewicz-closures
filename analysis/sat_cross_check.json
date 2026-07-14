@@ -1,17 +1,19 @@
 {
-  "certified_result": {
+  "candidate_result": {
     "arithmetic_eliminations": 12,
     "arithmetic_profiles": 25,
-    "consequence": "Z(11,23,3,3)=123 by vertex deletion and a matching explicit witness",
+    "current_interval": [
+      112,
+      114
+    ],
     "excluded_target": 113,
-    "proof_replay": "audit/z10_23_sat_replay.json",
-    "sat_manifest": "certificates/z10_23_sat.json",
-    "theorem": "Z(10,23,3,3)=112",
-    "traced_profiles": 13,
+    "proposed_theorem": "Z(10,23,3,3)=112",
+    "sat_profiles_requiring_certificates": 13,
+    "status": "UPPER_BOUND_NOT_YET_CERTIFIED",
     "witness": "data/z10_23_112_matrix.csv"
   },
-  "description": "The unlogged 2026-07-05 SAT sweep was a useful discovery record but was not proof. It has been superseded by deterministic profile CNFs and compressed direct or complete-cover DRAT cores replayed through independent LRAT checking for every surviving 113-one profile.",
-  "evidence_status": "SUPERSEDED_BY_REPLAYABLE_CERTIFICATE",
+  "description": "The 112-one matrix and the arithmetic elimination of 12 of the 25 feasible 113-one degree profiles are verified. The remaining 13 profiles require a complete, replayable proof family. No final SAT manifest or replay audit is checked into this publication boundary, so the proposed equality is not an established theorem here.",
+  "evidence_status": "ACTIVE_CERTIFICATION_PENDING",
   "historical_untraced_session": {
     "date": "2026-07-05",
     "profile_counts": {
@@ -19,7 +21,18 @@
       "114": 11
     },
     "status": "CORROBORATING_ONLY",
-    "summary": "The original sweep reported every capacity-feasible profile UNSAT or arithmetically filtered, but retained no proof traces. None of those verdicts is load-bearing in the completed proof."
+    "summary": "The original sweep reported every capacity-feasible profile UNSAT or arithmetically filtered, but retained no proof traces. None of those solver verdicts is load-bearing."
   },
-  "schema_version": 2
+  "publication_consequence": {
+    "established_now": [
+      "Z(10,23,3,3)>=112",
+      "Z(10,23,3,3)<=114"
+    ],
+    "not_established": [
+      "Z(10,23,3,3)=112",
+      "Z(11,23,3,3)=123"
+    ],
+    "pending_dependency": "A complete replayable refutation of all 13 surviving 113-one profiles would establish Z(10,23)=112; vertex deletion would then give Z(11,23)<=123, matching its checked witness."
+  },
+  "schema_version": 3
 }

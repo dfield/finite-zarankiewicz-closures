@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check the additional exact values, frontier, and finite certificate."""
+"""Check established values, candidate lower bounds, and frontier certificates."""
 
 from __future__ import annotations
 
@@ -25,13 +25,13 @@ from finite_zarankiewicz_closures.matrix import (  # noqa: E402
 
 
 WITNESSES = (
-    ("z10_21_106_matrix.csv", 10, 21, 106),
-    ("z10_22_110_matrix.csv", 10, 22, 110),
-    ("z10_23_112_matrix.csv", 10, 23, 112),
-    ("z11_19_106_matrix.csv", 11, 19, 106),
-    ("z11_20_111_matrix.csv", 11, 20, 111),
-    ("z11_23_123_matrix.csv", 11, 23, 123),
-    ("z12_23_134_matrix.csv", 12, 23, 134),
+    ("z10_21_106_matrix.csv", 10, 21, 106, "established"),
+    ("z10_22_110_matrix.csv", 10, 22, 110, "established"),
+    ("z10_23_112_matrix.csv", 10, 23, 112, "candidate_lower_bound"),
+    ("z11_19_106_matrix.csv", 11, 19, 106, "established"),
+    ("z11_20_111_matrix.csv", 11, 20, 111, "established"),
+    ("z11_23_123_matrix.csv", 11, 23, 123, "candidate_lower_bound"),
+    ("z12_23_134_matrix.csv", 12, 23, 134, "established"),
 )
 
 
@@ -39,7 +39,7 @@ def report() -> dict[str, object]:
     """Return the independently recomputed extended-results report."""
 
     witnesses = []
-    for filename, rows, columns, ones in WITNESSES:
+    for filename, rows, columns, ones, publication_status in WITNESSES:
         path = ROOT / "data" / filename
         result = verify_by_row_triples(
             read_boolean_csv(path),
@@ -50,7 +50,13 @@ def report() -> dict[str, object]:
         )
         if not result.valid:
             raise AssertionError(f"extended witness failed: {filename}")
-        witnesses.append({"file": f"data/{filename}", **result.as_dict()})
+        witnesses.append(
+            {
+                "file": f"data/{filename}",
+                "publication_status": publication_status,
+                **result.as_dict(),
+            }
+        )
     return {
         "status": "VERIFIED",
         "frontier": extended_frontier_report(),

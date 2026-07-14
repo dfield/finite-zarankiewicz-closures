@@ -1,17 +1,17 @@
-"""Exact finite results, frontier bounds, and certificates for the 2026 table.
+"""Established results, candidates, and frontier bounds for the 2026 table.
 
 Alongside the marked-row proof of ``Z(9,23,3,3)=103``, this module records
-seven further closures obtained by propagating and checking the open table in
-Bhan--Nobili--Langer (2026): ``Z(10,21)=106``, ``Z(10,22)=110``,
-``Z(10,23)=112``, ``Z(11,19)=106``, ``Z(11,20)=111``, ``Z(11,23)=123``, and
-``Z(12,23)=134``.  The deletion closures use established neighboring values;
-the other cases use finite degree-profile, deficit, and traced SAT
-certificates.  The module also checks the improved upper bound
-``Z(13,23)<=144``.
+five further exact values obtained by propagating and checking the open table
+in Bhan--Nobili--Langer (2026): ``Z(10,21)=106``, ``Z(10,22)=110``,
+``Z(11,19)=106``, ``Z(11,20)=111``, and ``Z(12,23)=134``.  It also records the
+proved lower bounds and current intervals for the candidates ``Z(10,23)=112``
+and ``Z(11,23)=123``.  The former still needs a complete replayable refutation
+at 113 ones; the latter's proposed upper bound depends on that refutation.
+The module additionally checks ``Z(13,23)<=144``.
 
 Only the standard library is used by this arithmetic module.  The separate
-``Z(10,23)`` certificate layer binds the surviving formulas to independently
-replayable DRAT cores that are also converted to and checked as LRAT.
+``Z(10,23)`` arithmetic front end classifies the remaining SAT instances but
+does not, by itself, certify their unsatisfiability.
 """
 
 from __future__ import annotations
@@ -74,14 +74,17 @@ REPOSITORY_EXACT_VALUES = {
     (9, 23): 103,
     (10, 21): 106,
     (10, 22): 110,
-    (10, 23): 112,
     (11, 19): 106,
     (11, 20): 111,
-    (11, 23): 123,
     (12, 23): 134,
 }
 
-REPOSITORY_UPPER_BOUNDS = {(13, 23): 144}
+REPOSITORY_CANDIDATE_VALUES = {(10, 23): 112, (11, 23): 123}
+REPOSITORY_CANDIDATE_INTERVALS = {
+    (10, 23): (112, 114),
+    (11, 23): (123, 125),
+}
+REPOSITORY_UPPER_BOUNDS = {(10, 23): 114, (13, 23): 144}
 
 
 def deletion_upper(smaller_bound: int, larger_part: int) -> int:
@@ -816,13 +819,27 @@ def extended_frontier_report() -> dict[str, object]:
             f"{rows},{columns}": value
             for (rows, columns), value in sorted(REPOSITORY_UPPER_BOUNDS.items())
         },
+        "repository_candidates": {
+            f"{rows},{columns}": {
+                "proposed_value": REPOSITORY_CANDIDATE_VALUES[(rows, columns)],
+                "current_lower": bounds[0],
+                "current_upper": bounds[1],
+                "status": "UPPER_BOUND_NOT_YET_CERTIFIED",
+            }
+            for (rows, columns), bounds in sorted(
+                REPOSITORY_CANDIDATE_INTERVALS.items()
+            )
+        },
         "remaining_open_cases": len(remaining),
         "remaining_parameters": [f"{rows},{columns}" for rows, columns in remaining],
         "deletion_checks": {
             "Z(10,21)<=106": deletion_upper(96, 10),
+            "Z(10,23)<=114": deletion_upper(103, 10),
             "Z(11,19)<=106": deletion_upper(101, 19),
             "Z(11,20)<=111": deletion_upper(106, 20),
-            "Z(11,23)<=123": deletion_upper(112, 11),
+        },
+        "conditional_implications": {
+            "if_Z(10,23)<=112_then_Z(11,23)<=123": deletion_upper(112, 11),
         },
         "paper_bounds": {
             f"{rows},{columns}": {"lower": lower, "upper": upper}

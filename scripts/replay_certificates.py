@@ -65,7 +65,8 @@ def main() -> int:
         ],
         "scope": (
             "These traces replay only the three terminal Z(9,23) integer aggregations. The "
-            "eight case-specific JSON certificates establish each result's separate evidence path."
+            "six case-specific JSON certificates establish the publishable results; "
+            "the two candidates have separate, incomplete evidence paths."
         ),
     }
     rendered = json.dumps(result, indent=2, sort_keys=True) + "\n"

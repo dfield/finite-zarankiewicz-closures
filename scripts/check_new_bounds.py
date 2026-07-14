@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
-"""Verify the frontier extension, including the eight repository closures,
-the upper bound Z(13,23,3,3)<=144, and the propagated bound table in
-analysis/new_bounds.json.
+"""Verify six repository closures, two candidates, and propagated bounds.
+
+The publication gate treats ``Z(10,23)=112`` and ``Z(11,23)=123`` as
+candidates.  Their checked matrices are lower-bound witnesses; neither is
+inserted as an exact seed until the missing ``Z(10,23)`` replay certificate is
+complete.
 
 Standard library only.  Usage:
     python3 scripts/check_new_bounds.py --check    # verify everything
@@ -63,21 +66,19 @@ def check_witness() -> dict:
 
 
 def check_sat_record_catalog() -> dict[str, object]:
-    """Check that the historical lead points to its certified replacement."""
+    """Check the explicit pending status of the candidate SAT proof."""
 
     record = json.loads(SAT_RECORD.read_text(encoding="utf-8"))
-    assert record["schema_version"] == 2
-    assert record["evidence_status"] == "SUPERSEDED_BY_REPLAYABLE_CERTIFICATE"
-    certified = record["certified_result"]
-    assert certified["theorem"] == "Z(10,23,3,3)=112"
-    assert certified["arithmetic_profiles"] == 25
-    assert certified["arithmetic_eliminations"] == 12
-    assert certified["traced_profiles"] == 13
-    manifest_path = ROOT / certified["sat_manifest"]
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-    assert manifest["theorem"] == certified["theorem"]
-    assert manifest["excluded_target"] == 113
-    assert len(manifest["profiles"]) == certified["traced_profiles"]
+    assert record["schema_version"] == 3
+    assert record["evidence_status"] == "ACTIVE_CERTIFICATION_PENDING"
+    candidate = record["candidate_result"]
+    assert candidate["proposed_theorem"] == "Z(10,23,3,3)=112"
+    assert candidate["current_interval"] == [112, 114]
+    assert candidate["arithmetic_profiles"] == 25
+    assert candidate["arithmetic_eliminations"] == 12
+    assert candidate["sat_profiles_requiring_certificates"] == 13
+    assert candidate["status"] == "UPPER_BOUND_NOT_YET_CERTIFIED"
+    assert not (ROOT / "certificates" / "z10_23_sat.json").exists()
     generated_counts = {
         str(total): len(degree_profiles(10, 23, total)) for total in (113, 114)
     }
@@ -86,7 +87,9 @@ def check_sat_record_catalog() -> dict[str, object]:
     return {
         "evidence_status": record["evidence_status"],
         "profile_counts": generated_counts,
-        "traced_profiles": len(manifest["profiles"]),
+        "sat_profiles_requiring_certificates": candidate[
+            "sat_profiles_requiring_certificates"
+        ],
     }
 
 
@@ -358,13 +361,14 @@ ESTABLISHED = {
 }
 CLOSED = {
     # this repository (docs/PROOF.md, docs/EXTENDED_RESULTS.md)
-    (9, 23): 103, (10, 21): 106, (10, 22): 110, (10, 23): 112,
-    (11, 20): 111, (11, 23): 123,
+    (9, 23): 103, (10, 21): 106, (10, 22): 110,
+    (11, 20): 111,
     # Bhan--Nobili--Langer
     (11, 21): 116, (11, 22): 121, (12, 22): 132,
     # this extension (docs/NEW_BOUNDS.md)
     (11, 19): 106, (12, 23): 134,
 }
+CANDIDATE_LOWER = {(10, 23): 112, (11, 23): 123}
 BNL_OPEN = {
     (10, 23): (112, 115), (11, 23): (118, 125),
     (12, 17): (102, 108), (12, 18): (108, 113), (12, 19): (110, 118),
@@ -403,6 +407,10 @@ def build_table() -> dict:
         if v < U[cell]:
             U[cell] = v
             usrc[cell] = "deficit-theorem"
+    for cell, value in CANDIDATE_LOWER.items():
+        if value > L[cell]:
+            L[cell] = value
+        lsrc[cell] = "checked-candidate-witness"
     changed = True
     while changed:
         changed = False
@@ -437,9 +445,9 @@ def build_table() -> dict:
             "creates K33).",
             "Every upper bound is the literature value, the deficit theorems of "
             "docs/NEW_BOUNDS.md, or a floor(k/(k-1) * bound) deletion propagation.",
-            "The Z(10,23) seed is supported by an arithmetic reduction and "
-            "DRAT cores independently replayed through LRAT checking; no unlogged "
-            "solver verdict is used.",
+            "Z(10,23)>=112 and Z(11,23)>=123 are checked witness bounds, not "
+            "exact-value seeds. The proposed Z(10,23)=112 still requires a "
+            "complete replayable refutation at 113 ones.",
         ],
         "cells": table,
     }
@@ -455,13 +463,13 @@ def run(check_only: bool) -> int:
         "sat_record_catalog": check_sat_record_catalog(),
     }
     table = build_table()
-    # closure consistency: the new exact values must agree with the table
+    # Publication consistency: exact values close; candidates remain intervals.
     cell = table["cells"]["11,19"]
     assert cell["lower"] == cell["upper"] == 106, cell
     cell = table["cells"]["10,23"]
-    assert cell["lower"] == cell["upper"] == 112, cell
+    assert (cell["lower"], cell["upper"]) == (112, 114), cell
     cell = table["cells"]["11,23"]
-    assert cell["lower"] == cell["upper"] == 123, cell
+    assert (cell["lower"], cell["upper"]) == (123, 125), cell
     cell = table["cells"]["12,23"]
     assert cell["lower"] == cell["upper"] == 134, cell
     if check_only:

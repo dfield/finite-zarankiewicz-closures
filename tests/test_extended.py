@@ -30,7 +30,16 @@ class ExtendedResultTests(unittest.TestCase):
         report = extended_frontier_report()
         self.assertEqual(len(PAPER_OPEN_BOUNDS), 44)
         self.assertEqual(report["source_open_cases"], 44)
-        self.assertEqual(report["remaining_open_cases"], 33)
+        self.assertEqual(report["remaining_open_cases"], 35)
+        self.assertEqual(
+            report["repository_candidates"]["10,23"],
+            {
+                "proposed_value": 112,
+                "current_lower": 112,
+                "current_upper": 114,
+                "status": "UPPER_BOUND_NOT_YET_CERTIFIED",
+            },
+        )
 
     def test_z10_22_upper_certificate_is_recomputed(self) -> None:
         report = z10_22_certificate_report()

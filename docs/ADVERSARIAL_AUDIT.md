@@ -2,9 +2,9 @@
 
 ## Audit objective
 
-This audit asks how any of the eight claimed exact values or the additional $Z(13,23)$ bound could be wrong even if ordinary happy-path tests pass. It treats prose, data, generators, certificates, formal code, and literature claims as separate attack surfaces.
+This audit asks how any of the six claimed exact values, the additional $Z(13,23)$ bound, or the stated evidence for two candidates could be wrong even if ordinary happy-path tests pass. It treats prose, data, generators, certificates, formal code, and literature claims as separate attack surfaces.
 
-The original audit was completed on 2026-07-04 and extended for four later closures on 2026-07-06. “Full” here means every evidence layer shipped by the repository was placed in scope; it does not mean the work has received external peer review or that every possible implementation has been verified.
+The original audit was completed on 2026-07-04 and extended through 2026-07-13. The later review found that the $Z(10,23)$ proof-production state did not yet justify a completed theorem certificate, so that case and its $Z(11,23)$ consequence were demoted to candidates. “Full” here means every shipped evidence layer was placed in scope; it does not mean external peer review is complete.
 
 ## Threat model
 
@@ -17,7 +17,7 @@ The principal failure modes considered were:
 5. Lean succeeds because of an admission, custom axiom, or inaccurately stated boundary;
 6. a literature table is misread as exact;
 7. generated evidence depends on a local path, timestamp, random seed, or unavailable private source; or
-8. documentation silently upgrades corroborating computation into a theorem's logical basis; or
+8. documentation silently upgrades corroborating or partial computation into a theorem's logical basis;
 9. the extended table is mistranscribed, a deletion bound is rounded incorrectly, or a finite profile/orbit is omitted from the $(10,22)$, $(10,23)$, or $(12,23)$ certificate; or
 10. a $(10,23)$ CNF omits a legal matrix, a cover omits a canonical branch, or a stored direct or leaf DRAT core fails its advertised DRAT-to-LRAT replay.
 
@@ -80,9 +80,9 @@ The extended certificate independently enumerates the four possible degree profi
 
 The minimum residue sums are recomputed rather than trusted from JSON. The other two profiles are rejected by transparent divisibility and symmetric-difference arguments.
 
-Eight case-specific wrapper certificates bind those upper-bound checks to the exact witness file, dimensions, weight, row and column sums, exhaustive row-triple result, and SHA-256 digest. The checker regenerates all fields, and mutation tests require an altered exact value to be rejected for every case.
+Six case-specific wrapper certificates bind established upper-bound checks to the exact witness file, dimensions, weight, row and column sums, exhaustive row-triple result, and SHA-256 digest. The checker regenerates all fields, and mutation tests require an altered exact value to be rejected for every established case.
 
-For $Z(10,23)$, the arithmetic checker independently enumerates all 25 feasible profiles at 113 ones, partitions them as 5 low-degree, 4 two-degree-three, 3 residue, and 13 SAT cases, and rejects mutations of the SAT manifest. Every stored formula header, body count, hash, and proof hash is checked before the case certificate is accepted.
+For the $Z(10,23)$ candidate, the arithmetic checker independently enumerates all 25 feasible profiles at 113 ones and partitions them as 5 low-degree, 4 two-degree-three, 3 residue, and 13 SAT cases. Because no final SAT manifest covering the thirteen cases exists, there is no exact-value wrapper certificate to accept.
 
 The $Z(12,23)$ certificate separately classifies the unique profile at 136 and all five profiles at 135. It recomputes the pair equation, all residue budgets, and the minimum value 25 in the sole row-type enumeration. The $Z(13,23)$ report independently classifies the three profiles at 145 and checks each marked-row deficit contradiction.
 
@@ -102,9 +102,7 @@ All sixteen generic target models regenerate byte-for-byte. The repository audit
 
 The audit found no basis for describing these traces as a proof of the raw cell CNF, so the documentation does not do so. They replay only the terminal aggregate contradictions. The JSON certificate and its checker are the bridge from the mathematical problem to those endpoints.
 
-Separately, `drat-trim` accepts the ten direct compressed DRAT cores and every leaf core in the three complete $Z(10,23)$ cover archives, converting each to an LRAT refutation accepted by `lrat-check`. Direct proofs are checked against the exact unsplit profile CNF. Cover leaves are checked against that same base formula with precisely their indexed cell literals appended as unit clauses. The standard-library trie audit recomputes all permitted child supports and rejects missing, duplicate, overlapping, wrong-degree, or noncanonical leaves. Thus neither an incremental solver status nor the catalog generator is trusted for completeness.
-
-For compressed streams stored in multiple byte chunks, the integrity gate checks the ordered part hashes and each reconstructed-stream hash before replay. It also binds every cover catalog and per-leaf proof index. The recorded semantic replay is [`audit/z10_23_sat_replay.json`](../audit/z10_23_sat_replay.json).
+The $Z(10,23)$ directory contains partial direct and cover artifacts, but the audit cannot establish a complete census, complete cover family, or end-to-end DRAT/LRAT replay for all thirteen profiles. There is deliberately no `audit/z10_23_sat_replay.json` report in the publication gate. [`SAT_Z10_23_STATUS.md`](SAT_Z10_23_STATUS.md) lists the acceptance criteria, and [`AWS_Z10_23_RUN.md`](AWS_Z10_23_RUN.md) records the isolated production environment. Cloud job status is explicitly outside the proof trust boundary.
 
 ## 6. Lean audit
 
@@ -136,7 +134,7 @@ The three table-level claims most relevant to the previous one-edge gap were che
 
 The search included exact parameter variants, paper titles, DOI and arXiv records, and forward-looking queries through 2026-07-04. No earlier closure was located. The repository describes this as a dated search conclusion and explicitly invites earlier references.
 
-The extended audit transcribes all 44 cells that the paper identifies as previously open and checks the set cardinality directly. After the paper's three closures and this repository's eight closures, set subtraction leaves 33 cells. The documentation expressly retains their open status.
+The extended audit transcribes all 44 cells that the paper identifies as previously open and checks the set cardinality directly. After the paper's three closures and this repository's six established closures, set subtraction leaves 35 cells. The two candidates remain in that set.
 
 ## 8. Portability and provenance audit
 
@@ -151,16 +149,16 @@ The root Git commit contains only the human proof. This makes the requested proo
 The audit does not remove the need for external review. In particular:
 
 - no independent mathematician has yet signed off on the proofs;
-- the Lean development covers the arithmetic kernels for all eight exact results and the additional bound, not end-to-end matrix theorems;
+- the Lean development covers arithmetic kernels for six exact results, one additional bound, and conditional candidate implications, not end-to-end matrix theorems;
 - no monolithic LRAT trace is provided for the raw 9-by-23 cell model;
-- the $Z(10,23)$ proof depends on the correctness of the independently replayed DRAT/LRAT checkers and the documented CNF reduction;
+- the proposed $Z(10,23)$ equality is not established because complete independently replayed DRAT/LRAT evidence is still missing;
 - the extended finite enumerations are checked by standard-library code; Lean checks their recorded minima and consequences but does not rerun the orbit or row-type searches;
 - the DGH formula transcription was checked by exact tests and source comparison but is diagnostic, not part of the theorem;
 - the finite literature search cannot establish absolute priority; and
 - external replay tools add their own trusted implementations.
 
-These limitations do not presently reveal a gap in the claimed proofs, but they define the claims that this repository does and does not make.
+These limitations do not presently reveal a gap in the six established exact proofs or the $Z(13,23)$ bound. They are the reason the two proposed equalities remain candidates.
 
 ## Audit verdict
 
-Within the declared scope, all known positive, negative, mutation, regeneration, parser, external-replay, and formal-axiom checks pass. No unresolved mathematical or reproducibility defect is presently known. The result remains appropriately labeled as awaiting independent expert review.
+Within the declared publication scope, the six exact-value certificates, frontier certificate, witnesses, mutation checks, deterministic regenerations, terminal trace replay, and formal-axiom checks pass. The unresolved $Z(10,23)$ proof obligation is exposed rather than waived; consequently $Z(10,23)=112$ and $Z(11,23)=123$ remain provisional. All results await independent expert review.
