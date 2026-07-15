@@ -1,0 +1,35 @@
+{
+  "archive": {
+    "format": "deterministic POSIX.1-1988 ustar",
+    "gid": 0,
+    "member_compression": "xz",
+    "member_name_pattern": "proofs/leaf-%06d.vipr.xz",
+    "mode": "0444",
+    "mtime": 0,
+    "uid": 0
+  },
+  "bytes": 15759360,
+  "certificate_bytes": 15574768,
+  "cover_manifest": {
+    "bytes": 865746,
+    "file": "profile-c-vipr-final-manifest.json",
+    "sha256": "30fd5b8fba89a4d51fcac8e37be2e34535606be36fc19f651fbfa990ef419ded"
+  },
+  "format": "TAR+VIPR+xz-members+github-release-parts",
+  "member_count": 236,
+  "parts": [
+    {
+      "bytes": 15759360,
+      "name": "3d1_4d3_5d16_6d3.vipr-certificates.tar.part-00",
+      "sha256": "6d4c8a105a3728114c88c4f8b6c7f73484ea7cddcde155a9aa146d874b493bf9"
+    }
+  ],
+  "profile": "3x1,4x3,5x16,6x3",
+  "release": {
+    "repository": "dfield/finite-zarankiewicz-closures",
+    "tag": "z10-23-certificate-v1"
+  },
+  "schema_version": 1,
+  "sha256": "6d4c8a105a3728114c88c4f8b6c7f73484ea7cddcde155a9aa146d874b493bf9",
+  "slug": "3d1_4d3_5d16_6d3"
+}

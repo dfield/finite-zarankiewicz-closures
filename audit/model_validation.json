@@ -225,7 +225,7 @@
       "ones": 15
     }
   ],
-  "scope": "Small-instance semantic validation only. Six excluded-target impossibilities are established by separate proofs; two models correspond to candidates.",
+  "scope": "Small-instance semantic validation only. Eight excluded-target impossibilities are established by separate case-specific proofs.",
   "seed": 20260704,
   "solver": {
     "name": "CaDiCaL",

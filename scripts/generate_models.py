@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate or byte-check decision models for established cases and candidates."""
+"""Generate or byte-check decision models for established exact cases."""
 
 from __future__ import annotations
 
@@ -23,10 +23,10 @@ MODEL_CASES = (
     ("z9_23_103", 9, 23, 104, "established"),
     ("z10_21_106", 10, 21, 107, "established"),
     ("z10_22_110", 10, 22, 111, "established"),
-    ("z10_23_112", 10, 23, 113, "candidate"),
+    ("z10_23_112", 10, 23, 113, "established"),
     ("z11_19_106", 11, 19, 107, "established"),
     ("z11_20_111", 11, 20, 112, "established"),
-    ("z11_23_123", 11, 23, 124, "candidate"),
+    ("z11_23_123", 11, 23, 124, "established"),
     ("z12_23_134", 12, 23, 135, "established"),
 )
 

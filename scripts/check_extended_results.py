@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Check established values, candidate lower bounds, and frontier certificates."""
+"""Check established values, witnesses, and frontier certificates."""
 
 from __future__ import annotations
 
@@ -27,10 +27,10 @@ from finite_zarankiewicz_closures.matrix import (  # noqa: E402
 WITNESSES = (
     ("z10_21_106_matrix.csv", 10, 21, 106, "established"),
     ("z10_22_110_matrix.csv", 10, 22, 110, "established"),
-    ("z10_23_112_matrix.csv", 10, 23, 112, "candidate_lower_bound"),
+    ("z10_23_112_matrix.csv", 10, 23, 112, "established"),
     ("z11_19_106_matrix.csv", 11, 19, 106, "established"),
     ("z11_20_111_matrix.csv", 11, 20, 111, "established"),
-    ("z11_23_123_matrix.csv", 11, 23, 123, "candidate_lower_bound"),
+    ("z11_23_123_matrix.csv", 11, 23, 123, "established"),
     ("z12_23_134_matrix.csv", 12, 23, 134, "established"),
 )
 

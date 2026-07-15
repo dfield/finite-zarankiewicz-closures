@@ -1,4 +1,4 @@
-"""Uniform, case-specific certificates for the six established exact values.
+"""Uniform, case-specific certificates for the eight established exact values.
 
 Each stored JSON certificate is treated as untrusted.  This module rebuilds
 the witness invariants and the appropriate upper-bound certificate, then
@@ -30,7 +30,7 @@ class CaseCertificateError(ValueError):
 
 @dataclass(frozen=True)
 class CaseSpec:
-    """Static parameters for one established result or active candidate."""
+    """Static parameters for one established result."""
 
     slug: str
     rows: int
@@ -50,32 +50,14 @@ ALL_CASE_SPECS = (
     CaseSpec("z9_23_103", 9, 23, 103, "data/z9_23_103_matrix.csv"),
     CaseSpec("z10_21_106", 10, 21, 106, "data/z10_21_106_matrix.csv"),
     CaseSpec("z10_22_110", 10, 22, 110, "data/z10_22_110_matrix.csv"),
-    CaseSpec(
-        "z10_23_112",
-        10,
-        23,
-        112,
-        "data/z10_23_112_matrix.csv",
-        "candidate",
-    ),
+    CaseSpec("z10_23_112", 10, 23, 112, "data/z10_23_112_matrix.csv"),
     CaseSpec("z11_19_106", 11, 19, 106, "data/z11_19_106_matrix.csv"),
     CaseSpec("z11_20_111", 11, 20, 111, "data/z11_20_111_matrix.csv"),
-    CaseSpec(
-        "z11_23_123",
-        11,
-        23,
-        123,
-        "data/z11_23_123_matrix.csv",
-        "candidate",
-    ),
+    CaseSpec("z11_23_123", 11, 23, 123, "data/z11_23_123_matrix.csv"),
     CaseSpec("z12_23_134", 12, 23, 134, "data/z12_23_134_matrix.csv"),
 )
-ESTABLISHED_CASE_SPECS = tuple(
-    case for case in ALL_CASE_SPECS if case.publication_status == "established"
-)
-CANDIDATE_CASE_SPECS = tuple(
-    case for case in ALL_CASE_SPECS if case.publication_status == "candidate"
-)
+ESTABLISHED_CASE_SPECS = ALL_CASE_SPECS
+CANDIDATE_CASE_SPECS: tuple[CaseSpec, ...] = ()
 # Backwards-compatible public name used by the publication certificate gate.
 CASE_SPECS = ESTABLISHED_CASE_SPECS
 CASE_BY_SLUG = {case.slug: case for case in CASE_SPECS}
@@ -97,6 +79,15 @@ def _witness_certificate(root: Path, case: CaseSpec) -> dict[str, Any]:
     if not report.valid:
         raise CaseCertificateError(f"invalid witness for {case.slug}")
     return {"file": case.witness_file, **report.as_dict()}
+
+
+@lru_cache(maxsize=None)
+def _z10_23_upper_report(root_text: str) -> dict[str, Any]:
+    """Deeply verify and cache the complete 113-one certificate family."""
+
+    from .sat_certificate import load_and_verify_z10_23_sat_manifest
+
+    return load_and_verify_z10_23_sat_manifest(Path(root_text))
 
 
 def _upper_certificate(root: Path, case: CaseSpec) -> dict[str, Any]:
@@ -145,6 +136,23 @@ def _upper_certificate(root: Path, case: CaseSpec) -> dict[str, Any]:
                 "case-B and case-C row-symmetry orbit enumeration"
             ),
         }
+    if case.slug == "z10_23_112":
+        manifest = root / "certificates" / "z10_23_sat.json"
+        report = _z10_23_upper_report(str(root.resolve()))
+        if report.get("status") != "VERIFIED" or report.get("sat_profiles") != 13:
+            raise CaseCertificateError("incomplete Z(10,23) certificate family")
+        return {
+            "method": "arithmetic_reduction_and_replayable_certificates",
+            "excluded_target": 113,
+            "master_manifest": "certificates/z10_23_sat.json",
+            "master_manifest_sha256": _sha256(manifest),
+            "detailed_report": report,
+            "computer_assisted_component": (
+                "eleven DRAT/LRAT profile refutations and two exact SCIP/VIPR "
+                "orbit-cover refutations"
+            ),
+            "lean_kernel": "Zarankiewicz.Z10_23.ArithmeticFrontEnd",
+        }
     if case.slug == "z11_19_106":
         bound = deletion_upper(101, 19)
         if bound != 106:
@@ -191,6 +199,39 @@ def _upper_certificate(root: Path, case: CaseSpec) -> dict[str, Any]:
                 },
             ],
             "lean_kernel": "ZarankiewiczFiniteClosures.ArithmeticKernels",
+        }
+    if case.slug == "z11_23_123":
+        # If a K_3,3-free 11 x 23 matrix had 124 ones, one of its eleven
+        # rows would have degree at most floor(124/11)=11.  Deleting that row
+        # would leave at least 113 ones in a 10 x 23 matrix, contradicting the
+        # independently certified bound Z(10,23)<=112.
+        excluded_target = 124
+        deleted_degree = excluded_target // 11
+        remaining = excluded_target - deleted_degree
+        if (deleted_degree, remaining) != (11, 113):
+            raise CaseCertificateError("unexpected Z(11,23) deletion arithmetic")
+        z10_report = _z10_23_upper_report(str(root.resolve()))
+        if z10_report.get("status") != "VERIFIED":
+            raise CaseCertificateError("Z(11,23) depends on an unverified Z(10,23) bound")
+        return {
+            "method": "minimum_row_deletion",
+            "excluded_target": excluded_target,
+            "steps": [
+                {
+                    "source": "Z(10,23,3,3)<=112",
+                    "source_upper_bound": 112,
+                    "larger_row_part": 11,
+                    "minimum_deleted_degree_at_most": deleted_degree,
+                    "remaining_ones_at_least": remaining,
+                    "contradictory_target": 113,
+                }
+            ],
+            "source_certificate": "certificates/z10_23_112.json",
+            "source_manifest": "certificates/z10_23_sat.json",
+            "source_manifest_sha256": _sha256(
+                root / "certificates" / "z10_23_sat.json"
+            ),
+            "lean_kernel": "Zarankiewicz.Z11_23.Deletion",
         }
     if case.slug == "z12_23_134":
         return {

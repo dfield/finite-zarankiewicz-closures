@@ -44,9 +44,9 @@
   },
   "10,23": {
    "lower": 112,
-   "lower_source": "checked-candidate-witness",
-   "upper": 114,
-   "upper_source": "deletion-from-(9,23)"
+   "lower_source": "closed",
+   "upper": 112,
+   "upper_source": "closed"
   },
   "11,16": {
    "lower": 92,
@@ -92,9 +92,9 @@
   },
   "11,23": {
    "lower": 123,
-   "lower_source": "checked-candidate-witness",
-   "upper": 125,
-   "upper_source": "literature"
+   "lower_source": "closed",
+   "upper": 123,
+   "upper_source": "closed"
   },
   "12,16": {
    "lower": 99,
@@ -437,7 +437,7 @@
  "notes": [
   "Every lower bound is an explicit construction from the cited source, extended monotonically (a new row or column with two ones never creates K33).",
   "Every upper bound is the literature value, the deficit theorems of docs/NEW_BOUNDS.md, or a floor(k/(k-1) * bound) deletion propagation.",
-  "Z(10,23)>=112 and Z(11,23)>=123 are checked witness bounds, not exact-value seeds. The proposed Z(10,23)=112 still requires a complete replayable refutation at 113 ones."
+  "Z(10,23)=112 is an exact seed backed by the complete replayable 113-one certificate family; Z(11,23)=123 follows by minimum-row deletion and its checked witness."
  ],
  "scope": "Z(m,n,3,3) for 8<=m<=16, 16<=n<=23"
 }

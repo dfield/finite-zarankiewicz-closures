@@ -21,6 +21,7 @@ from typing import Any, Iterator, Mapping
 
 from .cube_cover import CubeCoverError, verify_cube_catalog
 from .extended import z10_23_profile_report
+from .vipr_certificate import ViprCertificateError, verify_vipr_cover
 
 
 class SatCertificateError(ValueError):
@@ -476,6 +477,43 @@ def _check_cube_proof(
     return archive_bytes, cover_report
 
 
+def _check_vipr_proof(
+    root: Path,
+    profile: str,
+    payload: Mapping[str, Any],
+) -> tuple[int, dict[str, Any]]:
+    """Check local descriptors and deeply audit one exact SCIP/VIPR orbit cover."""
+
+    if payload.get("format") != "exact-scip-vipr-orbit-cover":
+        raise SatCertificateError(f"unexpected VIPR-cover format for {profile}")
+    descriptors = {
+        "cover_manifest": ".json",
+        "catalog": ".jsonl",
+        "catalog_metadata": ".json",
+        "release_sidecar": ".release.json",
+    }
+    paths = {}
+    for field, suffix in descriptors.items():
+        descriptor = payload.get(field)
+        if not isinstance(descriptor, dict):
+            raise SatCertificateError(f"missing {field} for VIPR profile {profile}")
+        path = _check_hashed_file(root, descriptor)
+        if not path.name.endswith(suffix):
+            raise SatCertificateError(f"unexpected {field} name for VIPR profile {profile}")
+        paths[field] = path
+    archive = payload.get("archive")
+    if not isinstance(archive, dict):
+        raise SatCertificateError(f"missing release archive for VIPR profile {profile}")
+    sidecar = json.loads(paths["release_sidecar"].read_text(encoding="ascii"))
+    if archive != sidecar:
+        raise SatCertificateError(f"VIPR release sidecar differs from the SAT manifest: {profile}")
+    try:
+        report = verify_vipr_cover(root, profile)
+    except ViprCertificateError as error:
+        raise SatCertificateError(f"invalid VIPR cover for {profile}: {error}") from error
+    return int(report["release_bytes"]), report
+
+
 def verify_z10_23_sat_manifest(manifest: Mapping[str, Any], root: Path) -> dict[str, Any]:
     """Check an untrusted manifest against arithmetic scope and file contents."""
 
@@ -490,16 +528,26 @@ def verify_z10_23_sat_manifest(manifest: Mapping[str, Any], root: Path) -> dict[
     if manifest.get("arithmetic_eliminated_profiles") != 12:
         raise SatCertificateError("unexpected arithmetic elimination count in SAT manifest")
     if manifest.get("toolchain") != {
-        "cnf_generator": "python-sat 1.9.dev2",
-        "solver": "CaDiCaL 3.0.0",
-        "solver_commit": "7b99c07f0bcab5824a5a3ce62c7066554017f641",
-        "cube_solver_options": ["--unsat", "-q", "-P2"],
-        "proof_converter": "drat-trim",
-        "proof_projection": "lrat-check DRAT output",
-        "proof_checker": "drat-trim + lrat-check",
-        "proof_tools_commit": "2e3b2dc0ecf938addbd779d42877b6ed69d9a985",
+        "sat": {
+            "cnf_generator": "python-sat 1.9.dev2",
+            "solver": "CaDiCaL 3.0.0",
+            "solver_commit": "7b99c07f0bcab5824a5a3ce62c7066554017f641",
+            "cube_solver_options": ["--unsat", "-q", "-P2"],
+            "proof_converter": "drat-trim",
+            "proof_projection": "lrat-check DRAT output",
+            "proof_checker": "drat-trim + lrat-check",
+            "proof_tools_commit": "2e3b2dc0ecf938addbd779d42877b6ed69d9a985",
+        },
+        "vipr": {
+            "solver": "SCIP 10.0.3 exact mode",
+            "solver_git_hash": "d409edf9f6",
+            "scip_archive_sha256": "ddbb7129bdb83f8f70ed26391d206fd1658139e44c7c7fd7d73a1e4cefbca94f",
+            "proof_checker": "viprchk",
+            "vipr_source_commit": "30f2951d1e90e47afa821bdd1b12b82246656c42",
+            "vipr_source_sha256": "7d20cd04ba11488fbc8ed3fbabfdfa513e161a0c36b75220927f55051614ed2f",
+        },
     }:
-        raise SatCertificateError("unexpected SAT proof toolchain metadata")
+        raise SatCertificateError("unexpected Z(10,23) proof toolchain metadata")
 
     arithmetic = z10_23_profile_report()
     expected_profiles = {_canonical_profile(label) for label in arithmetic["sat_profiles"]}
@@ -514,6 +562,9 @@ def verify_z10_23_sat_manifest(manifest: Mapping[str, Any], root: Path) -> dict[
     direct_profiles = 0
     cube_profiles = 0
     cube_leaves = 0
+    vipr_profiles = 0
+    vipr_orbits = 0
+    vipr_raw_states = 0
     for case in cases:
         profile = case["profile"]
         formula_payload = case.get("formula")
@@ -530,12 +581,22 @@ def verify_z10_23_sat_manifest(manifest: Mapping[str, Any], root: Path) -> dict[
             proof_bytes, cover_report = _check_cube_proof(root, profile, proof_payload)
             cube_profiles += 1
             cube_leaves += cover_report["leaf_count"]
+        elif strategy == "scip_vipr_orbit_cover":
+            proof_bytes, cover_report = _check_vipr_proof(root, profile, proof_payload)
+            vipr_profiles += 1
+            vipr_orbits += int(cover_report["orbits"])
+            vipr_raw_states += int(cover_report["raw_states"])
         else:
             raise SatCertificateError(f"unexpected SAT strategy for {profile}")
-        if case.get("replay") != {
-            "checker": "drat-trim -> LRAT -> lrat-check",
+        expected_replay = {
+            "checker": (
+                "viprchk + regenerated-OPB model binding"
+                if strategy == "scip_vipr_orbit_cover"
+                else "drat-trim -> LRAT -> lrat-check"
+            ),
             "status": "VERIFIED",
-        }:
+        }
+        if case.get("replay") != expected_replay:
             raise SatCertificateError(f"missing independent replay record: {profile}")
         total_compressed_bytes += proof_bytes
 
@@ -548,6 +609,9 @@ def verify_z10_23_sat_manifest(manifest: Mapping[str, Any], root: Path) -> dict[
         "direct_profiles": direct_profiles,
         "cube_cover_profiles": cube_profiles,
         "cube_leaves": cube_leaves,
+        "vipr_cover_profiles": vipr_profiles,
+        "vipr_orbits": vipr_orbits,
+        "vipr_raw_states": vipr_raw_states,
         "compressed_proof_bytes": total_compressed_bytes,
     }
 

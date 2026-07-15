@@ -27,6 +27,18 @@ PROFILES = (
     "3x1,4x3,5x16,6x3",
     "3x1,4x4,5x14,6x4",
 )
+VIPR_PROFILES = {
+    "3x1,4x3,5x16,6x3": {
+        "name": "c",
+        "catalog": "profile-c-degree6-orbits.jsonl",
+        "catalog_metadata": "profile-c-degree6-orbits.json",
+    },
+    "3x1,4x4,5x14,6x4": {
+        "name": "b",
+        "catalog": "profile-b-deficit-orbits.jsonl",
+        "catalog_metadata": "profile-b-deficit-orbits.json",
+    },
+}
 
 
 class _ConcatenatedReader(io.RawIOBase):
@@ -94,6 +106,32 @@ def _formula_metadata(path: Path) -> dict[str, object]:
         "bytes": path.stat().st_size,
         "variables": header[0],
         "clauses": header[1],
+    }
+
+
+def _file_metadata(path: Path) -> dict[str, object]:
+    return {
+        "file": str(path.relative_to(ROOT)),
+        "sha256": _sha256(path),
+        "bytes": path.stat().st_size,
+    }
+
+
+def _vipr_proof_metadata(profile: str, slug: str) -> dict[str, object]:
+    data = VIPR_PROFILES[profile]
+    directory = ROOT / "certificates" / "z10_23" / "vipr"
+    manifest = directory / f"profile-{data['name']}-vipr-final-manifest.json"
+    catalog = directory / str(data["catalog"])
+    catalog_metadata = directory / str(data["catalog_metadata"])
+    release_sidecar = directory / f"{slug}.vipr-certificates.release.json"
+    release = json.loads(release_sidecar.read_text(encoding="ascii"))
+    return {
+        "format": "exact-scip-vipr-orbit-cover",
+        "cover_manifest": _file_metadata(manifest),
+        "catalog": _file_metadata(catalog),
+        "catalog_metadata": _file_metadata(catalog_metadata),
+        "release_sidecar": _file_metadata(release_sidecar),
+        "archive": release,
     }
 
 
@@ -300,6 +338,20 @@ def render() -> str:
         slug = _slug(profile)
         formula = ROOT / "models" / "z10_23" / f"{slug}.cnf"
         proof_directory = ROOT / "certificates" / "z10_23"
+        if profile in VIPR_PROFILES:
+            cases.append(
+                {
+                    "profile": profile,
+                    "strategy": "scip_vipr_orbit_cover",
+                    "formula": _formula_metadata(formula),
+                    "proof": _vipr_proof_metadata(profile, slug),
+                    "replay": {
+                        "checker": "viprchk + regenerated-OPB model binding",
+                        "status": "VERIFIED",
+                    },
+                }
+            )
+            continue
         direct_exists = (proof_directory / f"{slug}.drat.xz").is_file() or bool(
             list(proof_directory.glob(f"{slug}.drat.xz.part-*"))
         )
@@ -329,14 +381,24 @@ def render() -> str:
         "arithmetic_eliminated_profiles": 12,
         "profiles": cases,
         "toolchain": {
-            "cnf_generator": "python-sat 1.9.dev2",
-            "solver": "CaDiCaL 3.0.0",
-            "solver_commit": "7b99c07f0bcab5824a5a3ce62c7066554017f641",
-            "cube_solver_options": ["--unsat", "-q", "-P2"],
-            "proof_converter": "drat-trim",
-            "proof_projection": "lrat-check DRAT output",
-            "proof_checker": "drat-trim + lrat-check",
-            "proof_tools_commit": "2e3b2dc0ecf938addbd779d42877b6ed69d9a985",
+            "sat": {
+                "cnf_generator": "python-sat 1.9.dev2",
+                "solver": "CaDiCaL 3.0.0",
+                "solver_commit": "7b99c07f0bcab5824a5a3ce62c7066554017f641",
+                "cube_solver_options": ["--unsat", "-q", "-P2"],
+                "proof_converter": "drat-trim",
+                "proof_projection": "lrat-check DRAT output",
+                "proof_checker": "drat-trim + lrat-check",
+                "proof_tools_commit": "2e3b2dc0ecf938addbd779d42877b6ed69d9a985",
+            },
+            "vipr": {
+                "solver": "SCIP 10.0.3 exact mode",
+                "solver_git_hash": "d409edf9f6",
+                "scip_archive_sha256": "ddbb7129bdb83f8f70ed26391d206fd1658139e44c7c7fd7d73a1e4cefbca94f",
+                "proof_checker": "viprchk",
+                "vipr_source_commit": "30f2951d1e90e47afa821bdd1b12b82246656c42",
+                "vipr_source_sha256": "7d20cd04ba11488fbc8ed3fbabfdfa513e161a0c36b75220927f55051614ed2f",
+            },
         },
     }
     return json.dumps(manifest, indent=2, sort_keys=True) + "\n"

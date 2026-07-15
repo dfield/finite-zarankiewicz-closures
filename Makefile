@@ -1,7 +1,7 @@
 PYTHON ?= python3
 export PYTHONPATH := src
 
-.PHONY: all analysis audit candidate-certificate certificate checksums extended models new-bounds test verify witness
+.PHONY: all analysis audit candidate-certificate certificate checksums extended models new-bounds test verify witness z10-23-certificate
 
 all: verify
 
@@ -14,13 +14,18 @@ witness:
 
 certificate:
 	$(PYTHON) scripts/check_proof_certificate.py
+	$(PYTHON) scripts/build_z10_23_sat_manifest.py --check
 	$(PYTHON) scripts/check_case_certificates.py --check
 	$(PYTHON) scripts/check_frontier_certificate.py --check
 
-# Optional heavyweight gate. It becomes available only after every Z(10,23)
-# proof asset and the final SAT manifest have been harvested into the clone.
-candidate-certificate:
+# Self-contained integrity gate: regenerates both VIPR orbit covers and every
+# OPB leaf, but does not download the 25 GB external-checker release assets.
+z10-23-certificate:
 	$(PYTHON) scripts/build_z10_23_sat_manifest.py --check
+	$(PYTHON) scripts/check_z10_23_certificate.py
+
+# Backwards-compatible name from the pre-publication candidate phase.
+candidate-certificate: z10-23-certificate
 
 extended:
 	$(PYTHON) scripts/check_extended_results.py --check

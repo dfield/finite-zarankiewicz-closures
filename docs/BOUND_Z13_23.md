@@ -41,4 +41,11 @@ Degree-six and degree-seven columns contribute 10 and 15, both divisible by five
 
 All profiles are impossible, proving $Z(13,23,3,3)\le144$.
 
-The standalone certificate is [`z13_23_upper_144.json`](../certificates/z13_23_upper_144.json), recomputed by `z13_23_upper_report` in [`extended.py`](../src/finite_zarankiewicz_closures/extended.py). Lean checks the profile arithmetic and terminal inequalities in [`ArithmeticKernels.lean`](../lean/ZarankiewiczFiniteClosures/ArithmeticKernels.lean). No matching 144-one construction is claimed; the repository's propagated interval is $139\text{--}144$.
+The end-to-end Lean upper-bound theorem is
+[`Zarankiewicz/Bounds/Z13_23.lean`](../lean/Zarankiewicz/Bounds/Z13_23.lean);
+it proves the matrix-to-profile reduction and all three contradictions. The
+standalone certificate [`z13_23_upper_144.json`](../certificates/z13_23_upper_144.json),
+recomputed by `z13_23_upper_report` in
+[`extended.py`](../src/finite_zarankiewicz_closures/extended.py), remains an
+independent cross-check. No matching 144-one construction is claimed; the
+repository's propagated interval is $139\text{--}144$.

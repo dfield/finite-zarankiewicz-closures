@@ -3,12 +3,12 @@ import Lean.Elab.Tactic.Omega
 /-!
 # Arithmetic kernels for additional finite closures and frontier bounds
 
-This file checks arithmetic endpoints for five further exact values, two
-candidate implications, and the bound `Z(13,23,3,3) ≤ 144`. As with the
+This file checks arithmetic endpoints for seven further exact values and the
+bound `Z(13,23,3,3) ≤ 144`. As with the
 original `ZarankiewiczZ923` module, the combinatorial reductions remain in the
 proof documents and Python certificates. In particular, Lean checks reported
-finite minima but does not re-run row-symmetry or row-type enumeration or
-replay the still-incomplete `Z(10,23)` propositional certificates.
+finite minima but does not re-run row-symmetry or row-type enumeration and
+does not replay the completed external `Z(10,23)` proof certificates.
 -/
 
 namespace ZarankiewiczFiniteClosures

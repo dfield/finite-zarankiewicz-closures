@@ -217,10 +217,6 @@ class CaseCertificateTests(unittest.TestCase):
             self.assertEqual(archive_bytes, 24)
             self.assertEqual(report["leaf_count"], len(catalog))
 
-    @unittest.skipUnless(
-        Z10_SAT_MANIFEST.is_file(),
-        "candidate Z(10,23) certificate has not yet been completed",
-    )
     def test_z10_23_sat_manifest_rejects_scope_and_toolchain_mutations(self) -> None:
         path = Z10_SAT_MANIFEST
         manifest = json.loads(path.read_text(encoding="utf-8"))
@@ -229,11 +225,11 @@ class CaseCertificateTests(unittest.TestCase):
         with self.assertRaises(SatCertificateError):
             verify_z10_23_sat_manifest(scope_mutation, ROOT)
         toolchain_mutation = copy.deepcopy(manifest)
-        toolchain_mutation["toolchain"]["solver"] = "unrecorded"
+        toolchain_mutation["toolchain"]["sat"]["solver"] = "unrecorded"
         with self.assertRaises(SatCertificateError):
             verify_z10_23_sat_manifest(toolchain_mutation, ROOT)
         commit_mutation = copy.deepcopy(manifest)
-        commit_mutation["toolchain"]["proof_tools_commit"] = "unrecorded"
+        commit_mutation["toolchain"]["sat"]["proof_tools_commit"] = "unrecorded"
         with self.assertRaises(SatCertificateError):
             verify_z10_23_sat_manifest(commit_mutation, ROOT)
         strategy_mutation = copy.deepcopy(manifest)
@@ -281,13 +277,10 @@ class CaseCertificateTests(unittest.TestCase):
                 report = verify_case_certificate(certificate, ROOT)
                 self.assertEqual(report["status"], "VERIFIED")
 
-    def test_publication_gate_excludes_active_candidates(self) -> None:
+    def test_publication_gate_contains_all_established_cases(self) -> None:
         self.assertEqual(len(ALL_CASE_SPECS), 8)
-        self.assertEqual(len(CASE_SPECS), 6)
-        self.assertEqual(
-            {case.slug for case in CANDIDATE_CASE_SPECS},
-            {"z10_23_112", "z11_23_123"},
-        )
+        self.assertEqual(len(CASE_SPECS), 8)
+        self.assertEqual(CANDIDATE_CASE_SPECS, ())
 
     def test_each_case_rejects_mutation(self) -> None:
         for case in CASE_SPECS:
@@ -308,11 +301,17 @@ class CaseCertificateTests(unittest.TestCase):
             "z10_22_110": lambda c: c["upper_bound"]["detailed_report"]["case_c"].__setitem__(
                 "minimum_pair_residue_sum", 11
             ),
+            "z10_23_112": lambda c: c["upper_bound"]["detailed_report"].__setitem__(
+                "vipr_orbits", 444
+            ),
             "z11_19_106": lambda c: c["upper_bound"]["steps"][0].__setitem__(
                 "source_upper_bound", 102
             ),
             "z11_20_111": lambda c: c["upper_bound"]["steps"][1].__setitem__(
                 "recomputed_upper_bound", 112
+            ),
+            "z11_23_123": lambda c: c["upper_bound"]["steps"][0].__setitem__(
+                "remaining_ones_at_least", 112
             ),
             "z12_23_134": lambda c: c["upper_bound"]["detailed_report"]["at_135"][
                 "cases"

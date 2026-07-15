@@ -44,3 +44,12 @@
 'ZarankiewiczFiniteClosures.classify_z13_23_degree_profile' depends on axioms: [propext, Classical.choice, Quot.sound]
 'ZarankiewiczFiniteClosures.z13_23_clean_row_contradiction' depends on axioms: [propext, Quot.sound]
 'ZarankiewiczFiniteClosures.z13_23_case_deficit_bounds' does not depend on any axioms
+'Zarankiewicz.Exact.Z9_23.exact_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Zarankiewicz.Exact.Z10_22.exact_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Zarankiewicz.Exact.Z12_23.exact_value' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Zarankiewicz.Bounds.Z13_23.upper_bound' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Zarankiewicz.Exact.DeletionClosures.z10_21_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Zarankiewicz.Exact.DeletionClosures.z11_19_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Zarankiewicz.Exact.DeletionClosures.z11_20_exact' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Zarankiewicz.Exact.DeletionClosures.z10_23_exact_of_upper' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Zarankiewicz.Exact.DeletionClosures.z11_23_exact' depends on axioms: [propext, Classical.choice, Quot.sound]

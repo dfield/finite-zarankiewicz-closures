@@ -1,6 +1,6 @@
-# Two further exact values, two candidates, and new frontier bounds
+# Four further exact values and new frontier bounds
 
-> **Attribution:** The $Z(11,19)$ and $Z(12,23)$ results and the $Z(13,23)$ bound were produced by **Claude (Anthropic)** in a verification-and-extension session dated 2026-07-05. OpenAI Codex is performing the unfinished replayable certification of the $Z(10,23)$ candidate and its conditional $Z(11,23)$ consequence. The work awaits independent expert review.
+> **Attribution:** The $Z(11,19)$ and $Z(12,23)$ results and the $Z(13,23)$ bound were produced by **Claude (Anthropic)** in a verification-and-extension session dated 2026-07-05. OpenAI Codex completed the replayable $Z(10,23)$ certification and its $Z(11,23)$ consequence. The work awaits independent expert review.
 
 ## 1. Summary
 
@@ -13,20 +13,20 @@ $$
 \boxed{Z(12,23,3,3)=134}.
 $$
 
-**Two retained candidates, stated only as current intervals.**
+**Two additional exact values.**
 
 $$
-112\le Z(10,23,3,3)\le114,\qquad
-123\le Z(11,23,3,3)\le125.
+\boxed{Z(10,23,3,3)=112},\qquad
+\boxed{Z(11,23,3,3)=123}.
 $$
 
 For $(11,19)$, the upper bound is the deletion bound already derived in [`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) from the established value $Z(11,18,3,3)=101$; the matching lower bound is a new explicit 106-one matrix, [`data/z11_19_106_matrix.csv`](../data/z11_19_106_matrix.csv), found by simulated annealing over fixed column-degree profiles and verified by exhaustive scan. Bhan--Nobili--Langer's best construction had 102 ones.
 
 For $(12,23)$, Section 3 proves $Z(12,23,3,3)\le134$ by a two-step deficit argument (their reported interval was $125$--$136$), and the matching lower bound is a new explicit 134-one matrix, [`data/z12_23_134_matrix.csv`](../data/z12_23_134_matrix.csv).
 
-For $(10,23)$, [`PROOF_Z10_23.md`](PROOF_Z10_23.md) reduces 113 ones to twelve arithmetic contradictions and thirteen deterministic CNFs. The explicit 112-one matrix is checked, but the final replayable proof family for all thirteen CNFs is not complete in the repository. The 123-one $(11,23)$ matrix is also checked; its proposed upper bound 123 is conditional on completing $Z(10,23)\le112$.
+For $(10,23)$, [`PROOF_Z10_23.md`](PROOF_Z10_23.md) reduces 113 ones to twelve arithmetic contradictions and thirteen finite instances, all covered by complete DRAT/LRAT or exact SCIP/VIPR certificates. Minimum-row deletion then gives the $(11,23)$ upper bound 123, matching its checked witness.
 
-Counting all six established repository equalities, 9 of the paper's 44 open cells are settled and **35 remain open**. The two candidates are included among those 35.
+Counting all eight repository equalities, 11 of the paper's 44 open cells are exact and **33 remain open**.
 
 **New elementary upper bounds.**
 
@@ -38,7 +38,7 @@ $$
 
 The previous published upper bounds were 136 and 145. The proofs use only the row-triple capacity count and the deficit mechanisms already present in this repository — the pair-deficit count of the $Z(10,22)$ proof and the marked-row residues of the $Z(9,23)$ proof — applied at new parameters, with residue moduli 10 and 4 at twelve rows and 5 at thirteen rows. Full proofs are in Sections 3 and 4; every arithmetic step, including the one finite enumeration, is checked by [`scripts/check_new_bounds.py`](../scripts/check_new_bounds.py).
 
-**A propagated bound table.** Closing the table of [BNL26] under the deletion lemma and under two-one-line extensions tightens 20 upper bounds and 17 lower bounds beyond the paper's published intervals. Candidate matrices enter only as proved lower bounds. The machine-readable result, with per-cell provenance, is [`analysis/new_bounds.json`](../analysis/new_bounds.json). Section 5 lists every change.
+**A propagated bound table.** Closing the table of [BNL26] under the deletion lemma and under two-one-line extensions tightens 21 upper bounds and 17 lower bounds beyond the paper's published intervals. All eight repository equalities enter as exact seeds. The machine-readable result, with per-cell provenance, is [`analysis/new_bounds.json`](../analysis/new_bounds.json). Section 5 lists every change.
 
 ## 2. The value $Z(11,19,3,3)=106$
 
@@ -242,12 +242,12 @@ Two elementary observations close the published table under implication:
 1. **Deletion (upper bounds).** If $Z(m-1,n,3,3)\le B$ then $Z(m,n,3,3)\le\lfloor mB/(m-1)\rfloor$, and symmetrically in $n$. This is the lemma of [`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) Section 2.
 2. **Two-one-line extension (lower bounds).** Appending a row or column with exactly two ones can never create a $K_{3,3}$ (an all-one $3\times3$ block needs three ones from every participating line), so $Z(m,n,3,3)\ge Z(m-1,n,3,3)+2$ and $Z(m,n,3,3)\ge Z(m,n-1,3,3)+2$.
 
-Seeding with the previously established cells of [BNL26] Figure 2, the six repository exact values, the two checked candidate lower-bound witnesses, the paper's published intervals, and the two theorems above, then iterating to a fixpoint, produces [`analysis/new_bounds.json`](../analysis/new_bounds.json). The changed cells are:
+Seeding with the previously established cells of [BNL26] Figure 2, the eight repository exact values, the paper's published intervals, and the frontier theorems above, then iterating to a fixpoint, produces [`analysis/new_bounds.json`](../analysis/new_bounds.json). The changed cells are:
 
 | Cell | [BNL26] interval | New interval | Upper-bound mechanism |
 |---|---:|---:|---|
-| $(10,23)$ | 112--115 | **112--114** (candidate) | checked witness; deletion from $Z(9,23)=103$ |
-| $(11,23)$ | 118--125 | **123--125** (candidate) | checked witness; upper bound 123 remains conditional |
+| $(10,23)$ | 112--115 | **112** (closed) | complete 113-one certificate family |
+| $(11,23)$ | 118--125 | **123** (closed) | deletion from $Z(10,23)=112$ plus witness |
 | $(12,17)$ | 102--108 | 102--**104** | deletion from $Z(11,17)=96$ |
 | $(12,18)$ | 108--113 | 108--**110** | deletion from $Z(11,18)=101$ |
 | $(12,19)$ | 110--118 | 110--**115** | deletion from $Z(11,19)=106$ |
@@ -280,7 +280,7 @@ Cells not listed are unchanged. Note that $(12,19)$, $(12,20)$, and $(12,21)$ in
 
 - The $Z(11,19)$ **upper** bound and every deletion-propagated bound depend on the correctness of the established values in [BNL26] Figure 2 / Tan's Table 3 — the same dependency already accepted by [`EXTENDED_RESULTS.md`](EXTENDED_RESULTS.md) for $Z(10,21)$ and $Z(11,20)$. The witness and both deficit theorems are self-contained.
 - The theorems of Sections 3 and 4 are fully elementary; [`scripts/check_new_bounds.py`](../scripts/check_new_bounds.py) re-derives the profile classifications by exhaustive enumeration and re-checks every displayed number, in the standard library only.
-- The original 2026-07-05 per-profile SAT sweep retained no proof traces and remains non-load-bearing historical evidence. The current checker enumerates all 25 feasible profiles and eliminates twelve arithmetically; certification work for the remaining thirteen is ongoing. [`analysis/sat_cross_check.json`](../analysis/sat_cross_check.json) and [`SAT_Z10_23_STATUS.md`](SAT_Z10_23_STATUS.md) record the missing evidence explicitly.
+- The original 2026-07-05 per-profile SAT sweep retained no proof traces and remains non-load-bearing historical evidence. The later proof-producing run covers the thirteen non-arithmetic profiles with hash-bound, independently checked certificates. [`analysis/sat_cross_check.json`](../analysis/sat_cross_check.json) and [`SAT_Z10_23_STATUS.md`](SAT_Z10_23_STATUS.md) record the completed evidence boundary.
 - The figure-2 transcription used here was re-read from the arXiv HTML of [BNL26] v2 during the session and matches [`analysis/extended_results.json`](../analysis/extended_results.json); the upper bounds equal $\min(\text{[Tan22] Table 3},\ \text{[DGH26] Table 2})$ cell-by-cell, and an exact-rational re-computation of the [DGH26] linear program reproduced their published values for every open cell.
 
 ## 7. Reproduction
@@ -289,8 +289,8 @@ Cells not listed are unchanged. Note that $(12,19)$, $(12,20)$, and $(12,21)$ in
 # everything claimed above (witness scan, both theorems, the propagated table)
 python3 scripts/check_new_bounds.py --check
 
-# after all candidate assets and the final manifest exist
-make candidate-certificate
+# regenerate both VIPR covers and every OPB leaf, then check the master manifest
+make z10-23-certificate
 
 # regenerate the machine-readable table after an intentional change
 python3 scripts/check_new_bounds.py --write

@@ -1,67 +1,60 @@
-# AWS proof-production record for the $Z(10,23)$ candidate
+# AWS proof-production record for $Z(10,23,3,3)=112$
 
-> **Publication status as of 2026-07-13:** proof production is ongoing. This dossier is an operational record, not a completed certificate and not evidence for the equality by itself.
+> **Final status:** proof production and aggregate verification completed; dedicated compute was scaled to zero. Cloud state is operational provenance, not theorem evidence by itself.
 
-## Identifiers
+## Identifiers and isolation
 
 - Project: `zarankiewicz-z10-23-lrat`
 - Base run: `z1023-lrat-20260706t190127z-a2e0ce9f`
-- Adaptive stage: `z1023-r8-20260712t160923z-a2e0ce9f`
-- Active recovery: `z1023-r8-recovery-20260714t030653z-a2e0ce9f`
+- Final adaptive stage: `r9`
+- Profile-B sweep: `z1023-scip-vipr-b-20260715t004830z-a2e0ce9f`
+- Profile-B residual sweep: `z1023-scip-vipr-b-r-20260715t015331z-a2e0ce9f`
+- Profile-C sweep: `z1023-scip-vipr-c-20260715t022016z-a2e0ce9f`
 - Region: `us-east-2`
-- Run-scoped durable prefix: `zarankiewicz-z10-23-lrat/runs/z1023-lrat-20260706t190127z-a2e0ce9f/`
+- Durable prefix: `zarankiewicz-z10-23-lrat/runs/z1023-lrat-20260706t190127z-a2e0ce9f/`
 
-The recovery launch was independently reconstructed from the sealed prior cutoff and binds 5,717,908 outstanding proof tasks. Its configured safety cutoff is `2026-07-14T22:00:00Z`.
+The work reused the `conway99-stage10` EKS control plane but used a project-specific namespace, service account, ECR repository, encrypted/versioned S3 bucket, IAM role, labels, taints, and run-scoped object prefixes. The dedicated On-Demand node group was capped at six `r7i.2xlarge` instances: 48 vCPUs total.
 
-## Isolation and capacity
+## Earlier DRAT/LRAT stage
 
-The work uses the existing `conway99-stage10` EKS control plane but project-specific mutable resources:
+The base and recovery stages produced the ten direct CaDiCaL proof traces and the complete 17,170-leaf cube proof family. Every accepted leaf passed:
 
-- namespace and service account `zarankiewicz-z10-23-lrat`;
-- managed On-Demand node group `zarankiewicz-z10-23-lrat-od`;
-- ECR repository and encrypted, versioned S3 bucket dedicated to the project;
-- IRSA role `zarankiewicz-z10-23-lrat-worker-irsa`; and
-- run-, stage-, and recovery-scoped object prefixes.
+1. DRAT replay with the pinned `drat-trim` build;
+2. DRAT-to-LRAT conversion;
+3. independent LRAT replay with `lrat-check`; and
+4. projected-core replay before its encrypted, hash-bound checkpoint was accepted.
 
-The worker pool is capped at six On-Demand `r7i.2xlarge` instances, eight vCPUs each, for 48 vCPUs. Project labels and taints keep the workload on its dedicated nodes. No Conway workload namespace, job, bucket, or node group is part of the proof state.
+Recovery and adaptive refinement were used to finish hard leaves. Failed, timed-out, incomplete, and superseded attempts remain operational history and do not enter the final proof index.
 
-The immutable worker image is
+## Final exact SCIP/VIPR stage
 
-```text
-624052199967.dkr.ecr.us-east-2.amazonaws.com/zarankiewicz-z10-23-lrat:z1023-lrat-20260706t190127z-a2e0ce9f
-```
+The last two profiles were solved as exact integer programs over complete row-symmetry orbit covers.
 
-with manifest digest `sha256:c6e4a1986c13c538105ae17c2e8ee2bf5241a4823e691670fb302d984f39cb18`.
+| Profile | Raw states | Orbits | Verified leaves | Certificate bytes |
+|---|---:|---:|---:|---:|
+| $3^1 4^4 5^{14}6^4$ | 295,001 | 209 | 209 | 7,914,211,500 |
+| $3^1 4^3 5^{16}6^3$ | 950,250 | 236 | 236 | 15,574,768 |
 
-| Tool | Version or source | SHA-256 |
-|---|---|---|
-| CaDiCaL | 3.0.0 | `0d576865772350ba09ac01e33cb7264c11b94ea8ed7130a519448c38d5656aba` |
-| `drat-trim` | proof-tools commit `2e3b2dc0ecf938addbd779d42877b6ed69d9a985` | `9c09fe813af0b52f58d923837a1bc3ca5e6017987c1e9530d62fa5b4f018412a` |
-| `lrat-check` | same proof-tools commit | `bf67af3ff4c0ce09a0873ad32ac53d797047d4a31d50bf2effd025c3c9e89986` |
-| XZ | 5.4.1 | `31c8422d8432de91ffa9b3713743c98cb8011c561546c76759600c9476357dc0` |
+Profile B required a residual run for thirteen certificates whose first exact SCIP output requested unsupported completion steps. The residual run disabled separation as well as presolve and conflict analysis. Only certificates fully accepted by `viprchk` without completion are present in the final aggregate. Profile C completed all 236 representatives directly.
 
-## Durable workflow
+The final aggregate manifest hashes are:
 
-The cloud stage handles difficult leaves from complete row-stabilizer covers. Catalog construction and refinement make no SAT claim. For each retained leaf, the intended verified pipeline is:
+- profile B: `3c46aa06a9f7a33ef42e5328e738f4ecfdcb26f60603b1a85ad01145cbc500af`;
+- profile C: `30fd5b8fba89a4d51fcac8e37be2e34535606be36fc19f651fbfa990ef419ded`.
 
-1. append the catalogued cell literals to the exact base CNF as unit clauses;
-2. produce a DRAT trace with the pinned CaDiCaL binary;
-3. replay with `drat-trim` and derive LRAT;
-4. check LRAT independently with `lrat-check`;
-5. replay the projected compact DRAT core; and
-6. write an encrypted, hash-bound S3 checkpoint only after all checks succeed.
+## Pinned proof tools
 
-The recovery task partition was reconstructed twice and required identical manifests before launch. A corrected in-cluster guard uses the AWS SDK, records progress to the recovery prefix, and scales the dedicated node group to zero at completion or cutoff. An earlier guard invocation used an unsupported CLI option; the affected cutoff was manually sealed and capacity was scaled to zero before the corrected recovery was launched. That incident is operational history and no affected pod status is accepted as mathematical evidence.
+| Tool | Version or identity |
+|---|---|
+| CaDiCaL | 3.0.0, commit `7b99c07f0bcab5824a5a3ce62c7066554017f641` |
+| `drat-trim` / `lrat-check` | proof-tools commit `2e3b2dc0ecf938addbd779d42877b6ed69d9a985` |
+| SCIP | 10.0.3 exact mode, git hash `d409edf9f6` |
+| SCIP archive SHA-256 | `ddbb7129bdb83f8f70ed26391d206fd1658139e44c7c7fd7d73a1e4cefbca94f` |
+| `viprchk` source | commit `30f2951d1e90e47afa821bdd1b12b82246656c42` |
+| `viprchk` source SHA-256 | `7d20cd04ba11488fbc8ed3fbabfdfa513e161a0c36b75220927f55051614ed2f` |
 
-## What must happen before publication as an equality
+## Harvest and publication boundary
 
-Completion of compute is not sufficient. Promotion of $Z(10,23,3,3)=112$ requires:
+The final artifacts were harvested from S3, checked against their leaf manifests, packed into deterministic split release streams, and bound into [`z10_23_sat.json`](../certificates/z10_23_sat.json). The repository independently regenerates the covers and formulas without AWS access. The heavyweight replay can obtain the proof bodies from the GitHub release and invoke all three external checkers.
 
-- a sealed census with exactly one verified core for every retained leaf;
-- deterministic cover-completeness audits;
-- deterministic proof archives and sidecars binding every part name, size, and SHA-256 digest;
-- a final manifest covering all thirteen SAT profiles;
-- independent local DRAT and LRAT replay from the published artifacts; and
-- a clean-clone repository audit that promotes the candidate explicitly.
-
-None of those final aggregate artifacts is asserted complete in this version. Until they are harvested and replayed, [`analysis/result_status.json`](../analysis/result_status.json) keeps $Z(10,23)=112$ and its dependent $Z(11,23)=123$ as candidates.
+AWS pod status, solver log text, S3 object presence, and autoscaling state are never sufficient for publication. The theorem depends only on the checked witness, arithmetic reduction, complete cover arguments, hash-bound proof bodies, and successful independent proof-checker runs described in [`PROOF_Z10_23.md`](PROOF_Z10_23.md).

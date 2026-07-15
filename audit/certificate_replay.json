@@ -20,6 +20,6 @@
     "drat-trim models/terminal_CASE.cnf certificates/terminal_CASE.drat",
     "lrat-check models/terminal_CASE.cnf certificates/terminal_CASE.lrat"
   ],
-  "scope": "These traces replay only the three terminal Z(9,23) integer aggregations. Six case-specific JSON certificates establish the publishable exact results; the two candidates have separate, incomplete evidence paths.",
+  "scope": "These traces replay only the three terminal Z(9,23) integer aggregations. Eight case-specific JSON certificates establish the publishable exact results; Z(10,23) has a separate heavyweight DRAT/LRAT and VIPR replay path.",
   "status": "VERIFIED"
 }

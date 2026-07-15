@@ -1,0 +1,81 @@
+{
+  "certificate_type": "exact_finite_zarankiewicz_case",
+  "conclusion": "Z(11,23,3,3)=123",
+  "lower_bound": {
+    "column_sums": [
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      5,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      6,
+      5,
+      5,
+      4
+    ],
+    "columns": 23,
+    "file": "data/z11_23_123_matrix.csv",
+    "first_violation": null,
+    "maximum_common_columns": 2,
+    "ones": 123,
+    "row_sums": [
+      11,
+      11,
+      11,
+      11,
+      11,
+      12,
+      11,
+      11,
+      11,
+      11,
+      12
+    ],
+    "row_triples_checked": 165,
+    "rows": 11,
+    "sha256": "f29c569df7aade98f2a0773fc3d907998aa88dd55d9de277c2fac59b898da5ca",
+    "valid": true
+  },
+  "parameters": {
+    "columns": 23,
+    "exact_value": 123,
+    "forbidden_columns": 3,
+    "forbidden_rows": 3,
+    "rows": 11
+  },
+  "schema_version": 1,
+  "slug": "z11_23_123",
+  "theorem": "Z(11,23,3,3)=123",
+  "upper_bound": {
+    "excluded_target": 124,
+    "lean_kernel": "Zarankiewicz.Z11_23.Deletion",
+    "method": "minimum_row_deletion",
+    "source_certificate": "certificates/z10_23_112.json",
+    "source_manifest": "certificates/z10_23_sat.json",
+    "source_manifest_sha256": "548a0bb7dd8087f4bf9cd85900244e3ffe3c6f46f1906e998742b7d180d78514",
+    "steps": [
+      {
+        "contradictory_target": 113,
+        "larger_row_part": 11,
+        "minimum_deleted_degree_at_most": 11,
+        "remaining_ones_at_least": 113,
+        "source": "Z(10,23,3,3)<=112",
+        "source_upper_bound": 112
+      }
+    ]
+  }
+}

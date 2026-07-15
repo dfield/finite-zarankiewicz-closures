@@ -153,8 +153,8 @@ def main() -> int:
         "known_cases": known,
         "random_fixed_matrices": random_reports,
         "scope": (
-            "Small-instance semantic validation only. Six excluded-target impossibilities "
-            "are established by separate proofs; two models correspond to candidates."
+            "Small-instance semantic validation only. Eight excluded-target impossibilities "
+            "are established by separate case-specific proofs."
         ),
     }
     rendered = json.dumps(result, indent=2, sort_keys=True) + "\n"

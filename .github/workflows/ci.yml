@@ -35,7 +35,7 @@ jobs:
         run: make verify
 
   lean:
-    name: Lean arithmetic kernel
+    name: Lean end-to-end proofs
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -45,7 +45,7 @@ jobs:
           lake-package-directory: lean
           build: true
           test: false
-          use-mathlib-cache: false
+          use-mathlib-cache: true
           leanchecker: true
       - name: Print theorem axiom dependencies
         working-directory: lean

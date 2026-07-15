@@ -1,5 +1,6 @@
 import ZarankiewiczZ923.ArithmeticKernel
 import ZarankiewiczFiniteClosures.ArithmeticKernels
+import Zarankiewicz
 
 /-!
 This executable audit file is not part of the library API.  Running
@@ -56,3 +57,20 @@ prints the axioms used by every theorem that carries the mathematical load.
 #print axioms ZarankiewiczFiniteClosures.classify_z13_23_degree_profile
 #print axioms ZarankiewiczFiniteClosures.z13_23_clean_row_contradiction
 #print axioms ZarankiewiczFiniteClosures.z13_23_case_deficit_bounds
+
+/-! End-to-end matrix theorems. -/
+
+#print axioms Zarankiewicz.Exact.Z9_23.exact_value
+#print axioms Zarankiewicz.Exact.Z10_22.exact_value
+#print axioms Zarankiewicz.Exact.Z12_23.exact_value
+#print axioms Zarankiewicz.Bounds.Z13_23.upper_bound
+
+/-! These closures deliberately retain historical or externally certified
+upper bounds as ordinary theorem parameters; the audit confirms that the
+closure machinery adds no axiom of its own. -/
+
+#print axioms Zarankiewicz.Exact.DeletionClosures.z10_21_exact
+#print axioms Zarankiewicz.Exact.DeletionClosures.z11_19_exact
+#print axioms Zarankiewicz.Exact.DeletionClosures.z11_20_exact
+#print axioms Zarankiewicz.Exact.DeletionClosures.z10_23_exact_of_upper
+#print axioms Zarankiewicz.Exact.DeletionClosures.z11_23_exact

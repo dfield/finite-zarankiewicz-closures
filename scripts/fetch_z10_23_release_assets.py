@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fetch and hash-check the release-backed Z(10,23) cube-proof archives."""
+"""Fetch and hash-check every release-backed Z(10,23) proof archive."""
 
 from __future__ import annotations
 
@@ -30,8 +30,9 @@ def main() -> int:
     output = args.output if args.output.is_absolute() else ROOT / args.output
     output.mkdir(parents=True, exist_ok=True)
     sidecars = sorted(CERTIFICATES.glob("*.cube-proofs.release.json"))
+    sidecars.extend(sorted((CERTIFICATES / "vipr").glob("*.vipr-certificates.release.json")))
     if not sidecars:
-        raise RuntimeError("no release-backed cube-proof metadata is present")
+        raise RuntimeError("no release-backed proof metadata is present")
     gh = shutil.which("gh")
     if gh is None:
         raise RuntimeError("GitHub CLI (gh) is required")
@@ -81,6 +82,7 @@ def main() -> int:
                     "asset": part["name"],
                     "bytes": part["bytes"],
                     "sha256": part["sha256"],
+                    "sidecar": str(sidecar.relative_to(ROOT)),
                     "status": status,
                 }
             )

@@ -28,6 +28,8 @@ PATTERNS = (
     "certificates/z10_23/*.cube-proofs.release.json",
     "certificates/z10_23/*.cube-proofs.tar.xz",
     "certificates/z10_23/*.cube-proofs.tar.xz.part-*",
+    "certificates/z10_23/vipr/*.json",
+    "certificates/z10_23/vipr/*.jsonl",
     "data/*.csv",
     "models/*.cnf",
     "models/*.json",

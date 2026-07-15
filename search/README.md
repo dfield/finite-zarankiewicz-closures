@@ -5,8 +5,8 @@ Most of these programs were used to *discover* the results documented in
 proofs: the elementary bounds are rechecked by
 [`scripts/check_new_bounds.py`](../scripts/check_new_bounds.py), and every
 witness matrix is checked by exhaustive scan. The $Z(10,23)$ proof-production
-tools are active research infrastructure; their final complete replay has not
-yet been accepted into the theorem gate.
+tools produced the complete certificate family now accepted by the theorem
+gate; exploratory verdicts outside the final manifests remain non-load-bearing.
 
 | File | Purpose | Dependencies |
 |---|---|---|
@@ -16,10 +16,11 @@ yet been accepted into the theorem gate.
 | `filters.py` | the general row/pair deficit profile filter behind the two new upper-bound theorems | Python 3.9+ |
 | `sat_tool.py` | per-profile SAT feasibility (sequential-counter cardinalities, double-lex symmetry breaking) | `pip install python-sat` |
 | `tier2.py` | configuration-level residue filter (found the five profile kills behind the $Z(12,23,3,3)\le134$ theorem) | Python 3.9+ |
-| `z10_23_certify.py` | deterministic profile CNFs, fixed row-stabilizer frontiers, adaptive search cubes, and direct proof production for the $Z(10,23)=112$ candidate | `python-sat`, CaDiCaL, `drat-trim`, `lrat-check` |
+| `z10_23_certify.py` | deterministic profile CNFs, fixed row-stabilizer frontiers, adaptive search cubes, and direct proof production for $Z(10,23)=112$ | `python-sat`, CaDiCaL, `drat-trim`, `lrat-check` |
 | `z10_23_cube_certify.py` | completeness checking plus proof production and independent replay for full or partially fixed canonical cube leaves | CaDiCaL, `drat-trim`, `lrat-check` |
 | `z10_23_residual_refine.py` | deterministic structural refinement of timeout manifests, with complete-cover rechecking and reuse/parent-to-child maps | Python standard library |
 | `z10_23_cube_finalize.py` | deterministic validation and indexing of a proof family produced in distributed shards | CaDiCaL |
+| `z10_23_vipr/` | exact OPB generation and independent orbit-cover reconstruction for the two SCIP/VIPR profiles | Python standard library |
 | `lp_dgh.py` | exact-rational Davies--Gill--Horsley LP, reproduces their published table | Python 3.9+ |
 
 Build the annealers with:
@@ -53,7 +54,7 @@ cadical profile.cnf profile.drat
 drat-trim profile.cnf profile.drat
 ```
 
-For the candidate case, list the exact SAT scope, regenerate a direct proof,
+For the certificate case, list the exact SAT scope, regenerate a direct proof,
 write a fixed proof frontier, or generate an adaptive cube partition for
 search experiments:
 
@@ -103,6 +104,7 @@ base CNF. Any trace proposed for the final certificate must be produced from
 the corresponding formula and replayed against that same file.
 
 An `UNSAT` line without the emitted formula, its hash, and a checked proof
-trace is not accepted as a repository theorem. Only a complete, hash-bound
-family of CNFs and independently replayed DRAT/LRAT files can become
-load-bearing SAT evidence; the current partial family is not sufficient.
+trace is not accepted as a repository theorem. The load-bearing family is the
+complete hash-bound DRAT/LRAT and SCIP/VIPR collection indexed by
+[`certificates/z10_23_sat.json`](../certificates/z10_23_sat.json); other search
+outputs remain exploratory.

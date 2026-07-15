@@ -47,7 +47,7 @@ The same penalty inequality leaves exactly five profiles. Write $s$ for unused r
 |---|---|
 | $5^3 6^{20}$ | Row residues modulo 10 sum to at least 40, but $3s=30$. |
 | $4^1 5^1 6^{21}$ | Pair residues modulo 4 sum to 22 for every exceptional-column overlap, but $3s=18$. |
-| $5^4 6^{18}7^1$ | Exhaustive row-type enumeration gives minimum row-residue sum 25, but $3s=15$. |
+| $5^4 6^{18}7^1$ | A ten-variable Lean row-type kernel proves the minimum row-residue sum is 25, but $3s=15$. |
 | $4^1 5^2 6^{19}7^1$ | The residue budget permits the degree-seven column to meet at most five rows, not seven. |
 | $5^5 6^{16}7^2$ | Zero residue forces five rows into all five degree-five columns, requiring 50 triple incidences when only 20 are available. |
 
@@ -58,7 +58,11 @@ Therefore neither 135 nor 136 ones is possible. By deleting ones, any matrix wit
 - Case certificate: [`certificates/z12_23_134.json`](../certificates/z12_23_134.json)
 - Excluded-target models: [`cells_12x23_exact_135.cnf`](../models/cells_12x23_exact_135.cnf) and [`column_types_12x23_exact_135.lp`](../models/column_types_12x23_exact_135.lp)
 - Standard-library certificate: `z12_23_certificate_report` in [`extended.py`](../src/finite_zarankiewicz_closures/extended.py)
-- Lean arithmetic: the `z12_23_*` theorems in [`ArithmeticKernels.lean`](../lean/ZarankiewiczFiniteClosures/ArithmeticKernels.lean)
+- End-to-end Lean theorem: [`Zarankiewicz/Exact/Z12_23.lean`](../lean/Zarankiewicz/Exact/Z12_23.lean)
+- Legacy arithmetic cross-checks: the `z12_23_*` theorems in [`ArithmeticKernels.lean`](../lean/ZarankiewiczFiniteClosures/ArithmeticKernels.lean)
 - Independent witness scan: [`verify_extended_witnesses_independent.py`](../scripts/verify_extended_witnesses_independent.py)
 
-The finite row-type enumeration in the third profile is a proof component. Lean checks its recorded minimum and all surrounding arithmetic but does not rerun that enumeration.
+The public Lean theorem embeds the witness, proves every combinatorial double
+count, derives all five profiles, and proves the row-type minimum with
+`omega`. The standard-library certificate and independent scan remain useful
+cross-checks, but their output is not a premise of the Lean proof.

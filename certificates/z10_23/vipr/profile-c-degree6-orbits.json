@@ -1,0 +1,31 @@
+{
+  "admissibility_filters": [
+    "support multiplicity at most two",
+    "the three degree-six supports have no common row triple",
+    "at most one degree-six support contains the fixed triple"
+  ],
+  "catalog": {
+    "bytes": 74114,
+    "file": "profile-c-degree6-orbits.jsonl",
+    "sha256": "1bbdaf13f43bfeccbcf8c52d7890ba9494a89252603294f08c5cb2b640dd331b"
+  },
+  "classified_object": "unordered multiset of the three degree-six supports",
+  "fixed_degree_three_support": [
+    0,
+    1,
+    2
+  ],
+  "generated_at": "2026-07-15T00:56:15.680302+00:00",
+  "orbit_count": 236,
+  "orbit_size_sum": 950250,
+  "profile": "3x1,4x3,5x16,6x3",
+  "raw_state_count": 950250,
+  "schema_version": 1,
+  "status": "COMPLETE_ORBIT_COVER",
+  "symmetry": {
+    "complete_invariant": "three-bit row-membership pattern counts in the fixed and free row blocks, minimized over all six support labelings",
+    "row_group": "S_3 x S_7",
+    "row_group_order": 30240,
+    "support_multiset": "unordered"
+  }
+}

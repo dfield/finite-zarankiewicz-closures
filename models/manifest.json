@@ -83,7 +83,7 @@
       "columns": 23,
       "excluded_target": 113,
       "monotonicity_note": "Testing exactly 113 ones suffices because deleting ones preserves K_3,3-freeness.",
-      "publication_status": "candidate",
+      "publication_status": "established",
       "rows": 10,
       "slug": "z10_23_112"
     },
@@ -170,7 +170,7 @@
       "columns": 23,
       "excluded_target": 124,
       "monotonicity_note": "Testing exactly 124 ones suffices because deleting ones preserves K_3,3-freeness.",
-      "publication_status": "candidate",
+      "publication_status": "established",
       "rows": 11,
       "slug": "z11_23_123"
     },

@@ -1,9 +1,17 @@
 name = "ZarankiewiczFiniteClosures"
-version = "1.6.0"
-defaultTargets = ["ZarankiewiczZ923", "ZarankiewiczFiniteClosures"]
+version = "2.0.0"
+defaultTargets = ["Zarankiewicz"]
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "v4.29.0"
 
 [[lean_lib]]
 name = "ZarankiewiczZ923"
 
 [[lean_lib]]
 name = "ZarankiewiczFiniteClosures"
+
+[[lean_lib]]
+name = "Zarankiewicz"

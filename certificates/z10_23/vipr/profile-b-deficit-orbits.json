@@ -1,0 +1,66 @@
+{
+  "catalog": {
+    "bytes": 316823,
+    "file": "profile-b-deficit-orbits.jsonl",
+    "records": 209,
+    "sha256": "f29131310a1518e4b65fc3b831f63cd88bff3334fb7424435ad7e530daceed42"
+  },
+  "fixed_degree_three_support": [
+    0,
+    1,
+    2
+  ],
+  "formula": {
+    "bytes": 427630,
+    "file": "column-count-b.opb",
+    "sha256": "6c79c3591a40f185ef6e68a82568f0b43c1b6bee8fd386825d869f012703f092"
+  },
+  "generators": [
+    [
+      0,
+      1
+    ],
+    [
+      1,
+      2
+    ],
+    [
+      3,
+      4
+    ],
+    [
+      4,
+      5
+    ],
+    [
+      5,
+      6
+    ],
+    [
+      6,
+      7
+    ],
+    [
+      7,
+      8
+    ],
+    [
+      8,
+      9
+    ]
+  ],
+  "group": "S_3 x S_7 stabilizer of the fixed support",
+  "orbit_count": 209,
+  "orbit_size_sum": 295001,
+  "profile": "3x1,4x4,5x14,6x4",
+  "raw_state_count": 295001,
+  "schema_version": 1,
+  "status": "COMPLETE_ORBIT_COVER",
+  "triple_deficit": 3,
+  "unit_count_per_leaf": 239,
+  "variable_map": {
+    "bytes": 138121,
+    "file": "column-count-b.variables.jsonl",
+    "sha256": "166c3a22cdfd3525a85ebd35d6589064ca159c8510f39b376998f6b916c7a4f5"
+  }
+}

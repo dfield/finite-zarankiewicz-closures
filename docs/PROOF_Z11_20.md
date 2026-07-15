@@ -41,8 +41,14 @@ The explicit 111-one matrix supplies the matching lower bound.
 ## Case-specific evidence
 
 - JSON certificate: [`z11_20_111.json`](../certificates/z11_20_111.json)
-- Lean arithmetic: `z11_19_deletion_bound`, `z11_20_deletion_bound`, and both excluded-target theorems in [`ArithmeticKernels.lean`](../lean/ZarankiewiczFiniteClosures/ArithmeticKernels.lean)
+- End-to-end conditional Lean closure: [`DeletionClosures.lean`](../lean/Zarankiewicz/Exact/DeletionClosures.lean)
+- Legacy arithmetic cross-check: `z11_19_deletion_bound`, `z11_20_deletion_bound`, and both excluded-target theorems in [`ArithmeticKernels.lean`](../lean/ZarankiewiczFiniteClosures/ArithmeticKernels.lean)
 - Cell CNF at 112 ones: [`cells_11x20_exact_112.cnf`](../models/cells_11x20_exact_112.cnf)
 - Column-support LP at 112 ones: [`column_types_11x20_exact_112.lp`](../models/column_types_11x20_exact_112.lp)
 
-Lean checks both quotient calculations and terminal arithmetic contradictions, not the combinatorial deletion lemma or CSV witness. The SAT/MIP files are reproducible formulations rather than solver certificates.
+Lean now checks an equivalent embedded witness and proves both combinatorial
+column-deletion steps in
+[`DeletionClosures.lean`](../lean/Zarankiewicz/Exact/DeletionClosures.lean).
+The exact theorem deliberately retains $Z(11,18,3,3)\le101$ as a parameter;
+the branch imports neither its SAT certificate nor any project axiom. The
+SAT/MIP files are reproducible formulations rather than solver certificates.

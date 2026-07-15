@@ -41,8 +41,15 @@ Together with the explicit construction, equality follows.
 ## Case-specific evidence
 
 - JSON certificate: [`z10_21_106.json`](../certificates/z10_21_106.json)
-- Lean arithmetic: `z10_21_deletion_bound` and `z10_21_excluded_target` in [`ArithmeticKernels.lean`](../lean/ZarankiewiczFiniteClosures/ArithmeticKernels.lean)
+- End-to-end conditional Lean closure: [`DeletionClosures.lean`](../lean/Zarankiewicz/Exact/DeletionClosures.lean)
+- Legacy arithmetic cross-check: `z10_21_deletion_bound` and `z10_21_excluded_target` in [`ArithmeticKernels.lean`](../lean/ZarankiewiczFiniteClosures/ArithmeticKernels.lean)
 - Cell CNF at 107 ones: [`cells_10x21_exact_107.cnf`](../models/cells_10x21_exact_107.cnf)
 - Column-support LP at 107 ones: [`column_types_10x21_exact_107.lp`](../models/column_types_10x21_exact_107.lp)
 
-Lean checks the quotient and terminal arithmetic, not the combinatorial deletion lemma or CSV witness. The SAT/MIP files are transparent decision formulations, not UNSAT certificates.
+Lean now embeds and checks the witness and proves the full combinatorial
+deletion step in
+[`DeletionClosures.lean`](../lean/Zarankiewicz/Exact/DeletionClosures.lean).
+Its theorem is explicitly conditional on the historical bound
+$Z(9,21,3,3)\le96$, whose published proof is a SAT classification. The branch
+does not import that certificate or hide the premise as an axiom. The SAT/MIP
+files here are transparent decision formulations, not UNSAT certificates.

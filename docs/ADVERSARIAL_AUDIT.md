@@ -2,163 +2,112 @@
 
 ## Audit objective
 
-This audit asks how any of the six claimed exact values, the additional $Z(13,23)$ bound, or the stated evidence for two candidates could be wrong even if ordinary happy-path tests pass. It treats prose, data, generators, certificates, formal code, and literature claims as separate attack surfaces.
+This audit asks how any of the eight exact values, the $Z(13,23)$ upper bound, or their computational evidence could be wrong even if ordinary happy-path tests pass. Prose, data, generators, covers, certificates, release packaging, formal code, and literature claims are separate attack surfaces.
 
-The original audit was completed on 2026-07-04 and extended through 2026-07-13. The later review found that the $Z(10,23)$ proof-production state did not yet justify a completed theorem certificate, so that case and its $Z(11,23)$ consequence were demoted to candidates. “Full” here means every shipped evidence layer was placed in scope; it does not mean external peer review is complete.
+The original audit began on 2026-07-04. On 2026-07-13 it correctly demoted $Z(10,23)$ and $Z(11,23)$ because the proof family was incomplete. The 2026-07-14 extension promotes them only after completing, aggregating, and independently checking the missing certificate families.
 
 ## Threat model
 
-The principal failure modes considered were:
+Principal failure modes include:
 
-1. an invalid 103-one matrix is accepted because of a parser or indexing bug;
-2. the degree-case certificate omits a profile or trusts a forged arithmetic field;
-3. the SAT and MIP generators encode a different problem;
-4. a proof trace is malformed or is presented as covering a broader reduction than it does;
-5. Lean succeeds because of an admission, custom axiom, or inaccurately stated boundary;
-6. a literature table is misread as exact;
-7. generated evidence depends on a local path, timestamp, random seed, or unavailable private source; or
-8. documentation silently upgrades corroborating or partial computation into a theorem's logical basis;
-9. the extended table is mistranscribed, a deletion bound is rounded incorrectly, or a finite profile/orbit is omitted from the $(10,22)$, $(10,23)$, or $(12,23)$ certificate; or
-10. a $(10,23)$ CNF omits a legal matrix, a cover omits a canonical branch, or a stored direct or leaf DRAT core fails its advertised DRAT-to-LRAT replay.
+1. a malformed or incorrectly parsed witness;
+2. an omitted degree profile or incorrect arithmetic residue bound;
+3. a CNF/OPB encoding a different problem;
+4. an incomplete or overlapping symmetry cover;
+5. a valid proof paired with the wrong formula;
+6. a corrupted, reordered, or missing release part or archive member;
+7. acceptance of weak/incomplete VIPR derivations;
+8. a Lean admission, project axiom, or overstated formalization boundary;
+9. a literature interval misread as exact; or
+10. operational solver output silently substituted for a proof certificate.
 
-## 1. Original human-proof audit
+## 1. Witness audit
 
-The proof was written and committed before implementation. The audit independently checked the following numerical identities:
+Every stored matrix is checked by two independent algorithms. The package verifier intersects row supports for every row triple. The standalone verifier imports no project module and examines every candidate $3\times3$ submatrix.
 
-- $2\binom93=168$;
-- $6\cdot104-20\cdot23=164$;
-- the penalty table $(20,14,8,3,0,0,4,13,28,50)$;
-- the only degree histograms under penalty four;
-- triple-incidence totals 164, 167, and 168;
-- exact marked-deficit totals 12, 3, and 0; and
-- residue lower bounds 18, 15, and 12.
+Negative tests cover malformed dimensions and CSV tokens, non-Boolean values, wrong weights, a forced forbidden block, and every one-bit extension of the original 103-one witness. Case certificates bind raw bytes, dimensions, weight, row and column sums, maximum triple intersection, and SHA-256 digest.
 
-The central congruence was checked in both directions: a marked degree-four column contributes $\binom32=3$, and a marked degree-five column contributes $\binom42=6$, both zero modulo three. The exceptional marked contributions are 1 for degree three and 10 for degree six, yielding residue one inside either exceptional support and residue two outside.
+## 2. Arithmetic-certificate audit
 
-No hidden existence assumption is used in passing from a denser matrix to weight 104: changing ones to zero cannot create an all-one submatrix.
+Degree profiles are independently enumerated from the count, total-degree, and triple-capacity equations rather than read from a claimed list. Stored arithmetic reports are regenerated and compared semantically.
 
-## 2. Witness audit
+For $Z(10,23)$, two independent enumerators agree on all 25 profiles at 113 ones and their partition into nine deletion cases, three deficit cases, and thirteen certificate cases. The pair-residue elimination independently regenerates 1,577 exceptional-column configurations, 1,380 legal configurations, and minimum residue sum 39.
 
-Two independently implemented algorithms accept the stored matrix.
+The $Z(10,22)$, $Z(12,23)$, and $Z(13,23)$ checkers likewise regenerate every finite profile and residue minimum. Mutation tests alter penalty values, profiles, budgets, aggregate cuts, theorem targets, and nested reports; each alteration must be rejected.
 
-- The package verifier checks all 84 row triples and finds at most two common columns.
-- The standalone script imports no package code and checks all 148,764 row/column triple pairs.
+## 3. Encoding audit
 
-Negative tests include:
+The sequential threshold circuit was checked by an independent DPLL implementation on every assignment of up to six base variables, every bound, and signed literals. The direct forbidden-submatrix clause sequence is independently reconstructed. A known small case, $Z(3,4,3,3)=10$, agrees with direct enumeration and solver results.
 
-- wrong row count;
-- wrong expected weight;
-- a non-Boolean in-memory entry;
-- CSV spellings `2`, `1.0`, `+1`, a space-prefixed one, an empty field, and `true`;
-- a deliberately forced all-one $3\times3$ block; and
-- every zero-to-one extension of the 103-one witness.
+Thirty seeded $5\times6$ matrices were fixed cell by cell; direct semantics, CaDiCaL, and the column-support formulation agreed on all cases. All sixteen generic target models regenerate byte-for-byte, and the repository audit checks DIMACS headers, literal ranges, exact forbidden-clause prefixes, LP support counts, triple constraints, terminators, and hashes.
 
-Every one-bit extension is rejected with an actual forbidden submatrix, not merely a weight mismatch. This also checks that the construction is maximal under adding a single one.
+For $Z(10,23)$, the theorem uses profile-specific formulas rather than assuming the generic models are UNSAT.
 
-The seven additional matrices are checked twice: the package verifier recomputes row-triple capacities, while the standalone verifier scans every candidate submatrix without importing project code. The later witnesses include scans of 212,520 candidates for $10\times23$, 159,885 for $11\times19$, 292,215 for $11\times23$, and 389,620 for $12\times23$.
+## 4. DRAT/LRAT audit
 
-## 3. Exact-certificate audit
+Ten $Z(10,23)$ profiles have direct DRAT traces. The eleventh SAT-based profile has a complete 17,170-leaf row-stabilizer cover.
 
-The checker independently enumerates degree histograms rather than iterating over the certificate's claimed list. It rejects representative mutations of:
+The integrity checker:
 
-- the target weight;
-- one penalty value;
-- a deleted degree case;
-- a degree count;
-- a triple-incidence total;
-- a row residue;
-- a claimed lower bound;
-- an aggregate cut; and
-- the conclusion string.
+- independently regenerates the canonical cube cover;
+- streams catalog and proof index in lockstep;
+- requires one canonical archive member per leaf;
+- checks member sizes and SHA-256 hashes; and
+- rejects missing, duplicate, extra, reordered, or noncanonical entries.
 
-The enumeration uses only nonnegative integer arithmetic and produces exactly three profiles. Category sizes are derived from the exceptional degree, so a certificate cannot choose how many rows are “inside” the exceptional column.
+During production, every accepted proof was replayed by `drat-trim`, converted to LRAT, and checked by `lrat-check`. The public replay script repeats that process from release assets. A proof index status without the corresponding hash-bound proof body is insufficient.
 
-The extended certificate independently enumerates the four possible degree profiles at 111 ones for a 10-by-22 matrix. Its two finite residue searches cover:
+## 5. VIPR orbit-cover audit
 
-- every intersection size $2,3,4,5,6$ for the two degree-six columns and all 210 degree-four columns in profile $4^1 5^{19}6^2$; and
-- 77 row-symmetry orbits for three degree-six columns, with all 22,155 unordered degree-four multisets in each orbit, in profile $4^2 5^{17}6^3$.
+Two residual profiles use exact SCIP/VIPR certificates. The repository independently reconstructs:
 
-The minimum residue sums are recomputed rather than trusted from JSON. The other two profiles are rejected by transparent divisibility and symmetric-difference arguments.
+- 295,001 raw states and 209 orbits for $3^1 4^4 5^{14}6^4$;
+- 950,250 raw states and 236 orbits for $3^1 4^3 5^{16}6^3$; and
+- every representative's exact OPB formula and indexed formula hash.
 
-Six case-specific wrapper certificates bind established upper-bound checks to the exact witness file, dimensions, weight, row and column sums, exhaustive row-triple result, and SHA-256 digest. The checker regenerates all fields, and mutation tests require an altered exact value to be rejected for every established case.
+This census does not trust the production catalog. It applies the relevant row group actions, recomputes canonical signatures and orbit sizes, and requires the raw-state and orbit totals to match.
 
-For the $Z(10,23)$ candidate, the arithmetic checker independently enumerates all 25 feasible profiles at 113 ones and partitions them as 5 low-degree, 4 two-degree-three, 3 residue, and 13 SAT cases. Because no final SAT manifest covering the thirteen cases exists, there is no exact-value wrapper certificate to accept.
+Each compressed VIPR certificate is checked at three levels:
 
-The $Z(12,23)$ certificate separately classifies the unique profile at 136 and all five profiles at 135. It recomputes the pair equation, all residue budgets, and the minimum value 25 in the sole row-type enumeration. The $Z(13,23)$ report independently classifies the three profiles at 145 and checks each marked-row deficit contradiction.
+1. archive member name, byte length, and SHA-256 digest;
+2. coefficient-for-coefficient equality between its embedded model and the independently regenerated OPB; and
+3. successful exact infeasibility verification by the unmodified `viprchk` checker.
 
-## 4. Encoding audit
+The aggregate verifier also rejects `AggrRow_`, `lin weak`, and `lin incomplete`. Thirteen first-pass profile-B certificates requiring completion were superseded by a residual run with separation disabled; only the fully checked replacements enter the final aggregate.
 
-The sequential threshold circuit was checked by a separate DPLL implementation on every assignment of one through six base variables, every possible bound, both positive and signed literals, and every exact target. The direct $K_{3,3}$ clauses were compared with an independently constructed set in a smaller model.
+Representative mutation tests change orbit data, a formula coefficient, manifest hashes, tool identities, checker status, release order, and aggregate counts. All are rejected.
 
-The known value $Z(3,4,3,3)=10$ was established by direct enumeration of all $2^{12}$ matrices. CaDiCaL 3.0.0 then reported SAT at weight 10 and UNSAT at weight 11 for generated CNFs.
+## 6. Release and provenance audit
 
-Thirty seeded 5-by-6 matrices were fixed cell by cell. Direct semantics, CaDiCaL, and the column-support evaluator agreed on all 30. The sample includes both valid and invalid matrices. The seed and per-case outcomes are preserved in [`audit/model_validation.json`](../audit/model_validation.json).
+Large proof bodies are split below GitHub's per-file limit. Checked-in sidecars bind each part name, size, and SHA-256 digest, plus the reassembled stream size and hash. The fetcher verifies every part before reuse. Stream readers reject unsafe paths, links, nonregular members, extra content, and order mismatches.
 
-All sixteen generic target models regenerate byte-for-byte. The repository audit parses every DIMACS clause independently, checks header counts and variable ranges, and compares every forbidden-clause prefix against a separately generated lexicographic sequence. It also checks each LP's support-variable count, row-triple count, terminator, and hash.
+AWS stage IDs, logs, checkpoints, pod states, and S3 object presence are provenance only. The theorem-facing master manifest contains the exact formulas, covers, proof indexes, checker identities, aggregate manifests, and release descriptors. The historical untraced sweep remains explicitly non-load-bearing.
 
-## 5. Proof-trace audit
+## 7. Lean audit
 
-`drat-trim` accepts each of the three DRAT files, and `lrat-check` accepts each of the three LRAT files. The recorded report is [`audit/certificate_replay.json`](../audit/certificate_replay.json).
+The Lean tree contains no `sorry`, `admit`, project `axiom`, or `native_decide`. `AxiomAudit.lean` reports only standard Lean/Mathlib dependencies such as `propext`, `Classical.choice`, and `Quot.sound`.
 
-The audit found no basis for describing these traces as a proof of the raw cell CNF, so the documentation does not do so. They replay only the terminal aggregate contradictions. The JSON certificate and its checker are the bridge from the mathematical problem to those endpoints.
+Lean proves unconditional end-to-end results for $Z(9,23)$, $Z(10,22)$, and $Z(12,23)$ and the upper bound for $Z(13,23)$. Deletion-derived theorem types expose their historical premises. Lean does not replay DRAT/LRAT or VIPR and is not described as a certificate-free proof of $Z(10,23)$.
 
-The $Z(10,23)$ directory contains partial direct and cover artifacts, but the audit cannot establish a complete census, complete cover family, or end-to-end DRAT/LRAT replay for all thirteen profiles. There is deliberately no `audit/z10_23_sat_replay.json` report in the publication gate. [`SAT_Z10_23_STATUS.md`](SAT_Z10_23_STATUS.md) lists the acceptance criteria, and [`AWS_Z10_23_RUN.md`](AWS_Z10_23_RUN.md) records the isolated production environment. Cloud job status is explicitly outside the proof trust boundary.
+## 8. Literature and frontier audit
 
-## 6. Lean audit
+The 44-cell source boundary was transcribed from Bhan--Nobili--Langer Figure 2 and its cardinality is checked. Combining the paper's three exact cells with the repository's eight gives 11 exact cells and 33 remaining parameters. The literature review states its search cutoff and cannot rule out unpublished, unindexed, or later work.
 
-The Lean project contains no `sorry`, `admit`, or declared project axiom. It has no Mathlib or third-party dependency.
+## 9. Portability audit
 
-An early audit build used `native_decide` for two tiny finite computations. `#print axioms` revealed the generated native-evaluation trust axiom, even though the build was green. That implementation was rejected and replaced with kernel `decide`.
+The local integrity gate uses the Python standard library and is tested on Python 3.9 and 3.14. Repository text is scanned for private workspace paths; symlinks and files over GitHub's 100 MB Git limit are rejected. Deterministic theorem artifacts contain no hostname, temporary path, or random solver verdict.
 
-The original marked-row axiom report is:
+The proof-first root commit contains only [`PROOF.md`](PROOF.md), making the original proof-before-code ordering independently inspectable.
 
-- `penalty_eq_formula`: no axioms;
-- `penalty_table`: no axioms;
-- `penalty_budget_structure`: `propext`, `Classical.choice`, `Quot.sound`;
-- `classify_degree_profile`: the same standard Lean axioms; and
-- all three deficit contradictions: `propext`, `Quot.sound`.
+## 10. Known limitations
 
-These are the standard dependencies of Lean's `omega` tactic, not project-added assumptions. [`lean/AxiomAudit.lean`](../lean/AxiomAudit.lean) reproduces the report.
-
-The additional Lean library checks the deletion chains, the $(10,22)$ and $(10,23)$ arithmetic certificate endpoints, the $(12,23)$ penalty tables and profile classifications at 136 and 135, its five terminal contradictions, and the $(13,23)$ profile/residue arithmetic. Its executable quotient, penalty, and minima facts use no axioms; its `omega` theorems report only the same standard Lean principles.
-
-The audit also rejects a broader formalization claim: the combinatorial translations, deletion lemma, orbit enumeration, and witnesses are not represented in Lean. Both the README and Lean documentation state that limitation prominently.
-
-## 7. Literature audit
-
-The three table-level claims most relevant to the previous one-edge gap were checked against rendered primary sources, not search snippets:
-
-- Tan's $z_3(9,23)=104$ entry is not marked exact;
-- Davies--Gill--Horsley do not list an improvement for this cell; and
-- Bhan--Nobili--Langer display upper 104 over lower 103 without a tightness mark.
-
-The search included exact parameter variants, paper titles, DOI and arXiv records, and forward-looking queries through 2026-07-04. No earlier closure was located. The repository describes this as a dated search conclusion and explicitly invites earlier references.
-
-The extended audit transcribes all 44 cells that the paper identifies as previously open and checks the set cardinality directly. After the paper's three closures and this repository's six established closures, set subtraction leaves 35 cells. The two candidates remain in that set.
-
-## 8. Portability and provenance audit
-
-The core package uses Python's standard library and supports Python 3.9 onward. The first test run exposed two features that were not available in the actual Python 3.9 interpreter (`type | type` at runtime and `int.bit_count`); both were removed, and the declared compatibility floor was corrected.
-
-All repository text is scanned for prohibited private-workspace markers and absolute user paths. Symlinks are rejected. Stored generator outputs contain no timestamps, hostnames, or resolved paths. Random validation is pinned to seed `20260704`.
-
-The root Git commit contains only the human proof. This makes the requested proof-before-code ordering independently inspectable rather than merely asserted in prose.
-
-## 9. Known limitations
-
-The audit does not remove the need for external review. In particular:
-
-- no independent mathematician has yet signed off on the proofs;
-- the Lean development covers arithmetic kernels for six exact results, one additional bound, and conditional candidate implications, not end-to-end matrix theorems;
-- no monolithic LRAT trace is provided for the raw 9-by-23 cell model;
-- the proposed $Z(10,23)$ equality is not established because complete independently replayed DRAT/LRAT evidence is still missing;
-- the extended finite enumerations are checked by standard-library code; Lean checks their recorded minima and consequences but does not rerun the orbit or row-type searches;
-- the DGH formula transcription was checked by exact tests and source comparison but is diagnostic, not part of the theorem;
-- the finite literature search cannot establish absolute priority; and
-- external replay tools add their own trusted implementations.
-
-These limitations do not presently reveal a gap in the six established exact proofs or the $Z(13,23)$ bound. They are the reason the two proposed equalities remain candidates.
+- Independent expert and peer review are still required.
+- The full $Z(10,23)$ semantic replay downloads approximately 25.3 GB and trusts the pinned external checker implementations.
+- There is no certificate-free Lean proof of $Z(10,23)=112$.
+- Some deletion closures depend on historical exact bounds exposed as Lean hypotheses.
+- The finite literature search cannot establish absolute priority.
+- Diagnostic generic models and the DGH relaxation are not theorem certificates.
 
 ## Audit verdict
 
-Within the declared publication scope, the six exact-value certificates, frontier certificate, witnesses, mutation checks, deterministic regenerations, terminal trace replay, and formal-axiom checks pass. The unresolved $Z(10,23)$ proof obligation is exposed rather than waived; consequently $Z(10,23)=112$ and $Z(11,23)=123$ remain provisional. All results await independent expert review.
+Within the declared scope, eight exact-value certificates, the frontier certificate, all witnesses, deterministic regenerations, cover-completeness checks, formula/model bindings, release hashes, mutation checks, and formal-axiom checks pass. The former $Z(10,23)$ gap is closed by a complete replayable proof family rather than by solver status, and $Z(11,23)=123$ follows by a checked deletion argument. All claims remain subject to independent review.

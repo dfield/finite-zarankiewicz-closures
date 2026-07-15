@@ -1,19 +1,30 @@
 {
-  "candidate_result": {
+  "certified_result": {
     "arithmetic_eliminations": 12,
     "arithmetic_profiles": 25,
-    "current_interval": [
+    "certified_profiles": 13,
+    "exact_interval": [
       112,
-      114
+      112
     ],
     "excluded_target": 113,
-    "proposed_theorem": "Z(10,23,3,3)=112",
-    "sat_profiles_requiring_certificates": 13,
-    "status": "UPPER_BOUND_NOT_YET_CERTIFIED",
+    "master_manifest": "certificates/z10_23_sat.json",
+    "master_manifest_sha256": "548a0bb7dd8087f4bf9cd85900244e3ffe3c6f46f1906e998742b7d180d78514",
+    "orbit_cover_counts": {
+      "orbits": 445,
+      "raw_states": 1245251
+    },
+    "status": "UPPER_BOUND_CERTIFIED",
+    "strategy_counts": {
+      "direct_cadical": 10,
+      "row_stabilizer_cube_cover": 1,
+      "scip_vipr_orbit_cover": 2
+    },
+    "theorem": "Z(10,23,3,3)=112",
     "witness": "data/z10_23_112_matrix.csv"
   },
-  "description": "The 112-one matrix and the arithmetic elimination of 12 of the 25 feasible 113-one degree profiles are verified. The remaining 13 profiles require a complete, replayable proof family. No final SAT manifest or replay audit is checked into this publication boundary, so the proposed equality is not an established theorem here.",
-  "evidence_status": "ACTIVE_CERTIFICATION_PENDING",
+  "description": "The checked 112-one witness proves the lower bound. At 113 ones, arithmetic eliminates 12 of 25 feasible degree profiles. Ten remaining profiles have direct CaDiCaL DRAT/LRAT refutations, one has a complete row-stabilizer cube cover with a checked leaf proof for every cube, and two have complete exact SCIP/VIPR orbit covers. The master manifest binds every local descriptor, formula, catalog, checker identity, and release part by SHA-256.",
+  "evidence_status": "COMPLETE_REPLAYABLE_CERTIFICATE",
   "historical_untraced_session": {
     "date": "2026-07-05",
     "profile_counts": {
@@ -21,18 +32,15 @@
       "114": 11
     },
     "status": "CORROBORATING_ONLY",
-    "summary": "The original sweep reported every capacity-feasible profile UNSAT or arithmetically filtered, but retained no proof traces. None of those solver verdicts is load-bearing."
+    "summary": "The original sweep retained no proof traces and remains non-load-bearing. The theorem instead uses the later proof-producing runs recorded by the master manifest."
   },
   "publication_consequence": {
     "established_now": [
-      "Z(10,23,3,3)>=112",
-      "Z(10,23,3,3)<=114"
-    ],
-    "not_established": [
       "Z(10,23,3,3)=112",
       "Z(11,23,3,3)=123"
     ],
-    "pending_dependency": "A complete replayable refutation of all 13 surviving 113-one profiles would establish Z(10,23)=112; vertex deletion would then give Z(11,23)<=123, matching its checked witness."
+    "not_established": [],
+    "vertex_deletion": "If an 11x23 K_3,3-free matrix had 124 ones, deleting a row of degree at most floor(124/11)=11 would leave a forbidden 10x23 example with at least 113 ones."
   },
-  "schema_version": 3
+  "schema_version": 4
 }

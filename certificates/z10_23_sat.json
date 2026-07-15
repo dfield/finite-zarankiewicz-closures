@@ -1,0 +1,555 @@
+{
+  "arithmetic_eliminated_profiles": 12,
+  "arithmetic_profile_count": 25,
+  "excluded_target": 113,
+  "profiles": [
+    {
+      "formula": {
+        "bytes": 348021,
+        "clauses": 22454,
+        "file": "models/z10_23/4d2_5d21.cnf",
+        "sha256": "01ef413829af808bf3667d13734a439654b22afab815deee4533bd84808314a0",
+        "variables": 10893
+      },
+      "profile": "4x2,5x21",
+      "proof": {
+        "bytes": 340197208,
+        "format": "DRAT+xz+split",
+        "parts": [
+          {
+            "bytes": 95000000,
+            "file": "certificates/z10_23/4d2_5d21.drat.xz.part-00",
+            "sha256": "17843dbe35185ce2fea6b1f1aa1cec20119c3ee4f6adcaeb85f9608da00eb6bb"
+          },
+          {
+            "bytes": 95000000,
+            "file": "certificates/z10_23/4d2_5d21.drat.xz.part-01",
+            "sha256": "1492235bcd7de7168e9a565ec29975721202d59a7b41d5c1670ee49a17172354"
+          },
+          {
+            "bytes": 95000000,
+            "file": "certificates/z10_23/4d2_5d21.drat.xz.part-02",
+            "sha256": "6ea5aef8ab408f2a22085fed566a9d364598cfe51ec14e38910c9bd5c18cda7b"
+          },
+          {
+            "bytes": 55197208,
+            "file": "certificates/z10_23/4d2_5d21.drat.xz.part-03",
+            "sha256": "dad130a32420f0a4d077f5e5b595c62102db1dab40c2753d927f93191322f11b"
+          }
+        ],
+        "sha256": "609599ff29a41859262ff3f23a880daad5b5e6dc927e38832ef29c2ac86edfba"
+      },
+      "replay": {
+        "checker": "drat-trim -> LRAT -> lrat-check",
+        "status": "VERIFIED"
+      },
+      "strategy": "direct_cadical"
+    },
+    {
+      "formula": {
+        "bytes": 346861,
+        "clauses": 22387,
+        "file": "models/z10_23/4d3_5d19_6d1.cnf",
+        "sha256": "a8a03d4afd61e726bf4621ea2e406a6e0c94a06c9ee97272c45fbd46296fbe14",
+        "variables": 10879
+      },
+      "profile": "4x3,5x19,6x1",
+      "proof": {
+        "bytes": 94127640,
+        "file": "certificates/z10_23/4d3_5d19_6d1.drat.xz",
+        "format": "DRAT+xz",
+        "sha256": "be28f8dfb741737947a4fedf09198666f68b3f87284a9c328d7dc905b12d9ad8"
+      },
+      "replay": {
+        "checker": "drat-trim -> LRAT -> lrat-check",
+        "status": "VERIFIED"
+      },
+      "strategy": "direct_cadical"
+    },
+    {
+      "formula": {
+        "bytes": 346725,
+        "clauses": 22379,
+        "file": "models/z10_23/4d4_5d17_6d2.cnf",
+        "sha256": "f1c1b2adbc682611ecada20f82505998e2d24b2e85d73580dd42d3bca0c79b89",
+        "variables": 10875
+      },
+      "profile": "4x4,5x17,6x2",
+      "proof": {
+        "bytes": 12226620,
+        "file": "certificates/z10_23/4d4_5d17_6d2.drat.xz",
+        "format": "DRAT+xz",
+        "sha256": "7f1266ba67bbd7941c04ff97c1cc92c315d1acf8322df8cbfb74119f32118451"
+      },
+      "replay": {
+        "checker": "drat-trim -> LRAT -> lrat-check",
+        "status": "VERIFIED"
+      },
+      "strategy": "direct_cadical"
+    },
+    {
+      "formula": {
+        "bytes": 346589,
+        "clauses": 22371,
+        "file": "models/z10_23/4d4_5d18_7d1.cnf",
+        "sha256": "c55f6c4f4b7f0f3a41872923ca943a3fe36b8aac2237c5bb9bc2170d75aa7f50",
+        "variables": 10871
+      },
+      "profile": "4x4,5x18,7x1",
+      "proof": {
+        "bytes": 4124340,
+        "file": "certificates/z10_23/4d4_5d18_7d1.drat.xz",
+        "format": "DRAT+xz",
+        "sha256": "5285a52dc26da654255c2664a5261d9e801a6a91d299b38f772bad358b8e36bf"
+      },
+      "replay": {
+        "checker": "drat-trim -> LRAT -> lrat-check",
+        "status": "VERIFIED"
+      },
+      "strategy": "direct_cadical"
+    },
+    {
+      "formula": {
+        "bytes": 346578,
+        "clauses": 22371,
+        "file": "models/z10_23/4d5_5d15_6d3.cnf",
+        "sha256": "af51d698a2482ee0d582d3e574e7fe570470da7b95a9b221fea20df1c51a9039",
+        "variables": 10871
+      },
+      "profile": "4x5,5x15,6x3",
+      "proof": {
+        "bytes": 8491188,
+        "file": "certificates/z10_23/4d5_5d15_6d3.drat.xz",
+        "format": "DRAT+xz",
+        "sha256": "023acb63f72b4f3cb03b72551187ddd1099a146a86201c68d226748cfd8fdc6e"
+      },
+      "replay": {
+        "checker": "drat-trim -> LRAT -> lrat-check",
+        "status": "VERIFIED"
+      },
+      "strategy": "direct_cadical"
+    },
+    {
+      "formula": {
+        "bytes": 345419,
+        "clauses": 22304,
+        "file": "models/z10_23/4d5_5d16_6d1_7d1.cnf",
+        "sha256": "c5693e3a89d65e162ff7531b709b13fe38e00ca0dd93a539fc1266c2e9e02b0a",
+        "variables": 10857
+      },
+      "profile": "4x5,5x16,6x1,7x1",
+      "proof": {
+        "bytes": 1030392,
+        "file": "certificates/z10_23/4d5_5d16_6d1_7d1.drat.xz",
+        "format": "DRAT+xz",
+        "sha256": "010d8de4570bbdc89fa96be6cd387c3424cabf94bf112689e0d4601dcbcd5af8"
+      },
+      "replay": {
+        "checker": "drat-trim -> LRAT -> lrat-check",
+        "status": "VERIFIED"
+      },
+      "strategy": "direct_cadical"
+    },
+    {
+      "formula": {
+        "bytes": 346430,
+        "clauses": 22363,
+        "file": "models/z10_23/4d6_5d13_6d4.cnf",
+        "sha256": "e7037c7e0e3699ccb587853cefe83a45f9110dbc98fbba6f01a99264e010110d",
+        "variables": 10867
+      },
+      "profile": "4x6,5x13,6x4",
+      "proof": {
+        "bytes": 12338016,
+        "file": "certificates/z10_23/4d6_5d13_6d4.drat.xz",
+        "format": "DRAT+xz",
+        "sha256": "13f3f815960ea2ce034411abbdcbd125633f9d9412db315b6786f4d7146b120d"
+      },
+      "replay": {
+        "checker": "drat-trim -> LRAT -> lrat-check",
+        "status": "VERIFIED"
+      },
+      "strategy": "direct_cadical"
+    },
+    {
+      "formula": {
+        "bytes": 346292,
+        "clauses": 22355,
+        "file": "models/z10_23/4d7_5d11_6d5.cnf",
+        "sha256": "3f3674f650fd91c03e030879786c6bed9188c5cc59dc95111c4c53ac0f47a5ae",
+        "variables": 10863
+      },
+      "profile": "4x7,5x11,6x5",
+      "proof": {
+        "bytes": 9627152,
+        "file": "certificates/z10_23/4d7_5d11_6d5.drat.xz",
+        "format": "DRAT+xz",
+        "sha256": "201daa4903015a81394fd5a2b2edc5c1e54703d97e590a218a3cfa549d84f992"
+      },
+      "replay": {
+        "checker": "drat-trim -> LRAT -> lrat-check",
+        "status": "VERIFIED"
+      },
+      "strategy": "direct_cadical"
+    },
+    {
+      "formula": {
+        "bytes": 347887,
+        "clauses": 22446,
+        "file": "models/z10_23/3d1_5d22.cnf",
+        "sha256": "ec244de37f2c55af9373abbc3d69a17b9c8a7ba22588b56899ef22bb0f8bb1e6",
+        "variables": 10889
+      },
+      "profile": "3x1,5x22",
+      "proof": {
+        "bytes": 41968656,
+        "file": "certificates/z10_23/3d1_5d22.drat.xz",
+        "format": "DRAT+xz",
+        "sha256": "d8b40bb528c39eaae256f72d037ac2e6b3643c29f32c31074e69bd0fb4f1fd37"
+      },
+      "replay": {
+        "checker": "drat-trim -> LRAT -> lrat-check",
+        "status": "VERIFIED"
+      },
+      "strategy": "direct_cadical"
+    },
+    {
+      "formula": {
+        "bytes": 345696,
+        "clauses": 22320,
+        "file": "models/z10_23/3d1_4d1_5d20_6d1.cnf",
+        "sha256": "040e336a7e774a1db6d082a94db2e857646a8c81b4450aeefb7dd424fb779024",
+        "variables": 10865
+      },
+      "profile": "3x1,4x1,5x20,6x1",
+      "proof": {
+        "bytes": 415038644,
+        "format": "DRAT+xz+split",
+        "parts": [
+          {
+            "bytes": 95000000,
+            "file": "certificates/z10_23/3d1_4d1_5d20_6d1.drat.xz.part-00",
+            "sha256": "2747a7774927c669172760163de13c653d65c38a0cfd77e18c6d2b1c42d9e0b5"
+          },
+          {
+            "bytes": 95000000,
+            "file": "certificates/z10_23/3d1_4d1_5d20_6d1.drat.xz.part-01",
+            "sha256": "c486e400c5fcbd31a4cda4edd79a1751d62ea80a102b0343e0736aa9778e7d68"
+          },
+          {
+            "bytes": 95000000,
+            "file": "certificates/z10_23/3d1_4d1_5d20_6d1.drat.xz.part-02",
+            "sha256": "82590a1c9c3a802ddb0bf9e07cbebd2e9cf47d1e1b6657ef5d33273e2098e952"
+          },
+          {
+            "bytes": 95000000,
+            "file": "certificates/z10_23/3d1_4d1_5d20_6d1.drat.xz.part-03",
+            "sha256": "3cafda0c34ecc15edf3126dfadeb3afa7e477ba6457a0c81ce2c863cb905968c"
+          },
+          {
+            "bytes": 35038644,
+            "file": "certificates/z10_23/3d1_4d1_5d20_6d1.drat.xz.part-04",
+            "sha256": "3de1e1ca08a4a8a5f2b790f5e3c8842f626c89aab49a29359ac3627a3779bc92"
+          }
+        ],
+        "sha256": "2ead9afc6e15f1a381a2e5bc73450f1b341f59e93a89565558f55a18f9f662e5"
+      },
+      "replay": {
+        "checker": "drat-trim -> LRAT -> lrat-check",
+        "status": "VERIFIED"
+      },
+      "strategy": "direct_cadical"
+    },
+    {
+      "formula": {
+        "bytes": 345560,
+        "clauses": 22312,
+        "file": "models/z10_23/3d1_4d2_5d18_6d2.cnf",
+        "sha256": "d0ad7bdc32580e68c69c6a48d12581160c05770b457a7459eee4a8820afa0d20",
+        "variables": 10861
+      },
+      "profile": "3x1,4x2,5x18,6x2",
+      "proof": {
+        "archive": {
+          "bytes": 16476359596,
+          "compression": {
+            "archive": "deterministic PAX tar",
+            "xz_options": [
+              "-T8",
+              "-3"
+            ],
+            "xz_version": "xz (XZ Utils) 5.4.1"
+          },
+          "format": "TAR+DRAT+xz+github-release-parts",
+          "parts": [
+            {
+              "bytes": 1800000000,
+              "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-00",
+              "sha256": "90148633846f12c73db6ce3f8410fff65b6f1aa0433d307644bf370bb7c09de8"
+            },
+            {
+              "bytes": 1800000000,
+              "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-01",
+              "sha256": "d6b0cd19db9257ba03fb67562085fe113534d8d93ab759523ddee53bf231a288"
+            },
+            {
+              "bytes": 1800000000,
+              "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-02",
+              "sha256": "b785ddcdf4ca03549343ecdc7db09bb3a3d96d85a8128583681bcf45c8f57835"
+            },
+            {
+              "bytes": 1800000000,
+              "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-03",
+              "sha256": "f2f824e680543380210a093e926ba3f45a388d98a06d0db7a6b691f0d44a7f97"
+            },
+            {
+              "bytes": 1800000000,
+              "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-04",
+              "sha256": "7ea5b77d8a34bd11d0768de6b2416e3dc494a26612ef492c041e148503caca89"
+            },
+            {
+              "bytes": 1800000000,
+              "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-05",
+              "sha256": "caf6e51f308c644c7cb8a17afd7ccf0ed718eafc11dcbda297370b86bb58e903"
+            },
+            {
+              "bytes": 1800000000,
+              "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-06",
+              "sha256": "1dab51c88cdfaf0bcf96f215f874894bad74402b00d72463344428fde36ce287"
+            },
+            {
+              "bytes": 1800000000,
+              "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-07",
+              "sha256": "a8a11e13aabb8750d3e4aabd3fd6a69e834c9ecb46ed6e136dd0364462a267fe"
+            },
+            {
+              "bytes": 1800000000,
+              "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-08",
+              "sha256": "f9eaac6bd406dfd9686465b4386213be4e886b7bdf9e6045e3778f58fd8a7057"
+            },
+            {
+              "bytes": 276359596,
+              "name": "3d1_4d2_5d18_6d2.cube-proofs.tar.xz.part-09",
+              "sha256": "c9a2c3078030fdf702bb46d5ae5750bb8631702fed68daafd8db73d2ca190ad4"
+            }
+          ],
+          "release": {
+            "repository": "dfield/finite-zarankiewicz-closures",
+            "tag": "z10-23-certificate-v1"
+          },
+          "sha256": "9ff048b2954ba7e87dde97b6b6d5e30d6c70e78cc36a7e816ce5b4927fca6dba"
+        },
+        "catalog": {
+          "bytes": 1157498,
+          "count": 17170,
+          "file": "certificates/z10_23/3d1_4d2_5d18_6d2.cubes.jsonl",
+          "sha256": "9c99a1363f9f75a583c917cf9ff50be8f07d0f548921c06de8d224a8139ac1ec"
+        },
+        "format": "row-stabilizer-cube-cover",
+        "proof_index": {
+          "bytes": 5499914,
+          "count": 17170,
+          "file": "certificates/z10_23/3d1_4d2_5d18_6d2.cube-proof-index.jsonl",
+          "sha256": "cf134a66977cbf710e14b62e09b0df81a677153752f4540a416c8103b3486cb4"
+        }
+      },
+      "replay": {
+        "checker": "drat-trim -> LRAT -> lrat-check",
+        "status": "VERIFIED"
+      },
+      "strategy": "row_stabilizer_cube_cover"
+    },
+    {
+      "formula": {
+        "bytes": 345419,
+        "clauses": 22304,
+        "file": "models/z10_23/3d1_4d3_5d16_6d3.cnf",
+        "sha256": "f2eada595b4c645cd6bce90cbe275723e319a089a5d93acca2513e4bc72992d4",
+        "variables": 10857
+      },
+      "profile": "3x1,4x3,5x16,6x3",
+      "proof": {
+        "archive": {
+          "archive": {
+            "format": "deterministic POSIX.1-1988 ustar",
+            "gid": 0,
+            "member_compression": "xz",
+            "member_name_pattern": "proofs/leaf-%06d.vipr.xz",
+            "mode": "0444",
+            "mtime": 0,
+            "uid": 0
+          },
+          "bytes": 15759360,
+          "certificate_bytes": 15574768,
+          "cover_manifest": {
+            "bytes": 865746,
+            "file": "profile-c-vipr-final-manifest.json",
+            "sha256": "30fd5b8fba89a4d51fcac8e37be2e34535606be36fc19f651fbfa990ef419ded"
+          },
+          "format": "TAR+VIPR+xz-members+github-release-parts",
+          "member_count": 236,
+          "parts": [
+            {
+              "bytes": 15759360,
+              "name": "3d1_4d3_5d16_6d3.vipr-certificates.tar.part-00",
+              "sha256": "6d4c8a105a3728114c88c4f8b6c7f73484ea7cddcde155a9aa146d874b493bf9"
+            }
+          ],
+          "profile": "3x1,4x3,5x16,6x3",
+          "release": {
+            "repository": "dfield/finite-zarankiewicz-closures",
+            "tag": "z10-23-certificate-v1"
+          },
+          "schema_version": 1,
+          "sha256": "6d4c8a105a3728114c88c4f8b6c7f73484ea7cddcde155a9aa146d874b493bf9",
+          "slug": "3d1_4d3_5d16_6d3"
+        },
+        "catalog": {
+          "bytes": 74114,
+          "file": "certificates/z10_23/vipr/profile-c-degree6-orbits.jsonl",
+          "sha256": "1bbdaf13f43bfeccbcf8c52d7890ba9494a89252603294f08c5cb2b640dd331b"
+        },
+        "catalog_metadata": {
+          "bytes": 993,
+          "file": "certificates/z10_23/vipr/profile-c-degree6-orbits.json",
+          "sha256": "6184d0ac76602ff054602a7cb71eee284ad512e459f2f4488bdb988ff1a4677f"
+        },
+        "cover_manifest": {
+          "bytes": 865746,
+          "file": "certificates/z10_23/vipr/profile-c-vipr-final-manifest.json",
+          "sha256": "30fd5b8fba89a4d51fcac8e37be2e34535606be36fc19f651fbfa990ef419ded"
+        },
+        "format": "exact-scip-vipr-orbit-cover",
+        "release_sidecar": {
+          "bytes": 1015,
+          "file": "certificates/z10_23/vipr/3d1_4d3_5d16_6d3.vipr-certificates.release.json",
+          "sha256": "6c65d115077f6caeef6b478b0cb513e094884dc536885daa2fb63b3ea4484836"
+        }
+      },
+      "replay": {
+        "checker": "viprchk + regenerated-OPB model binding",
+        "status": "VERIFIED"
+      },
+      "strategy": "scip_vipr_orbit_cover"
+    },
+    {
+      "formula": {
+        "bytes": 345271,
+        "clauses": 22296,
+        "file": "models/z10_23/3d1_4d4_5d14_6d4.cnf",
+        "sha256": "c843228d178ce0337710098785f36b061b1a71aa1c64aa4f94ac215ec01df5e7",
+        "variables": 10853
+      },
+      "profile": "3x1,4x4,5x14,6x4",
+      "proof": {
+        "archive": {
+          "archive": {
+            "format": "deterministic POSIX.1-1988 ustar",
+            "gid": 0,
+            "member_compression": "xz",
+            "member_name_pattern": "proofs/leaf-%06d.vipr.xz",
+            "mode": "0444",
+            "mtime": 0,
+            "uid": 0
+          },
+          "bytes": 7914383360,
+          "certificate_bytes": 7914211500,
+          "cover_manifest": {
+            "bytes": 729399,
+            "file": "profile-b-vipr-final-manifest.json",
+            "sha256": "3c46aa06a9f7a33ef42e5328e738f4ecfdcb26f60603b1a85ad01145cbc500af"
+          },
+          "format": "TAR+VIPR+xz-members+github-release-parts",
+          "member_count": 209,
+          "parts": [
+            {
+              "bytes": 1800000000,
+              "name": "3d1_4d4_5d14_6d4.vipr-certificates.tar.part-00",
+              "sha256": "fa79eda9808dfd947ec735013a2aa4997d944149ec81680b73a8a538b5ffa134"
+            },
+            {
+              "bytes": 1800000000,
+              "name": "3d1_4d4_5d14_6d4.vipr-certificates.tar.part-01",
+              "sha256": "115066d2079c58f7878b966f2ebd356dc8465975bffc65f99ebb723905aaff53"
+            },
+            {
+              "bytes": 1800000000,
+              "name": "3d1_4d4_5d14_6d4.vipr-certificates.tar.part-02",
+              "sha256": "a8571dc98114d432219ce950d9d40738ac6761cd2c289f6e60dd9c6ca6fc42a3"
+            },
+            {
+              "bytes": 1800000000,
+              "name": "3d1_4d4_5d14_6d4.vipr-certificates.tar.part-03",
+              "sha256": "354efd90e7ff545e03d94111b9ecfc16067fc64ae920a5daabc675b3e0a011b5"
+            },
+            {
+              "bytes": 714383360,
+              "name": "3d1_4d4_5d14_6d4.vipr-certificates.tar.part-04",
+              "sha256": "4e9a6f3d34f501fdb7306541a2d89b3ce8d25e0cfe71148b08683bff72119335"
+            }
+          ],
+          "profile": "3x1,4x4,5x14,6x4",
+          "release": {
+            "repository": "dfield/finite-zarankiewicz-closures",
+            "tag": "z10-23-certificate-v1"
+          },
+          "schema_version": 1,
+          "sha256": "70f2136cfdb95eb89f15050eab270ed82546267270c23f006a6f1706702eb89c",
+          "slug": "3d1_4d4_5d14_6d4"
+        },
+        "catalog": {
+          "bytes": 316823,
+          "file": "certificates/z10_23/vipr/profile-b-deficit-orbits.jsonl",
+          "sha256": "f29131310a1518e4b65fc3b831f63cd88bff3334fb7424435ad7e530daceed42"
+        },
+        "catalog_metadata": {
+          "bytes": 1121,
+          "file": "certificates/z10_23/vipr/profile-b-deficit-orbits.json",
+          "sha256": "72c481950db00778c97ec29d1ffd7185e468bebe2bc751f38f4743e78df634c5"
+        },
+        "cover_manifest": {
+          "bytes": 729399,
+          "file": "certificates/z10_23/vipr/profile-b-vipr-final-manifest.json",
+          "sha256": "3c46aa06a9f7a33ef42e5328e738f4ecfdcb26f60603b1a85ad01145cbc500af"
+        },
+        "format": "exact-scip-vipr-orbit-cover",
+        "release_sidecar": {
+          "bytes": 1768,
+          "file": "certificates/z10_23/vipr/3d1_4d4_5d14_6d4.vipr-certificates.release.json",
+          "sha256": "d3549fa2ccabec0550eeaf7bb7981dc590c15cf2f1ddf314119e058b4b91d0d6"
+        }
+      },
+      "replay": {
+        "checker": "viprchk + regenerated-OPB model binding",
+        "status": "VERIFIED"
+      },
+      "strategy": "scip_vipr_orbit_cover"
+    }
+  ],
+  "schema_version": 1,
+  "theorem": "Z(10,23,3,3)=112",
+  "toolchain": {
+    "sat": {
+      "cnf_generator": "python-sat 1.9.dev2",
+      "cube_solver_options": [
+        "--unsat",
+        "-q",
+        "-P2"
+      ],
+      "proof_checker": "drat-trim + lrat-check",
+      "proof_converter": "drat-trim",
+      "proof_projection": "lrat-check DRAT output",
+      "proof_tools_commit": "2e3b2dc0ecf938addbd779d42877b6ed69d9a985",
+      "solver": "CaDiCaL 3.0.0",
+      "solver_commit": "7b99c07f0bcab5824a5a3ce62c7066554017f641"
+    },
+    "vipr": {
+      "proof_checker": "viprchk",
+      "scip_archive_sha256": "ddbb7129bdb83f8f70ed26391d206fd1658139e44c7c7fd7d73a1e4cefbca94f",
+      "solver": "SCIP 10.0.3 exact mode",
+      "solver_git_hash": "d409edf9f6",
+      "vipr_source_commit": "30f2951d1e90e47afa821bdd1b12b82246656c42",
+      "vipr_source_sha256": "7d20cd04ba11488fbc8ed3fbabfdfa513e161a0c36b75220927f55051614ed2f"
+    }
+  }
+}

@@ -44,7 +44,13 @@ ones, contradicting $Z(11,18,3,3)=101$. Thus $Z(11,19,3,3)\le106$.
 
 - Case certificate: [`certificates/z11_19_106.json`](../certificates/z11_19_106.json)
 - Excluded-target models: [`cells_11x19_exact_107.cnf`](../models/cells_11x19_exact_107.cnf) and [`column_types_11x19_exact_107.lp`](../models/column_types_11x19_exact_107.lp)
-- Lean arithmetic: `z11_19_deletion_bound` and `z11_19_excluded_target` in [`ArithmeticKernels.lean`](../lean/ZarankiewiczFiniteClosures/ArithmeticKernels.lean)
+- End-to-end conditional Lean closure: [`DeletionClosures.lean`](../lean/Zarankiewicz/Exact/DeletionClosures.lean)
+- Legacy arithmetic cross-check: `z11_19_deletion_bound` and `z11_19_excluded_target` in [`ArithmeticKernels.lean`](../lean/ZarankiewiczFiniteClosures/ArithmeticKernels.lean)
 - Independent direct scan: [`verify_extended_witnesses_independent.py`](../scripts/verify_extended_witnesses_independent.py)
 
-The Lean layer checks the quotient and excluded-target arithmetic. It does not formalize the deletion lemma or parse the witness CSV.
+Lean now checks an equivalent embedded bitmask witness and proves the complete
+column-deletion implication in
+[`DeletionClosures.lean`](../lean/Zarankiewicz/Exact/DeletionClosures.lean).
+The exact theorem deliberately retains $Z(11,18,3,3)\le101$ as a parameter,
+because that historical input was established by SAT classification and no
+certificate is imported into Lean.

@@ -1,48 +1,19 @@
 {
-  "candidates": [
-    {
-      "current_interval": [
-        112,
-        114
-      ],
-      "missing_evidence": "A complete replayable refutation of all 13 surviving profiles at 113 ones.",
-      "proposed_value": 112,
-      "proven_evidence": [
-        "A checked 112-one K_3,3-free witness.",
-        "An exhaustive arithmetic classification of 25 profiles at 113 ones.",
-        "Arithmetic contradictions for 12 profiles.",
-        "The safe deletion upper bound floor(10*103/9)=114."
-      ],
-      "status": "UPPER_BOUND_NOT_YET_CERTIFIED",
-      "target": "Z(10,23,3,3)"
-    },
-    {
-      "current_interval": [
-        123,
-        125
-      ],
-      "missing_evidence": "The upper bound 123 is conditional on completing the Z(10,23)<=112 certificate.",
-      "proposed_value": 123,
-      "proven_evidence": [
-        "A checked 123-one K_3,3-free witness.",
-        "The current literature/deletion upper bound 125."
-      ],
-      "status": "UPPER_BOUND_NOT_YET_CERTIFIED",
-      "target": "Z(11,23,3,3)"
-    }
-  ],
+  "candidates": [],
   "established_exact_values": [
     "Z(9,23,3,3)=103",
     "Z(10,21,3,3)=106",
     "Z(10,22,3,3)=110",
+    "Z(10,23,3,3)=112",
     "Z(11,19,3,3)=106",
     "Z(11,20,3,3)=111",
+    "Z(11,23,3,3)=123",
     "Z(12,23,3,3)=134"
   ],
   "established_upper_bounds": [
     "Z(13,23,3,3)<=144"
   ],
-  "publication_policy": "Only entries listed under established_exact_values or established_upper_bounds are theorem claims. Candidate witnesses, models, partial traces, and arithmetic reductions are retained as research artifacts but do not certify the proposed equalities.",
+  "publication_policy": "All eight entries under established_exact_values have checked lower-bound witnesses and case-specific upper-bound certificates. The Z(10,23) upper bound is computer-assisted and depends on replayable DRAT/LRAT and exact SCIP/VIPR proof families; it is not a certificate-free Lean theorem. Z(11,23) then follows by minimum-row deletion.",
   "schema_version": 1,
-  "status_as_of": "2026-07-13"
+  "status_as_of": "2026-07-14"
 }

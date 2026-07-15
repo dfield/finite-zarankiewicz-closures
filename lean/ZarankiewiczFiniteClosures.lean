@@ -1,6 +1,7 @@
 import ZarankiewiczFiniteClosures.ArithmeticKernels
+import Zarankiewicz
 
 /-!
-The formally checked arithmetic kernels for exact values, candidates, and the frontier bound.
+The legacy arithmetic kernels plus the end-to-end Zarankiewicz proof library.
 See `lean/README.md` for the exact formalization boundary.
 -/

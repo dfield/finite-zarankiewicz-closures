@@ -1,0 +1,55 @@
+{
+  "archive": {
+    "format": "deterministic POSIX.1-1988 ustar",
+    "gid": 0,
+    "member_compression": "xz",
+    "member_name_pattern": "proofs/leaf-%06d.vipr.xz",
+    "mode": "0444",
+    "mtime": 0,
+    "uid": 0
+  },
+  "bytes": 7914383360,
+  "certificate_bytes": 7914211500,
+  "cover_manifest": {
+    "bytes": 729399,
+    "file": "profile-b-vipr-final-manifest.json",
+    "sha256": "3c46aa06a9f7a33ef42e5328e738f4ecfdcb26f60603b1a85ad01145cbc500af"
+  },
+  "format": "TAR+VIPR+xz-members+github-release-parts",
+  "member_count": 209,
+  "parts": [
+    {
+      "bytes": 1800000000,
+      "name": "3d1_4d4_5d14_6d4.vipr-certificates.tar.part-00",
+      "sha256": "fa79eda9808dfd947ec735013a2aa4997d944149ec81680b73a8a538b5ffa134"
+    },
+    {
+      "bytes": 1800000000,
+      "name": "3d1_4d4_5d14_6d4.vipr-certificates.tar.part-01",
+      "sha256": "115066d2079c58f7878b966f2ebd356dc8465975bffc65f99ebb723905aaff53"
+    },
+    {
+      "bytes": 1800000000,
+      "name": "3d1_4d4_5d14_6d4.vipr-certificates.tar.part-02",
+      "sha256": "a8571dc98114d432219ce950d9d40738ac6761cd2c289f6e60dd9c6ca6fc42a3"
+    },
+    {
+      "bytes": 1800000000,
+      "name": "3d1_4d4_5d14_6d4.vipr-certificates.tar.part-03",
+      "sha256": "354efd90e7ff545e03d94111b9ecfc16067fc64ae920a5daabc675b3e0a011b5"
+    },
+    {
+      "bytes": 714383360,
+      "name": "3d1_4d4_5d14_6d4.vipr-certificates.tar.part-04",
+      "sha256": "4e9a6f3d34f501fdb7306541a2d89b3ce8d25e0cfe71148b08683bff72119335"
+    }
+  ],
+  "profile": "3x1,4x4,5x14,6x4",
+  "release": {
+    "repository": "dfield/finite-zarankiewicz-closures",
+    "tag": "z10-23-certificate-v1"
+  },
+  "schema_version": 1,
+  "sha256": "70f2136cfdb95eb89f15050eab270ed82546267270c23f006a6f1706702eb89c",
+  "slug": "3d1_4d4_5d14_6d4"
+}

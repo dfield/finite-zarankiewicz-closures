@@ -2,13 +2,14 @@
 
 ## Scope and search date
 
-This review records the literature relevant to six exact finite values and two active candidates studied in this repository. The established values are
+This review records the literature relevant to the eight exact finite values studied in this repository:
 
 $$
 \begin{aligned}
 Z(9,23,3,3)&=103, & Z(10,21,3,3)&=106,\\
-Z(10,22,3,3)&=110, & Z(11,19,3,3)&=106,\\
-Z(11,20,3,3)&=111, & Z(12,23,3,3)&=134.
+Z(10,22,3,3)&=110, & Z(10,23,3,3)&=112,\\
+Z(11,19,3,3)&=106, & Z(11,20,3,3)&=111,\\
+Z(11,23,3,3)&=123, & Z(12,23,3,3)&=134.
 \end{aligned}
 $$
 
@@ -18,9 +19,9 @@ $$
 103\le Z(9,23,3,3)\le104,
 $$
 
-and separately records the source intervals and neighboring values used for the other cases. The proposed values $Z(10,23)=112$ and $Z(11,23)=123$ remain candidates because their upper-bound certificate chain is incomplete. The Zarankiewicz literature is much larger than these eight finite problems, so the discussion of general asymptotic theory and geometric variants is necessarily selective. Füredi and Simonovits's historical survey is a suitable entry point for that broader literature [FS13].
+and separately records the source intervals and neighboring values used for the other cases. The $Z(10,23)=112$ certificate family was completed on **2026-07-14**, after the dated literature searches; $Z(11,23)=123$ then follows by deletion. The Zarankiewicz literature is much larger than these eight finite problems, so the discussion of general asymptotic theory and geometric variants is necessarily selective. Füredi and Simonovits's historical survey is a suitable entry point for that broader literature [FS13].
 
-The search covered exact-title, exact-parameter, author, DOI, arXiv, and citation-forward queries. Variants of all eight parameter pairs were checked, as were later references to Tan [Tan22], Davies--Gill--Horsley [DGH26], and Bhan--Nobili--Langer [BNL26]. No public source located by those searches identified the six established values as exact before the corresponding repository work. That statement is deliberately dated: it cannot rule out unpublished work, an unindexed source, or a later revision.
+The search covered exact-title, exact-parameter, author, DOI, arXiv, and citation-forward queries. Variants of all eight parameter pairs were checked, as were later references to Tan [Tan22], Davies--Gill--Horsley [DGH26], and Bhan--Nobili--Langer [BNL26]. No public source located by those searches identified the eight values as exact before the corresponding repository work. That statement is deliberately dated: it cannot rule out unpublished work, an unindexed source, or a later revision.
 
 ## 1. The problem in context
 
@@ -41,7 +42,7 @@ The general theory has several strands:
 - **Asymptotic estimates.** The orders of magnitude and leading constants remain subtle even when one or both part sizes grow. Nikiforov [Nik10], Conlon [Con21], and the survey of Füredi--Simonovits [FS13] place the finite questions within this wider program.
 - **Exact finite computation.** Integer programming, canonical generation, and SAT can close small cases that are beyond a single coarse counting inequality. Irving [Irv78], Goddard--Henning--Oellermann [GHO00], Collins--Riasanovsky--Wallace--Radziszowski [CRWR16], and Tan [Tan22] are important points in this line.
 
-The marked-row proof in this repository belongs to the first and fourth strands: a computation-discovered degree pattern is distilled into an elementary counting and congruence argument, while independent programs check the construction and the finite arithmetic. The other established closures use vertex deletion and finite computer-assisted deficit enumerations. The $(10,23)$ candidate is the subject of an unfinished proof-producing SAT certification effort.
+The marked-row proof in this repository belongs to the first and fourth strands: a computation-discovered degree pattern is distilled into an elementary counting and congruence argument, while independent programs check the construction and finite arithmetic. Other closures use vertex deletion and finite deficit enumerations. The $(10,23)$ case uses a completed proof-producing computation with DRAT/LRAT and exact SCIP/VIPR certificates.
 
 ## 2. Roman's degree bound and why 104 appeared
 
@@ -98,23 +99,25 @@ The construction in this repository independently certifies the same lower bound
 
 ## 6. Review of the other closures and remaining finite table
 
-Figure 2 of Bhan--Nobili--Langer contains 44 cells that were open at the paper's stated literature boundary. The paper closes three. This repository establishes six more exact values: the marked-row argument handles $(9,23)$, and the extension documents establish
+Figure 2 of Bhan--Nobili--Langer contains 44 cells that were open at the paper's stated literature boundary. The paper closes three. This repository establishes eight exact values: the marked-row argument handles $(9,23)$, and the extension documents establish
 
 $$
 Z(10,21,3,3)=106,
 \qquad Z(10,22,3,3)=110,
+\qquad Z(10,23,3,3)=112,
 $$
 
 $$
 Z(11,19,3,3)=106,
 \qquad Z(11,20,3,3)=111,
+\qquad Z(11,23,3,3)=123,
 $$
 
 $$
 Z(12,23,3,3)=134.
 $$
 
-Three of the six values use a classical minimum-degree deletion step, directly or in a chain; the remaining values use marked-row or finite degree-profile deficit arguments. The checked matrices prove $Z(10,23)\ge112$ and $Z(11,23)\ge123$, but the first still needs complete replayable propositional certificates and the second depends on that upper bound. Counting only exact results, 9 of the original 44 cells are settled and **35 remain open**.
+Four of the eight values use a classical minimum-degree deletion step, directly or in a chain. Three use marked-row or finite degree-profile deficit arguments. The eighth, $Z(10,23)=112$, combines twelve arithmetic profile eliminations with complete replayable certificates for the remaining thirteen profiles. Counting exact results, 11 of the original 44 cells are settled and **33 remain open**.
 
 The original four-result status was checked against the paper's rendered Figure 2 with a cutoff of **2026-07-04**; the four later parameters were checked again on **2026-07-06**. The searches located no later arXiv source containing those closures, but this negative literature finding remains provisional.
 
@@ -154,11 +157,11 @@ The eight source intervals and present publication status are:
 |---|---:|---|---:|
 | $Z(9,23,3,3)$ | $103\text{--}104$ | Marked-row deficit argument | 103 |
 | $Z(10,21,3,3)$ | $106\text{--}108$ | Vertex deletion from $Z(9,21,3,3)=96$ | 106 |
-| $Z(10,22,3,3)$ | $110\text{--}111$ | Computer-assisted pair-deficit enumeration | 110 |
-| $Z(10,23,3,3)$ | $112\text{--}115$ | checked witness, arithmetic reduction, safe deletion bound | **candidate; 112--114** |
+| $Z(10,22,3,3)$ | $110\text{--}111$ | Pure-Lean pair-deficit and incidence argument | 110 |
+| $Z(10,23,3,3)$ | $112\text{--}115$ | checked witness; arithmetic reduction; complete DRAT/LRAT and exact SCIP/VIPR certificate family | 112 |
 | $Z(11,19,3,3)$ | $102\text{--}108$ | Vertex deletion plus a new checked witness | 106 |
 | $Z(11,20,3,3)$ | $111\text{--}112$ | Two vertex-deletion steps from $Z(11,18,3,3)=101$ | 111 |
-| $Z(11,23,3,3)$ | $118\text{--}125$ | checked witness; upper bound 123 is conditional on the $(10,23)$ candidate | **candidate; 123--125** |
+| $Z(11,23,3,3)$ | $118\text{--}125$ | checked witness; minimum-row deletion from the certified $(10,23)$ value | 123 |
 | $Z(12,23,3,3)$ | $125\text{--}136$ | Two-stage row/pair-deficit certificate | 134 |
 
 ## 9. Reproducibility of the literature claims

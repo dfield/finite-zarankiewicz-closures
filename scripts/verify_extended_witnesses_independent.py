@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Standalone checker for five exact and two candidate matrix witnesses."""
+"""Standalone checker for seven extended exact-value matrix witnesses."""
 
 from __future__ import annotations
 

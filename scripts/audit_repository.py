@@ -14,6 +14,7 @@ import hashlib
 import itertools
 import json
 import math
+import os
 import re
 import subprocess
 import sys
@@ -21,6 +22,7 @@ from pathlib import Path
 from typing import Iterator
 
 ROOT = Path(__file__).resolve().parents[1]
+EXCLUDED_TREE_NAMES = frozenset({".git", ".lake", "__pycache__", ".venv"})
 sys.path.insert(0, str(ROOT / "src"))
 
 from finite_zarankiewicz_closures.certificate import verify_certificate  # noqa: E402
@@ -73,8 +75,17 @@ EXPECTED_FILES = (
     "certificates/z9_23_103.json",
     "certificates/z10_21_106.json",
     "certificates/z10_22_110.json",
+    "certificates/z10_23_112.json",
+    "certificates/z10_23_sat.json",
+    "certificates/z10_23/vipr/profile-b-vipr-final-manifest.json",
+    "certificates/z10_23/vipr/profile-c-vipr-final-manifest.json",
+    "certificates/z10_23/vipr/profile-b-deficit-orbits.jsonl",
+    "certificates/z10_23/vipr/profile-c-degree6-orbits.jsonl",
+    "certificates/z10_23/vipr/3d1_4d4_5d14_6d4.vipr-certificates.release.json",
+    "certificates/z10_23/vipr/3d1_4d3_5d16_6d3.vipr-certificates.release.json",
     "certificates/z11_19_106.json",
     "certificates/z11_20_111.json",
+    "certificates/z11_23_123.json",
     "certificates/z12_23_134.json",
     "certificates/z13_23_upper_144.json",
     "models/cells_9x23_exact_104.cnf",
@@ -105,15 +116,20 @@ EXPECTED_FILES = (
 )
 
 
-def repository_files() -> Iterator[Path]:
-    """Yield ordinary files while excluding VCS and build caches."""
+def repository_paths() -> Iterator[Path]:
+    """Yield publishable paths without descending into VCS or build caches."""
 
-    excluded = {".git", ".lake", "__pycache__", ".venv"}
-    for path in ROOT.rglob("*"):
-        if any(part in excluded for part in path.relative_to(ROOT).parts):
-            continue
-        if path.is_file():
-            yield path
+    for directory, names, files in os.walk(ROOT, followlinks=False):
+        names[:] = [name for name in names if name not in EXCLUDED_TREE_NAMES]
+        base = Path(directory)
+        yield from (base / name for name in names)
+        yield from (base / name for name in files)
+
+
+def repository_files() -> Iterator[Path]:
+    """Yield ordinary publishable files."""
+
+    yield from (path for path in repository_paths() if path.is_file())
 
 
 def sha256(path: Path) -> str:
@@ -138,7 +154,11 @@ def check_required_files() -> dict[str, object]:
 def check_no_path_leaks_or_symlinks() -> dict[str, object]:
     """Reject private-workspace markers, absolute user paths, and symlinks."""
 
-    symlinks = [path.relative_to(ROOT).as_posix() for path in ROOT.rglob("*") if path.is_symlink()]
+    symlinks = [
+        path.relative_to(ROOT).as_posix()
+        for path in repository_paths()
+        if path.is_symlink()
+    ]
     if symlinks:
         raise AssertionError(f"symlinks are not permitted: {symlinks}")
     oversized = [
@@ -402,13 +422,7 @@ def check_json_and_recorded_reports() -> dict[str, object]:
         status.get("established_exact_values", [])
     ) != expected_exact:
         raise AssertionError("result-status exact theorem boundary is inconsistent")
-    candidate_targets = {
-        item.get("target") for item in status.get("candidates", [])
-    }
-    if candidate_targets != {"Z(10,23,3,3)", "Z(11,23,3,3)"} or any(
-        item.get("status") != "UPPER_BOUND_NOT_YET_CERTIFIED"
-        for item in status.get("candidates", [])
-    ):
+    if status.get("candidates") != []:
         raise AssertionError("result-status candidate boundary is inconsistent")
     return {"json_files_parsed": parsed, "verified_recorded_reports": 2}
 
@@ -462,7 +476,7 @@ def check_mathematical_artifacts() -> dict[str, object]:
     )
     verify_z13_23_upper_certificate(stored_z13_certificate)
     frontier = extended_frontier_report()
-    if frontier["source_open_cases"] != 44 or frontier["remaining_open_cases"] != 35:
+    if frontier["source_open_cases"] != 44 or frontier["remaining_open_cases"] != 33:
         raise AssertionError("extended frontier count mismatch")
     case_certificate_reports = []
     for case in CASE_SPECS:
